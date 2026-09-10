@@ -1,8 +1,6 @@
 RENCANA PENGEMBANGAN semua website dan aplikasi didalam sso.
 
-1. saya ingin agar maintenance semua website dan aplikasi bisa dihandel dari sso. baik itu updating perubahan dan downgrading perubahan.
-
-2. bagaimana sistem, alur kerja, integrasi, dan lain lain. untuk mengakomodasi kebutuhan maintenance diatas? apakah menggunakan command git cukup?
+1. buat laman Maintenance & Lifecycle Orchestrator menjadi lebih rapih dan tidak semua menu menumpuk kebawah pada satu laman. kemudian yang bisa dijadikan laman baru/popup modal buatlah.
 
 
 

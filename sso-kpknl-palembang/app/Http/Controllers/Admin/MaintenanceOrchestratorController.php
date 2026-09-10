@@ -13,41 +13,118 @@ use Illuminate\Support\Facades\Storage;
 class MaintenanceOrchestratorController extends Controller
 {
     /**
-     * Display orchestrator dashboard.
+     * Display orchestrator fleet hub.
      */
     public function index(Request $request)
     {
-        $applications = Application::with([
-            'deployments' => fn($q) => $q->latest()->limit(5),
-            'backups' => fn($q) => $q->latest()->limit(5),
-            'releases' => fn($q) => $q->latest()->limit(5),
-        ])->get();
+        $applications = Application::withCount(['deployments', 'backups'])
+            ->with(['deployments' => fn($q) => $q->latest()->limit(1)])
+            ->get();
 
-        $selectedAppId = $request->query('app_id', $applications->first()?->id);
-        $selectedApp = $applications->firstWhere('id', $selectedAppId) ?: $applications->first();
+        $kpis = [
+            'total_apps' => $applications->count(),
+            'online_apps' => $applications->where('maintenance_mode', false)->count(),
+            'maintenance_apps' => $applications->where('maintenance_mode', true)->count(),
+            'total_backups' => ApplicationBackup::count(),
+            'total_deployments' => ApplicationDeployment::count(),
+            'last_deployment' => ApplicationDeployment::with('application')->latest()->first(),
+        ];
 
-        // Fetch commits for selected app if exists
-        $recentCommits = $selectedApp ? MaintenanceOrchestratorService::getCommitHistory($selectedApp, 10) : [];
-
-        // Historical deployments
+        // Recent 5 deployments for hub summary
         $recentDeployments = ApplicationDeployment::with('application', 'deployer')
             ->latest()
-            ->paginate(10);
+            ->limit(5)
+            ->get();
 
-        // Recent backups
+        // Recent 5 backups for hub summary
         $recentBackups = ApplicationBackup::with('application', 'creator')
             ->latest()
-            ->paginate(10);
+            ->limit(5)
+            ->get();
 
         $gitRemoteUrl = 'https://github.com/dalifajr/kpknl.git';
 
         return view('admin.maintenance.index', compact(
             'applications',
-            'selectedApp',
-            'recentCommits',
+            'kpis',
             'recentDeployments',
             'recentBackups',
             'gitRemoteUrl'
+        ));
+    }
+
+    /**
+     * Dedicated Application Workspace / Console.
+     */
+    public function appConsole(Application $application)
+    {
+        $application->load([
+            'deployments' => fn($q) => $q->with('deployer', 'backup')->latest()->limit(10),
+            'backups' => fn($q) => $q->with('creator')->latest()->limit(10),
+            'releases' => fn($q) => $q->latest()->limit(10),
+        ]);
+
+        $recentCommits = MaintenanceOrchestratorService::getCommitHistory($application, 15);
+        $gitRemoteUrl = 'https://github.com/dalifajr/kpknl.git';
+
+        return view('admin.maintenance.app_console', compact(
+            'application',
+            'recentCommits',
+            'gitRemoteUrl'
+        ));
+    }
+
+    /**
+     * Dedicated Global Deployments Audit Trail Page.
+     */
+    public function deployments(Request $request)
+    {
+        $applications = Application::all(['id', 'name', 'slug']);
+        
+        $query = ApplicationDeployment::with('application', 'deployer', 'backup')->latest();
+
+        if ($request->filled('app_id')) {
+            $query->where('application_id', $request->input('app_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('type')) {
+            $query->where('deployment_type', $request->input('type'));
+        }
+
+        $deployments = $query->paginate(15)->withQueryString();
+
+        return view('admin.maintenance.deployments', compact(
+            'deployments',
+            'applications'
+        ));
+    }
+
+    /**
+     * Dedicated Global Database Snapshots Vault Page.
+     */
+    public function backups(Request $request)
+    {
+        $applications = Application::all(['id', 'name', 'slug', 'database_name']);
+
+        $query = ApplicationBackup::with('application', 'creator')->latest();
+
+        if ($request->filled('app_id')) {
+            $query->where('application_id', $request->input('app_id'));
+        }
+
+        if ($request->filled('type')) {
+            $query->where('backup_type', $request->input('type'));
+        }
+
+        $backups = $query->paginate(15)->withQueryString();
+
+        return view('admin.maintenance.backups', compact(
+            'backups',
+            'applications'
         ));
     }
 

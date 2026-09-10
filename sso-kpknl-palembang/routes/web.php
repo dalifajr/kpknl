@@ -87,6 +87,9 @@ Route::middleware(['auth'])->group(function () {
         // Centralized Maintenance & Lifecycle Orchestrator
         Route::prefix('maintenance-orchestrator')->name('maintenance.')->group(function () {
             Route::get('/', [MaintenanceOrchestratorController::class, 'index'])->name('index');
+            Route::get('/apps/{application}', [MaintenanceOrchestratorController::class, 'appConsole'])->name('app-console');
+            Route::get('/deployments', [MaintenanceOrchestratorController::class, 'deployments'])->name('deployments');
+            Route::get('/backups', [MaintenanceOrchestratorController::class, 'backups'])->name('backups');
             Route::post('/fetch-git', [MaintenanceOrchestratorController::class, 'fetchGit'])->name('fetch-git');
             Route::get('/commits/{application}', [MaintenanceOrchestratorController::class, 'getGitCommits'])->name('commits');
             Route::post('/deploy/{application}', [MaintenanceOrchestratorController::class, 'deploy'])->name('deploy');
