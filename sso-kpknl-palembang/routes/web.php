@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ApplicationController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\MaintenanceOrchestratorController;
 use App\Http\Controllers\User\LoginSessionController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\NotificationController;
@@ -82,6 +83,21 @@ Route::middleware(['auth'])->group(function () {
         // Maintenance Mode Settings
         Route::get('settings/maintenance', [SettingController::class, 'editMaintenance'])->name('settings.maintenance.edit');
         Route::post('settings/maintenance', [SettingController::class, 'updateMaintenance'])->name('settings.maintenance.update');
+
+        // Centralized Maintenance & Lifecycle Orchestrator
+        Route::prefix('maintenance-orchestrator')->name('maintenance.')->group(function () {
+            Route::get('/', [MaintenanceOrchestratorController::class, 'index'])->name('index');
+            Route::post('/fetch-git', [MaintenanceOrchestratorController::class, 'fetchGit'])->name('fetch-git');
+            Route::get('/commits/{application}', [MaintenanceOrchestratorController::class, 'getGitCommits'])->name('commits');
+            Route::post('/deploy/{application}', [MaintenanceOrchestratorController::class, 'deploy'])->name('deploy');
+            Route::post('/rollback/{application}', [MaintenanceOrchestratorController::class, 'rollback'])->name('rollback');
+            Route::post('/toggle-maintenance/{application}', [MaintenanceOrchestratorController::class, 'toggleMaintenance'])->name('toggle');
+            Route::post('/backup/{application}', [MaintenanceOrchestratorController::class, 'createBackup'])->name('backup');
+            Route::post('/restore-backup/{backup}', [MaintenanceOrchestratorController::class, 'restoreBackup'])->name('restore-backup');
+            Route::get('/download-backup/{backup}', [MaintenanceOrchestratorController::class, 'downloadBackup'])->name('download-backup');
+            Route::get('/logs/{deployment}', [MaintenanceOrchestratorController::class, 'getDeploymentLog'])->name('logs');
+            Route::get('/health/{application}', [MaintenanceOrchestratorController::class, 'checkHealth'])->name('health');
+        });
     });
 });
 

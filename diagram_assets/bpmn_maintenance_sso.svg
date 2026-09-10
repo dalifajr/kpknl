@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 900" width="100%" height="100%" style="background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0c306b" flood-opacity="0.08"/>
+    </filter>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0c306b"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+
+  <!-- Title Banner -->
+  <rect x="30" y="20" width="1240" height="65" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="650" y="48" text-anchor="middle" fill="#ffffff" font-size="19" font-weight="700">BUSINESS PROCESS MODEL AND NOTATION (BPMN 2.0)</text>
+  <text x="650" y="70" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="500">ALUR KERJA PEMELIHARAAN, UPDATING &amp; DOWNGRADING MULTI-APLIKASI DARI SSO KPKNL PALEMBANG</text>
+
+  <!-- POOL CONTAINER -->
+  <rect x="30" y="105" width="1240" height="730" rx="8" fill="#ffffff" stroke="#0c306b" stroke-width="2" filter="url(#shadow)"/>
+
+  <!-- SWIMLANE 1: SUPERADMIN SSO -->
+  <rect x="30" y="105" width="50" height="150" fill="#eff6ff" stroke="#cbd5e1"/>
+  <text x="55" y="180" transform="rotate(-90 55 180)" text-anchor="middle" fill="#0c306b" font-size="12" font-weight="700">SUPERADMIN SSO</text>
+  <rect x="80" y="105" width="1190" height="150" fill="#f8fafc" stroke="#e2e8f0"/>
+
+  <!-- SWIMLANE 2: SSO ORCHESTRATOR ENGINE -->
+  <rect x="30" y="255" width="50" height="150" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="55" y="330" transform="rotate(-90 55 330)" text-anchor="middle" fill="#334155" font-size="12" font-weight="700">SSO ORCHESTRATOR</text>
+  <rect x="80" y="255" width="1190" height="150" fill="#ffffff" stroke="#e2e8f0"/>
+
+  <!-- SWIMLANE 3: PIPELINE EXECUTION WORKER -->
+  <rect x="30" y="405" width="50" height="170" fill="#fef3c7" stroke="#cbd5e1"/>
+  <text x="55" y="490" transform="rotate(-90 55 490)" text-anchor="middle" fill="#b45309" font-size="12" font-weight="700">PIPELINE WORKER</text>
+  <rect x="80" y="405" width="1190" height="170" fill="#fffbeb" stroke="#e2e8f0"/>
+
+  <!-- SWIMLANE 4: CLIENT APPLICATION -->
+  <rect x="30" y="575" width="50" height="140" fill="#f0fdf4" stroke="#cbd5e1"/>
+  <text x="55" y="645" transform="rotate(-90 55 645)" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700">TARGET APP</text>
+  <rect x="80" y="575" width="1190" height="140" fill="#ffffff" stroke="#e2e8f0"/>
+
+  <!-- SWIMLANE 5: DATABASE & BACKUP REPO -->
+  <rect x="30" y="715" width="50" height="120" fill="#f5f3ff" stroke="#cbd5e1"/>
+  <text x="55" y="775" transform="rotate(-90 55 775)" text-anchor="middle" fill="#6d28d9" font-size="12" font-weight="700">DATABASE &amp; SNAPSHOT</text>
+  <rect x="80" y="715" width="1190" height="120" fill="#faf5ff" stroke="#e2e8f0"/>
+
+  <!-- PROCESS NODES -->
+
+  <!-- START EVENT (Green Circle) -->
+  <circle cx="120" cy="175" r="16" fill="#22c55e" stroke="#16a34a" stroke-width="2"/>
+  <text x="120" y="208" text-anchor="middle" fill="#166534" font-size="10" font-weight="600">Pilih Aksi</text>
+
+  <!-- TASK 1: Pilih Aplikasi & Versi Target (Lane 1) -->
+  <rect x="160" y="145" width="130" height="60" rx="8" fill="#ffffff" stroke="#0c306b" stroke-width="1.5"/>
+  <text x="225" y="170" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="600">1. Pilih Aplikasi &amp;</text>
+  <text x="225" y="186" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="600">Target Versi (Tag)</text>
+
+  <!-- TASK 2: Input Sudo Password (Lane 1) -->
+  <rect x="320" y="145" width="120" height="60" rx="8" fill="#ffffff" stroke="#0c306b" stroke-width="1.5"/>
+  <text x="380" y="170" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="600">2. Input Sudo</text>
+  <text x="380" y="186" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="600">Password Konfirmasi</text>
+
+  <!-- TASK 3: Preflight Validation (Lane 2) -->
+  <rect x="320" y="295" width="120" height="60" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="380" y="320" text-anchor="middle" fill="#1e40af" font-size="11" font-weight="600">3. Validasi Hak &amp;</text>
+  <text x="380" y="336" text-anchor="middle" fill="#1e40af" font-size="11" font-weight="600">Preflight Check</text>
+
+  <!-- TASK 4: Trigger Auto-Snapshot DB (Lane 3 -> Lane 5) -->
+  <rect x="470" y="445" width="120" height="60" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+  <text x="530" y="470" text-anchor="middle" fill="#92400e" font-size="11" font-weight="600">4. Eksekusi Snapshot</text>
+  <text x="530" y="486" text-anchor="middle" fill="#92400e" font-size="11" font-weight="600">mysqldump &amp; Files</text>
+
+  <!-- TASK 5: Set Maintenance Mode DOWN (Lane 4) -->
+  <rect x="620" y="605" width="130" height="60" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="685" y="630" text-anchor="middle" fill="#991b1b" font-size="11" font-weight="600">5. artisan down</text>
+  <text x="685" y="646" text-anchor="middle" fill="#991b1b" font-size="10">--secret bypass key</text>
+
+  <!-- TASK 6: Git Checkout / Sparse Pull (Lane 3) -->
+  <rect x="620" y="445" width="130" height="60" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+  <text x="685" y="470" text-anchor="middle" fill="#92400e" font-size="11" font-weight="600">6. Sinkronisasi Kode</text>
+  <text x="685" y="486" text-anchor="middle" fill="#92400e" font-size="10">Git Tag / Specific Path</text>
+
+  <!-- TASK 7: Composer & Migration Run (Lane 4) -->
+  <rect x="780" y="605" width="130" height="60" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="845" y="630" text-anchor="middle" fill="#166534" font-size="11" font-weight="600">7. composer &amp;</text>
+  <text x="845" y="646" text-anchor="middle" fill="#166534" font-size="11" font-weight="600">artisan migrate --force</text>
+
+  <!-- GATEWAY: Decision Diamond (Lane 3) -->
+  <polygon points="845,445 875,475 845,505 815,475" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+  <text x="845" y="479" text-anchor="middle" fill="#854d0e" font-size="11" font-weight="700">Sukses?</text>
+
+  <!-- SUCCESS PATH: Clear Cache & artisan UP (Lane 4) -->
+  <rect x="940" y="605" width="130" height="60" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="1005" y="630" text-anchor="middle" fill="#166534" font-size="11" font-weight="600">8. artisan optimize &amp;</text>
+  <text x="1005" y="646" text-anchor="middle" fill="#166534" font-size="11" font-weight="600">artisan up (Aktif)</text>
+
+  <!-- FAILURE / ROLLBACK PATH: Rollback DB & Git (Lane 3 -> Lane 5) -->
+  <rect x="940" y="445" width="130" height="60" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="1005" y="470" text-anchor="middle" fill="#991b1b" font-size="11" font-weight="600">Rollback Otomatis:</text>
+  <text x="1005" y="486" text-anchor="middle" fill="#991b1b" font-size="10">Restore DB &amp; Commit</text>
+
+  <!-- TASK 9: Record Audit & Finish (Lane 2) -->
+  <rect x="1100" y="295" width="120" height="60" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="1160" y="320" text-anchor="middle" fill="#1e40af" font-size="11" font-weight="600">9. Simpan Log &amp;</text>
+  <text x="1160" y="336" text-anchor="middle" fill="#1e40af" font-size="11" font-weight="600">Notifikasi Superadmin</text>
+
+  <!-- END EVENT (Red/Green Double Circle) -->
+  <circle cx="1160" cy="175" r="16" fill="#ffffff" stroke="#0c306b" stroke-width="3"/>
+  <circle cx="1160" cy="175" r="11" fill="#22c55e"/>
+  <text x="1160" y="208" text-anchor="middle" fill="#0c306b" font-size="10" font-weight="600">Selesai</text>
+
+  <!-- CONNECTING ARROWS -->
+  <!-- Start -> Task 1 -->
+  <line x1="136" y1="175" x2="160" y2="175" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 1 -> Task 2 -->
+  <line x1="290" y1="175" x2="320" y2="175" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 2 -> Task 3 (Vertical Down) -->
+  <line x1="380" y1="205" x2="380" y2="295" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 3 -> Task 4 (Down Right) -->
+  <path d="M 440 325 L 490 325 L 490 445" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 4 -> DB Snapshot (Lane 5) -->
+  <path d="M 530 505 L 530 740" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="3" marker-end="url(#arrow)"/>
+  <text x="540" y="730" fill="#d97706" font-size="9" font-weight="600">Simpan .sql snapshot</text>
+
+  <!-- Task 4 -> Task 5 (Lane 4) -->
+  <path d="M 590 475 L 610 475 L 610 635 L 620 635" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 5 -> Task 6 -->
+  <line x1="685" y1="605" x2="685" y2="505" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 6 -> Task 7 -->
+  <path d="M 750 475 L 765 475 L 765 635 L 780 635" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 7 -> Gateway -->
+  <line x1="845" y1="605" x2="845" y2="505" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Gateway -> Success (Yes) -> Task 8 -->
+  <path d="M 875 475 L 900 475 L 900 635 L 940 635" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <text x="910" y="555" fill="#16a34a" font-size="10" font-weight="700">[Ya]</text>
+
+  <!-- Gateway -> Fail (No) -> Rollback -->
+  <line x1="875" y1="475" x2="940" y2="475" stroke="#dc2626" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <text x="895" y="465" fill="#dc2626" font-size="10" font-weight="700">[Gagal]</text>
+
+  <!-- Rollback -> DB Restore -->
+  <path d="M 1005 505 L 1005 740 L 590 740" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3" marker-end="url(#arrowRed)"/>
+  <text x="890" y="730" fill="#dc2626" font-size="9" font-weight="600">Restore Snapshot DB</text>
+
+  <!-- Rollback -> Task 8 (Bring UP) -->
+  <line x1="1005" y1="505" x2="1005" y2="605" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 8 -> Task 9 (Up to Lane 2) -->
+  <path d="M 1070 635 L 1085 635 L 1085 325 L 1100 325" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Task 9 -> End Event (Lane 1) -->
+  <line x1="1160" y1="295" x2="1160" y2="191" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Footer Info -->
+  <rect x="30" y="845" width="1240" height="40" rx="6" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="50" y="870" fill="#64748b" font-size="11">KPKNL Palembang &bull; Standar Prosedur Operasional (SOP) Digital Deployment &amp; Rollback Terpusat Multi-Aplikasi</text>
+  <text x="1250" y="870" text-anchor="end" fill="#0c306b" font-size="11" font-weight="600">Zero-Downtime &amp; Atomic Rollback Guarantee</text>
+</svg>

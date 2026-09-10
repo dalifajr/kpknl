@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 850" width="100%" height="100%" style="background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0c306b" flood-opacity="0.08"/>
+    </filter>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0c306b"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title Banner -->
+  <rect x="40" y="25" width="1120" height="70" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="600" y="55" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="700" letter-spacing="0.5">USE CASE DIAGRAM — CENTRAL APPLICATION MAINTENANCE</text>
+  <text x="600" y="78" text-anchor="middle" fill="#fcd34d" font-size="13" font-weight="500">SISTEM KENDALI TERPUSAT UPDATING, DOWNGRADING &amp; PEMELIHARAAN APLIKASI DI LINGKUP SSO</text>
+
+  <!-- ACTOR 1: SUPERADMIN SSO (Left) -->
+  <g transform="translate(70, 260)">
+    <circle cx="40" cy="30" r="20" fill="#eff6ff" stroke="#0c306b" stroke-width="2.5"/>
+    <line x1="40" y1="50" x2="40" y2="100" stroke="#0c306b" stroke-width="2.5"/>
+    <line x1="15" y1="70" x2="65" y2="70" stroke="#0c306b" stroke-width="2.5"/>
+    <line x1="40" y1="100" x2="15" y2="150" stroke="#0c306b" stroke-width="2.5"/>
+    <line x1="40" y1="100" x2="65" y2="150" stroke="#0c306b" stroke-width="2.5"/>
+    <rect x="-15" y="165" width="110" height="30" rx="6" fill="#0c306b"/>
+    <text x="40" y="185" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">Superadmin SSO</text>
+  </g>
+
+  <!-- ACTOR 2: DEVOPS / DEVELOPER (Left Bottom) -->
+  <g transform="translate(70, 560)">
+    <circle cx="40" cy="30" r="20" fill="#fef3c7" stroke="#b45309" stroke-width="2.5"/>
+    <line x1="40" y1="50" x2="40" y2="100" stroke="#b45309" stroke-width="2.5"/>
+    <line x1="15" y1="70" x2="65" y2="70" stroke="#b45309" stroke-width="2.5"/>
+    <line x1="40" y1="100" x2="15" y2="150" stroke="#b45309" stroke-width="2.5"/>
+    <line x1="40" y1="100" x2="65" y2="150" stroke="#b45309" stroke-width="2.5"/>
+    <rect x="-15" y="165" width="110" height="30" rx="6" fill="#b45309"/>
+    <text x="40" y="185" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">DevOps / Dev</text>
+  </g>
+
+  <!-- SYSTEM BOUNDARY -->
+  <rect x="230" y="125" width="720" height="645" rx="16" fill="#ffffff" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 4" filter="url(#shadow)"/>
+  <rect x="250" y="140" width="380" height="28" rx="6" fill="#f1f5f9"/>
+  <text x="260" y="159" fill="#334155" font-size="12" font-weight="700">SYSTEM BOUNDARY: SSO Maintenance Control Plane</text>
+
+  <!-- USE CASES (Ovals) -->
+  <!-- UC-01: Monitoring Multi-App Matrix -->
+  <g transform="translate(270, 190)">
+    <ellipse cx="160" cy="28" rx="150" ry="25" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+    <text x="160" y="33" text-anchor="middle" fill="#1e40af" font-size="12" font-weight="600">UC-M01: Monitoring Versi &amp; Healthcheck Aplikasi</text>
+  </g>
+
+  <!-- UC-02: Updating / Deploying -->
+  <g transform="translate(270, 260)">
+    <ellipse cx="160" cy="28" rx="150" ry="25" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+    <text x="160" y="33" text-anchor="middle" fill="#1e3a8a" font-size="12" font-weight="700">UC-M02: Eksekusi Update Aplikasi (Deploy Rilis)</text>
+  </g>
+
+  <!-- UC-03: Downgrading / Rollback -->
+  <g transform="translate(270, 330)">
+    <ellipse cx="160" cy="28" rx="150" ry="25" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+    <text x="160" y="33" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="700">UC-M03: Eksekusi Rollback / Downgrade Versi</text>
+  </g>
+
+  <!-- UC-04: Automated Snapshot / Backup -->
+  <g transform="translate(630, 220)">
+    <ellipse cx="150" cy="28" rx="140" ry="25" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="150" y="33" text-anchor="middle" fill="#b45309" font-size="12" font-weight="600">UC-M04: Snapshot &amp; Backup Otomatis DB</text>
+  </g>
+
+  <!-- UC-05: Maintenance Mode Toggle -->
+  <g transform="translate(270, 400)">
+    <ellipse cx="160" cy="28" rx="150" ry="25" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+    <text x="160" y="33" text-anchor="middle" fill="#854d0e" font-size="12" font-weight="600">UC-M05: Kendali Mode Pemeliharaan (Down/Up)</text>
+  </g>
+
+  <!-- UC-06: Sudo Password Challenge -->
+  <g transform="translate(630, 310)">
+    <ellipse cx="150" cy="28" rx="140" ry="25" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
+    <text x="150" y="33" text-anchor="middle" fill="#334155" font-size="12" font-weight="600">UC-M06: Verifikasi Sudo Password Superadmin</text>
+  </g>
+
+  <!-- UC-07: Real-time Terminal Execution Log -->
+  <g transform="translate(270, 480)">
+    <ellipse cx="160" cy="28" rx="150" ry="25" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/>
+    <text x="160" y="33" text-anchor="middle" fill="#6b21a8" font-size="12" font-weight="600">UC-M07: Pantau Live Terminal Logs Pipeline</text>
+  </g>
+
+  <!-- UC-08: Audit Trail & Notification -->
+  <g transform="translate(630, 450)">
+    <ellipse cx="150" cy="28" rx="140" ry="25" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+    <text x="150" y="33" text-anchor="middle" fill="#065f46" font-size="12" font-weight="600">UC-M08: Rekam Audit Trail &amp; Kirim Notifikasi</text>
+  </g>
+
+  <!-- UC-09: Register / Tag New Release -->
+  <g transform="translate(270, 580)">
+    <ellipse cx="160" cy="28" rx="150" ry="25" fill="#e0e7ff" stroke="#4338ca" stroke-width="2"/>
+    <text x="160" y="33" text-anchor="middle" fill="#312e81" font-size="12" font-weight="600">UC-M09: Daftarkan Versi &amp; Changelog Baru</text>
+  </g>
+
+  <!-- UC-10: Lihat Laman Informasi Pemeliharaan -->
+  <g transform="translate(630, 640)">
+    <ellipse cx="150" cy="28" rx="140" ry="25" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+    <text x="150" y="33" text-anchor="middle" fill="#475569" font-size="12" font-weight="600">UC-M10: Lihat Banner Layanan Dalam Perbaikan</text>
+  </g>
+
+  <!-- ACTOR 3: KEPALA KANTOR / AUDITOR (Right Top) -->
+  <g transform="translate(1030, 260)">
+    <circle cx="40" cy="30" r="20" fill="#f0fdf4" stroke="#059669" stroke-width="2.5"/>
+    <line x1="40" y1="50" x2="40" y2="100" stroke="#059669" stroke-width="2.5"/>
+    <line x1="15" y1="70" x2="65" y2="70" stroke="#059669" stroke-width="2.5"/>
+    <line x1="40" y1="100" x2="15" y2="150" stroke="#059669" stroke-width="2.5"/>
+    <line x1="40" y1="100" x2="65" y2="150" stroke="#059669" stroke-width="2.5"/>
+    <rect x="-15" y="165" width="110" height="30" rx="6" fill="#059669"/>
+    <text x="40" y="185" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">Pimpinan / Kasi</text>
+  </g>
+
+  <!-- ACTOR 4: END USER PEGAWAI (Right Bottom) -->
+  <g transform="translate(1030, 560)">
+    <circle cx="40" cy="30" r="20" fill="#f1f5f9" stroke="#64748b" stroke-width="2.5"/>
+    <line x1="40" y1="50" x2="40" y2="100" stroke="#64748b" stroke-width="2.5"/>
+    <line x1="15" y1="70" x2="65" y2="70" stroke="#64748b" stroke-width="2.5"/>
+    <line x1="40" y1="100" x2="15" y2="150" stroke="#64748b" stroke-width="2.5"/>
+    <line x1="40" y1="100" x2="65" y2="150" stroke="#64748b" stroke-width="2.5"/>
+    <rect x="-15" y="165" width="110" height="30" rx="6" fill="#64748b"/>
+    <text x="40" y="185" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">Pegawai (User)</text>
+  </g>
+
+  <!-- Association Lines -->
+  <!-- Superadmin to UC-M01, M02, M03, M05, M07 -->
+  <line x1="155" y1="320" x2="270" y2="218" stroke="#0c306b" stroke-width="1.5"/>
+  <line x1="155" y1="320" x2="270" y2="288" stroke="#0c306b" stroke-width="2"/>
+  <line x1="155" y1="320" x2="270" y2="358" stroke="#0c306b" stroke-width="2"/>
+  <line x1="155" y1="320" x2="270" y2="428" stroke="#0c306b" stroke-width="1.5"/>
+  <line x1="155" y1="320" x2="270" y2="508" stroke="#0c306b" stroke-width="1.5"/>
+
+  <!-- DevOps to UC-M09, M02, M07 -->
+  <line x1="155" y1="620" x2="270" y2="608" stroke="#b45309" stroke-width="1.5"/>
+  <line x1="155" y1="620" x2="270" y2="288" stroke="#b45309" stroke-width="1.5" stroke-dasharray="3"/>
+
+  <!-- Pimpinan to UC-M01, M08 -->
+  <line x1="1030" y1="320" x2="780" y2="465" stroke="#059669" stroke-width="1.5"/>
+  <line x1="1030" y1="320" x2="570" y2="218" stroke="#059669" stroke-width="1.5"/>
+
+  <!-- Pegawai to UC-M10 -->
+  <line x1="1030" y1="620" x2="910" y2="665" stroke="#64748b" stroke-width="1.5"/>
+
+  <!-- <<include>> and <<extend>> relationships -->
+  <!-- UC-M02 --include--> UC-M04 (Backup) -->
+  <path d="M 570 280 L 640 250" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="615" y="275" fill="#2563eb" font-size="10" font-weight="600">&lt;&lt;include&gt;&gt;</text>
+
+  <!-- UC-M02 --include--> UC-M06 (Sudo) -->
+  <path d="M 570 295 L 640 325" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="615" y="320" fill="#2563eb" font-size="10" font-weight="600">&lt;&lt;include&gt;&gt;</text>
+
+  <!-- UC-M03 --include--> UC-M06 (Sudo) -->
+  <path d="M 570 355 L 640 340" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="605" y="360" fill="#dc2626" font-size="10" font-weight="600">&lt;&lt;include&gt;&gt;</text>
+
+  <!-- UC-M02, M03 --include--> UC-M08 (Audit) -->
+  <path d="M 570 300 L 710 440" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4"/>
+
+  <!-- Footer Info -->
+  <rect x="40" y="785" width="1120" height="45" rx="6" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="60" y="812" fill="#64748b" font-size="12">KPKNL Palembang &bull; Diagram Use Case 4 Aktor Sistem Pemeliharaan Terpusat Multi-Aplikasi SSO</text>
+  <text x="1140" y="812" text-anchor="end" fill="#059669" font-size="12" font-weight="600">&#x2714; ISO/IEC 25010 Standardized</text>
+</svg>
