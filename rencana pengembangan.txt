@@ -1,0 +1,18 @@
+RENCANA PENGEMBANGAN semua website dan aplikasi didalam sso.
+
+1. saya ingin agar maintenance semua website dan aplikasi bisa dihandel dari sso. baik itu updating perubahan dan downgrading perubahan.
+
+2. bagaimana sistem, alur kerja, integrasi, dan lain lain. untuk mengakomodasi kebutuhan maintenance diatas? apakah menggunakan command git cukup?
+
+
+
+==permintaan==
+- lakukan analisa mendalam terlebih dahulu sebelum membuat diagram, untuk mengetahui aktor, relasi dll.
+- jelajahi semua fitur untuk pemahaman yang lebih jelas.
+- jawab melalui dokumen yang bisa saya simpan.
+- berikan syntax diagram yang bisa saya tampilkan di draw.io. atau plantuml. atau mermaid. mana saja yang bisa saya gunakan.
+- setelah itu lanjutkan dengan membuat gambar ERD dan UseCase Diagram dan Diagram BPMN.
+- tidak usah melakukan verifikasi menggunakan browser agent.
+- buatkan walktrough dan perencanaan serta laporan berupa file yang dapat saya baca.
+- lakukan brainstroming dan analisa kritik dan saran agar mendapatkan hasil yang maksimal.
+

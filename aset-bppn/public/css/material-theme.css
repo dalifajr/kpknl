@@ -1,0 +1,130 @@
+:root {
+  /* Material You Light Theme Palette */
+  --md-sys-color-primary: #005ac1;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d8e2ff;
+  --md-sys-color-on-primary-container: #001a41;
+  --md-sys-color-secondary: #535e78;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #d8e2ff;
+  --md-sys-color-on-secondary-container: #0f1b32;
+  --md-sys-color-tertiary: #76517b;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #ffd6f8;
+  --md-sys-color-on-tertiary-container: #2d0e34;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
+  --md-sys-color-background: #fdfbff;
+  --md-sys-color-on-background: #1a1b1e;
+  --md-sys-color-surface: #fdfbff;
+  --md-sys-color-on-surface: #1a1b1e;
+  --md-sys-color-surface-variant: #e0e2ec;
+  --md-sys-color-on-surface-variant: #44474f;
+  --md-sys-color-outline: #74777f;
+  --md-sys-color-surface-container: #f2f0f4;
+  --md-sys-color-surface-container-high: #eceaef;
+  
+  /* Shapes */
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* Elevations */
+  --md-sys-elevation-level1: 0px 1px 2px 0px rgba(0,0,0,0.3), 0px 1px 3px 1px rgba(0,0,0,0.15);
+  --md-sys-elevation-level2: 0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15);
+  --md-sys-elevation-level3: 0px 1px 3px 0px rgba(0,0,0,0.3), 0px 4px 8px 3px rgba(0,0,0,0.15);
+}
+
+body {
+    background-color: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface);
+    font-family: 'Roboto', 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Base Components inspired by material-web */
+.md-card {
+    background-color: var(--md-sys-color-surface);
+    border-radius: var(--md-sys-shape-corner-medium);
+    box-shadow: var(--md-sys-elevation-level1);
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.md-button {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border-radius: var(--md-sys-shape-corner-full);
+    padding: 10px 24px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.md-button:hover {
+    box-shadow: var(--md-sys-elevation-level2);
+}
+
+.md-button.secondary {
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.md-nav-drawer {
+    width: 280px;
+    background-color: var(--md-sys-color-surface);
+    height: 100vh;
+    position: fixed;
+    border-radius: 0 var(--md-sys-shape-corner-large) var(--md-sys-shape-corner-large) 0;
+    padding: 12px;
+    box-sizing: border-box;
+    box-shadow: var(--md-sys-elevation-level1);
+}
+
+.md-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: var(--md-sys-shape-corner-full);
+    color: var(--md-sys-color-on-surface-variant);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.md-nav-item:hover {
+    background-color: rgba(28, 27, 31, 0.08); /* state layer */
+}
+
+.md-nav-item.active {
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.md-nav-item i {
+    margin-right: 12px;
+}
+
+.md-top-app-bar {
+    height: 64px;
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    margin-left: 280px;
+    justify-content: space-between;
+}
+
+.md-main-content {
+    margin-left: 280px;
+    padding: 24px;
+}

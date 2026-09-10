@@ -1,0 +1,118 @@
+body {
+    background-color: #DBEEF5;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    width: 95%;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.header .icon {
+    width: 130px;
+    height: 50px;
+}
+
+.header input {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 200px;
+}
+
+.search-btn {
+    padding: 8px 16px;
+    background-color: #467588;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background-color: #355b69;
+}
+
+.home-btn {
+    margin-left: auto;
+    font-size: 24px;
+    text-decoration: none;
+    color: #1a3945;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #e6f0f5;
+}
+
+thead tr {
+    background-color: #3c6e7d;
+    color: white;
+}
+
+th, td {
+    border: 1px solid #3c6e7d;
+    padding: 10px;
+    text-align: center;
+}
+
+.btn-submit {
+    margin-top: 20px;
+    text-align: right;
+    margin-bottom: 40px;
+}
+
+.btn-submit button {
+    padding: 10px 20px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.btn-submit button:hover {
+    background-color: #bbb;
+}
+.status-disabled {
+    color: gray;
+    font-style: italic;
+}
+.status-available {
+    color: green;
+    font-weight: bold;
+}
+input[type="checkbox"][disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.kembali {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+
+        }
+
+        .kembali a {
+            display: inline-block;
+            padding: 8px 14px;
+            background: #28a745;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .kembali a:hover {
+            background: #218838;
+        }

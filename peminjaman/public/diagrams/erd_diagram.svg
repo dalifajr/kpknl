@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="100%" height="100%" style="background:#f8fafc; font-family:'Inter', -apple-system, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0c306b" flood-opacity="0.08"/>
+    </filter>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c306b"/>
+      <stop offset="100%" stop-color="#071f45"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title Banner -->
+  <rect x="40" y="25" width="1120" height="70" rx="12" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <rect x="40" y="92" width="1120" height="3" fill="#f59e0b"/>
+  <text x="65" y="60" fill="#ffffff" font-size="20" font-weight="700" letter-spacing="0.5">ENTITY RELATIONSHIP DIAGRAM (ERD) - SISTEM PEMINJAMAN RISALAH LELANG</text>
+  <text x="65" y="80" fill="#94a3b8" font-size="12">KPKNL Palembang &bull; Terintegrasi Database 'kpknl' (10.483 Arsip Fisik) &amp; SSO OAuth2</text>
+
+  <!-- ENTITY 1: SSO / USERS -->
+  <g transform="translate(60, 130)" filter="url(#shadow)">
+    <rect width="320" height="230" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect width="320" height="36" rx="8" fill="#0c306b"/>
+    <rect y="28" width="320" height="8" fill="#0c306b"/>
+    <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="700">users (SSO &amp; Local Auth)</text>
+    <text x="275" y="24" fill="#f59e0b" font-size="10" font-weight="600">16 Rows</text>
+    
+    <text x="15" y="60" fill="#0c306b" font-size="11" font-weight="700">PK  id</text><text x="140" y="60" fill="#64748b" font-size="11">BIGINT UNSIGNED AUTO_INC</text>
+    <text x="15" y="82" fill="#334155" font-size="11">     name</text><text x="140" y="82" fill="#64748b" font-size="11">VARCHAR(255)</text>
+    <text x="15" y="104" fill="#334155" font-size="11">     username</text><text x="140" y="104" fill="#64748b" font-size="11">VARCHAR(100) UNIQUE</text>
+    <text x="15" y="126" fill="#334155" font-size="11">     email</text><text x="140" y="126" fill="#64748b" font-size="11">VARCHAR(255)</text>
+    <text x="15" y="148" fill="#d97706" font-size="11" font-weight="700">     role</text><text x="140" y="148" fill="#d97706" font-size="11">ENUM('admin','pelelang','peminjam')</text>
+    <text x="15" y="170" fill="#334155" font-size="11">     sso_id</text><text x="140" y="170" fill="#64748b" font-size="11">BIGINT NULL (Mapping ke SSO)</text>
+    <text x="15" y="192" fill="#334155" font-size="11">     avatar_url</text><text x="140" y="192" fill="#64748b" font-size="11">VARCHAR(500) NULL</text>
+    <text x="15" y="214" fill="#334155" font-size="11">     timestamps</text><text x="140" y="214" fill="#64748b" font-size="11">created_at, updated_at</text>
+  </g>
+
+  <!-- ENTITY 2: PEMINJAMAN (HEADER) -->
+  <g transform="translate(440, 130)" filter="url(#shadow)">
+    <rect width="330" height="260" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect width="330" height="36" rx="8" fill="#0c306b"/>
+    <rect y="28" width="330" height="8" fill="#0c306b"/>
+    <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="700">peminjaman (Header Transaksi)</text>
+    <text x="270" y="24" fill="#f59e0b" font-size="10" font-weight="600">68 Rows</text>
+    
+    <text x="15" y="60" fill="#0c306b" font-size="11" font-weight="700">PK  id</text><text x="140" y="60" fill="#64748b" font-size="11">INT AUTO_INCREMENT</text>
+    <text x="15" y="82" fill="#0284c7" font-size="11" font-weight="600">FK  nama_peminjam</text><text x="140" y="82" fill="#64748b" font-size="11">VARCHAR(100) -> users.username</text>
+    <text x="15" y="104" fill="#334155" font-size="11">     tgl_peminjaman</text><text x="140" y="104" fill="#64748b" font-size="11">DATE (Waktu Pengajuan)</text>
+    <text x="15" y="126" fill="#334155" font-size="11">     tgl_pengembalian</text><text x="140" y="126" fill="#64748b" font-size="11">DATE NULL (Batas Tempo)</text>
+    <text x="15" y="148" fill="#d97706" font-size="11" font-weight="700">     status</text><text x="140" y="148" fill="#d97706" font-size="11">VARCHAR(50) (5 Tahapan Alur)</text>
+    <text x="15" y="170" fill="#334155" font-size="11">     alasan_peminjaman</text><text x="140" y="170" fill="#64748b" font-size="11">TEXT (Urgensi / Sidang PTUN)</text>
+    <text x="15" y="192" fill="#334155" font-size="11">     no_risalah</text><text x="140" y="192" fill="#64748b" font-size="11">VARCHAR(100) (Legacy Flat)</text>
+    <text x="15" y="214" fill="#334155" font-size="11">     nama_pelelang</text><text x="140" y="214" fill="#64748b" font-size="11">VARCHAR(100)</text>
+    <text x="15" y="236" fill="#334155" font-size="11">     box, lemari</text><text x="140" y="236" fill="#64748b" font-size="11">VARCHAR(50) Lokasi Simpan</text>
+  </g>
+
+  <!-- ENTITY 3: PEMINJAMAN_ITEMS (DETAIL MULTI-ITEM) -->
+  <g transform="translate(830, 130)" filter="url(#shadow)">
+    <rect width="310" height="230" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect width="310" height="36" rx="8" fill="#0c306b"/>
+    <rect y="28" width="310" height="8" fill="#0c306b"/>
+    <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="700">peminjaman_items (Multi-Item Detail)</text>
+    
+    <text x="15" y="60" fill="#0c306b" font-size="11" font-weight="700">PK  id</text><text x="140" y="60" fill="#64748b" font-size="11">BIGINT AUTO_INC</text>
+    <text x="15" y="82" fill="#0284c7" font-size="11" font-weight="600">FK  peminjaman_id</text><text x="140" y="82" fill="#64748b" font-size="11">INT -> peminjaman.id</text>
+    <text x="15" y="104" fill="#334155" font-size="11">     risalah_id</text><text x="140" y="104" fill="#64748b" font-size="11">INT (ID Risalah Terkait)</text>
+    <text x="15" y="126" fill="#334155" font-size="11">     jenis_risalah</text><text x="140" y="126" fill="#64748b" font-size="11">ENUM('minuta','tap','batal')</text>
+    <text x="15" y="148" fill="#334155" font-size="11">     status_item</text><text x="140" y="148" fill="#64748b" font-size="11">VARCHAR(50)</text>
+    <text x="15" y="170" fill="#334155" font-size="11">     tgl_kembali_real</text><text x="140" y="170" fill="#64748b" font-size="11">DATETIME NULL</text>
+    <text x="15" y="192" fill="#334155" font-size="11">     kondisi_kembali</text><text x="140" y="192" fill="#64748b" font-size="11">TEXT NULL (Kondisi Fisik)</text>
+  </g>
+
+  <!-- ENTITY 4: RISALAH_MINUTA (KATALOG UTAMA LAKU) -->
+  <g transform="translate(60, 430)" filter="url(#shadow)">
+    <rect width="330" height="230" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect width="330" height="36" rx="8" fill="#0c306b"/>
+    <rect y="28" width="330" height="8" fill="#0c306b"/>
+    <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="700">risalah_minuta (Lelang Laku)</text>
+    <text x="250" y="24" fill="#10b981" font-size="10" font-weight="600">8.529 Rows</text>
+    
+    <text x="15" y="60" fill="#0c306b" font-size="11" font-weight="700">PK  id</text><text x="140" y="60" fill="#64748b" font-size="11">INT AUTO_INCREMENT</text>
+    <text x="15" y="82" fill="#334155" font-size="11">     no_risalah</text><text x="140" y="82" fill="#64748b" font-size="11">VARCHAR(50) UNIQUE</text>
+    <text x="15" y="104" fill="#334155" font-size="11">     tgl_risalah</text><text x="140" y="104" fill="#64748b" font-size="11">DATE</text>
+    <text x="15" y="126" fill="#334155" font-size="11">     nama_pelelang</text><text x="140" y="126" fill="#64748b" font-size="11">VARCHAR(100)</text>
+    <text x="15" y="148" fill="#334155" font-size="11">     pemohon_lelang</text><text x="140" y="148" fill="#64748b" font-size="11">VARCHAR(100)</text>
+    <text x="15" y="170" fill="#0284c7" font-size="11" font-weight="600">     lemari, box</text><text x="140" y="170" fill="#64748b" font-size="11">VARCHAR(50) Lokasi Fisik</text>
+    <text x="15" y="192" fill="#10b981" font-size="11" font-weight="700">     status</text><text x="140" y="192" fill="#10b981" font-size="11">ENUM('tersedia','dipinjam')</text>
+    <text x="15" y="214" fill="#334155" font-size="11">     link_erisalah</text><text x="140" y="214" fill="#64748b" font-size="11">VARCHAR(255) NULL</text>
+  </g>
+
+  <!-- ENTITY 5: RISALAH_TAP (TIDAK ADA PENAWARAN) -->
+  <g transform="translate(420, 430)" filter="url(#shadow)">
+    <rect width="320" height="230" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect width="320" height="36" rx="8" fill="#0c306b"/>
+    <rect y="28" width="320" height="8" fill="#0c306b"/>
+    <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="700">risalah_tap (TAP)</text>
+    <text x="245" y="24" fill="#f59e0b" font-size="10" font-weight="600">1.340 Rows</text>
+    
+    <text x="15" y="60" fill="#0c306b" font-size="11" font-weight="700">PK  id</text><text x="140" y="60" fill="#64748b" font-size="11">INT AUTO_INCREMENT</text>
+    <text x="15" y="82" fill="#334155" font-size="11">     no_risalah</text><text x="140" y="82" fill="#64748b" font-size="11">VARCHAR(50)</text>
+    <text x="15" y="104" fill="#334155" font-size="11">     tgl_risalah</text><text x="140" y="104" fill="#64748b" font-size="11">DATE</text>
+    <text x="15" y="126" fill="#334155" font-size="11">     nama_pelelang</text><text x="140" y="126" fill="#64748b" font-size="11">VARCHAR(100)</text>
+    <text x="15" y="148" fill="#334155" font-size="11">     pemohon_lelang</text><text x="140" y="148" fill="#64748b" font-size="11">VARCHAR(100)</text>
+    <text x="15" y="170" fill="#0284c7" font-size="11" font-weight="600">     lemari, box</text><text x="140" y="170" fill="#64748b" font-size="11">VARCHAR(50) Lokasi Fisik</text>
+    <text x="15" y="192" fill="#10b981" font-size="11" font-weight="700">     status</text><text x="140" y="192" fill="#10b981" font-size="11">ENUM('tersedia','dipinjam')</text>
+  </g>
+
+  <!-- ENTITY 6: RISALAH_BATAL -->
+  <g transform="translate(770, 430)" filter="url(#shadow)">
+    <rect width="370" height="230" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect width="370" height="36" rx="8" fill="#0c306b"/>
+    <rect y="28" width="370" height="8" fill="#0c306b"/>
+    <text x="15" y="24" fill="#ffffff" font-size="13" font-weight="700">risalah_batal (Batal Pelaksanaan)</text>
+    <text x="305" y="24" fill="#ef4444" font-size="10" font-weight="600">614 Rows</text>
+    
+    <text x="15" y="60" fill="#0c306b" font-size="11" font-weight="700">PK  id</text><text x="140" y="60" fill="#64748b" font-size="11">INT AUTO_INCREMENT</text>
+    <text x="15" y="82" fill="#334155" font-size="11">     no_risalah</text><text x="140" y="82" fill="#64748b" font-size="11">VARCHAR(50)</text>
+    <text x="15" y="104" fill="#334155" font-size="11">     tgl_risalah</text><text x="140" y="104" fill="#64748b" font-size="11">DATE</text>
+    <text x="15" y="126" fill="#334155" font-size="11">     nama_pelelang</text><text x="140" y="126" fill="#64748b" font-size="11">VARCHAR(100)</text>
+    <text x="15" y="148" fill="#334155" font-size="11">     pemohon_lelang</text><text x="140" y="148" fill="#64748b" font-size="11">VARCHAR(100)</text>
+    <text x="15" y="170" fill="#0284c7" font-size="11" font-weight="600">     lemari, box</text><text x="140" y="170" fill="#64748b" font-size="11">VARCHAR(50) Lokasi Fisik</text>
+    <text x="15" y="192" fill="#10b981" font-size="11" font-weight="700">     status</text><text x="140" y="192" fill="#10b981" font-size="11">ENUM('tersedia','dipinjam')</text>
+  </g>
+
+  <!-- ENTITY 7: RISALAH_PENDING & REVISI -->
+  <g transform="translate(60, 690)" filter="url(#shadow)">
+    <rect width="510" height="175" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect width="510" height="32" rx="8" fill="#0284c7"/>
+    <rect y="24" width="510" height="8" fill="#0284c7"/>
+    <text x="15" y="21" fill="#ffffff" font-size="12" font-weight="700">risalah_pending (Antrean Pendaftaran Baru oleh Pelelang)</text>
+    <text x="440" y="21" fill="#ffffff" font-size="10" font-weight="600">8 Antrean</text>
+    
+    <text x="15" y="52" fill="#0c306b" font-size="10.5" font-weight="700">PK id (INT)</text>
+    <text x="110" y="52" fill="#334155" font-size="10.5">no_risalah, jenis ('minuta','tap','batal'), tgl_risalah, nama_pelelang, pemohon_lelang</text>
+    <text x="15" y="74" fill="#334155" font-size="10.5">lemari, box (NULL sebelum divalidasi oleh Admin Seksi HI)</text>
+    <text x="15" y="96" fill="#d97706" font-size="10.5" font-weight="600">status: 'belum_validasi' | Alur: Diverifikasi Admin -> Masuk ke Minuta/TAP/Batal atau Revisi</text>
+    <text x="15" y="125" fill="#64748b" font-size="10">Dikelola oleh RisalahValidationService dengan DB::transaction() &amp; lockForUpdate()</text>
+  </g>
+
+  <g transform="translate(610, 690)" filter="url(#shadow)">
+    <rect width="530" height="175" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect width="530" height="32" rx="8" fill="#ef4444"/>
+    <rect y="24" width="530" height="8" fill="#ef4444"/>
+    <text x="15" y="21" fill="#ffffff" font-size="12" font-weight="700">risalah_revisi (Koreksi Berkas dari Admin ke Pejabat Lelang)</text>
+    <text x="470" y="21" fill="#ffffff" font-size="10" font-weight="600">1 Berkas</text>
+    
+    <text x="15" y="52" fill="#0c306b" font-size="10.5" font-weight="700">PK id (INT)</text>
+    <text x="110" y="52" fill="#334155" font-size="10.5">no_risalah, jenis, tgl_risalah, nama_pelelang, pemohon_lelang</text>
+    <text x="15" y="74" fill="#ef4444" font-size="10.5" font-weight="700">catatan (TEXT): Poin-poin koreksi administratif dari Admin Seksi HI</text>
+    <text x="15" y="96" fill="#334155" font-size="10.5">Alur: Pejabat Lelang memperbaiki data -> Resubmit -> Masuk kembali ke Risalah Pending</text>
+    <text x="15" y="125" fill="#64748b" font-size="10">Menjamin integritas dan transparansi audit trail pengarsipan risalah lelang negara</text>
+  </g>
+
+  <!-- RELATIONSHIP CONNECTORS -->
+  <!-- users to peminjaman (1:N) -->
+  <path d="M 380 210 L 440 210" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="4,3"/>
+  <circle cx="380" cy="210" r="4" fill="#0284c7"/>
+  <polygon points="440,210 430,205 430,215" fill="#0284c7"/>
+  <text x="390" y="202" fill="#0284c7" font-size="9" font-weight="700">1 : N</text>
+
+  <!-- peminjaman to peminjaman_items (1:N) -->
+  <path d="M 770 210 L 830 210" fill="none" stroke="#0284c7" stroke-width="2.5"/>
+  <circle cx="770" cy="210" r="4" fill="#0284c7"/>
+  <polygon points="830,210 820,205 820,215" fill="#0284c7"/>
+  <text x="782" y="202" fill="#0284c7" font-size="9" font-weight="700">1 : N</text>
+
+  <!-- Catalog to Items (N:1) -->
+  <path d="M 985 360 L 985 410 L 225 410 L 225 430" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="3,3"/>
+  <polygon points="225,430 220,420 230,420" fill="#10b981"/>
+  <text x="235" y="423" fill="#10b981" font-size="9" font-weight="600">Minuta Ref</text>
+
+  <!-- Pending to Minuta/Tap/Batal validation line -->
+  <path d="M 315 690 L 315 660" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <polygon points="315,660 310,670 320,670" fill="#f59e0b"/>
+  <text x="325" y="678" fill="#d97706" font-size="9" font-weight="700">Validasi &amp; Simpan</text>
+
+  <!-- Pending to Revisi line -->
+  <path d="M 570 760 L 610 760" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,2"/>
+  <polygon points="610,760 600,755 600,765" fill="#ef4444"/>
+  <text x="572" y="752" fill="#ef4444" font-size="8.5" font-weight="700">Revisi</text>
+</svg>

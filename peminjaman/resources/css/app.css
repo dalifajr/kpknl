@@ -1,0 +1,156 @@
+/* Design System & Styling matching Dashboard Pengelolaan BMN KPKNL Palembang */
+
+:root {
+    --djkn-navy: #0c306b;
+    --djkn-navy-light: #1e4282;
+    --djkn-gold: #f59e0b;
+    --djkn-emerald: #10b981;
+    --djkn-sky: #0284c7;
+    --djkn-crimson: #ef4444;
+    --djkn-purple: #8b5cf6;
+    --djkn-bg: #f8fafc;
+    --djkn-card: #ffffff;
+    --djkn-border: #e2e8f0;
+}
+
+/* Base font and smooth rendering */
+body {
+    background-color: var(--djkn-bg);
+    color: #1e293b;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Header & Navigation */
+.executive-topbar {
+    background: linear-gradient(135deg, #0c306b 0%, #071f45 100%);
+    border-bottom: 2.5px solid #f59e0b;
+    box-shadow: 0 4px 20px rgba(12, 48, 107, 0.12);
+}
+
+.brand-title {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+}
+
+/* Stat Cards */
+.kpi-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px -2px rgba(12, 48, 107, 0.05);
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
+    position: relative;
+    overflow: hidden;
+}
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -4px rgba(12, 48, 107, 0.1);
+    border-color: #cbd5e1;
+}
+
+.kpi-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    transition: transform 0.35s ease;
+}
+.kpi-card:hover .kpi-icon-box {
+    transform: translateY(-1px);
+}
+
+/* Role Badges */
+.badge-role-admin {
+    background-color: #e0e7ff;
+    color: #1e3a8a;
+    border: 1px solid #c7d2fe;
+    font-weight: 600;
+}
+.badge-role-pelelang {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    font-weight: 600;
+}
+.badge-role-peminjam {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    font-weight: 600;
+}
+
+/* Status Badges */
+.badge-status-tersedia {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+.badge-status-dipinjam {
+    background-color: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+.badge-status-pending {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+.badge-status-revisi {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* Interactive Tabs */
+.nav-pills-custom .nav-link {
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border-radius: 10px;
+    padding: 8px 16px;
+    transition: all 0.25s ease;
+}
+.nav-pills-custom .nav-link:hover {
+    color: #0c306b;
+    background-color: #f1f5f9;
+}
+.nav-pills-custom .nav-link.active {
+    background-color: #0c306b;
+    color: #ffffff;
+    box-shadow: 0 4px 10px -2px rgba(12, 48, 107, 0.25);
+}
+
+/* Borrow Cart Floating Badge */
+.cart-floating-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1040;
+    background: linear-gradient(135deg, #0c306b 0%, #1e4282 100%);
+    color: #ffffff;
+    border: 2px solid #f59e0b;
+    box-shadow: 0 10px 25px rgba(12, 48, 107, 0.35);
+    border-radius: 50px;
+    padding: 12px 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.cart-floating-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 14px 28px rgba(12, 48, 107, 0.4);
+    color: #ffffff;
+}
+
+/* Modal Styling */
+.modal-content {
+    border-radius: 16px;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 20px 40px -10px rgba(12, 48, 107, 0.25);
+}
