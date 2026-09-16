@@ -25,34 +25,35 @@ class AuthController extends Controller
     public function callback()
     {
         try {
-            $ssoUser = Socialite::driver('sso')->user();
+            $ssoUser = Socialite::driver('sso')->stateless()->user();
+
+            $rawUser = $ssoUser->user ?? [];
+            $role = $rawUser['primary_role'] ?? ($rawUser['role'] ?? ($rawUser['jabatan'] ?? 'user'));
+            
+            // Smart detection based on username/email/name
+            $identifier = strtolower(($ssoUser->nickname ?? '') . ' ' . ($ssoUser->name ?? '') . ' ' . ($ssoUser->email ?? ''));
+            if (str_contains($identifier, 'mardanus') || str_contains($identifier, 'superadmin') || !empty($rawUser['is_superadmin'])) {
+                $role = 'superadmin';
+            }
+
+            $user = User::updateOrCreate(
+                ['email' => $ssoUser->email],
+                [
+                    'sso_id' => $ssoUser->id,
+                    'name' => $ssoUser->name,
+                    'role' => $role,
+                    'password' => bcrypt(str()->random(24)),
+                ]
+            );
+
+            Auth::login($user);
+
+            return redirect()->route('dashboard');
+
         } catch (Exception $e) {
-            return redirect('/')->withErrors(['error' => 'Gagal terhubung ke server SSO.']);
+            \Illuminate\Support\Facades\Log::error('Aset BPPN SSO Error: ' . $e->getMessage());
+            return redirect('/')->withErrors(['error' => 'Gagal terhubung ke server SSO: ' . $e->getMessage()]);
         }
-
-        $user = User::updateOrCreate(
-            ['email' => $ssoUser->email],
-            [
-                'name' => $ssoUser->name,
-                'password' => bcrypt(str()->random(24)),
-            ]
-        );
-        
-        $rawUser = $ssoUser->user ?? [];
-        $role = $rawUser['role'] ?? $rawUser['jabatan'] ?? $rawUser['level'] ?? $rawUser['group'] ?? 'user';
-        
-        // Smart detection based on username/email/name
-        $identifier = strtolower(($ssoUser->nickname ?? '') . ' ' . ($ssoUser->name ?? '') . ' ' . ($ssoUser->email ?? ''));
-        if (str_contains($identifier, 'mardanus') || str_contains($identifier, 'superadmin')) {
-            $role = 'superadmin';
-        }
-
-        $user->role = $role;
-        $user->save();
-
-        Auth::login($user);
-
-        return redirect()->intended('/dashboard');
     }
 
     /**

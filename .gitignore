@@ -1,0 +1,109 @@
+# ==============================================================================
+# KPKNL PALEMBANG - GITIGNORE PENGAMANAN DATA & FILE RAHASIA
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Konfigurasi Lingkungan & Kredensial Rahasia (Environment Secrets)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# ------------------------------------------------------------------------------
+# 2. Kunci Enkripsi, Sertifikat & OAuth Keys (Private Keys & Certificates)
+# ------------------------------------------------------------------------------
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+oauth-private.key
+oauth-public.key
+**/oauth-private.key
+**/oauth-public.key
+
+# ------------------------------------------------------------------------------
+# 3. Basis Data, Dump & Cadangan Database (Database Dumps & Backups)
+# ------------------------------------------------------------------------------
+*.sql
+*.sql.gz
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.db
+**/database/database.sqlite
+**/storage/app/backups/
+**/storage/app/private/backups/
+**/storage/backups/
+kpknl.sql
+
+# ------------------------------------------------------------------------------
+# 4. File Arsip & Backup Berat (Archives & Backup Files)
+# ------------------------------------------------------------------------------
+*.7z
+*.zip
+*.tar
+*.tar.gz
+*.gz
+*.rar
+*.bak
+*.backup
+www.7z
+
+# ------------------------------------------------------------------------------
+# 5. Log & Debugging (Logs, Sessions & Cookies)
+# ------------------------------------------------------------------------------
+*.log
+**/*.log
+storage/logs/
+**/storage/logs/*.log
+cookie*.txt
+*cookie*.txt
+*.tmp
+tunnel_log.txt
+tunnel_url.txt
+
+# ------------------------------------------------------------------------------
+# 6. Binary Tunnel & Remote Tools (Portable Executables)
+# ------------------------------------------------------------------------------
+cloudflared.exe
+code.exe
+*.exe
+
+# ------------------------------------------------------------------------------
+# 7. Framework Storage & Cache (Laravel Compiled & Sessions)
+# ------------------------------------------------------------------------------
+**/storage/framework/cache/data/*
+!**/storage/framework/cache/data/.gitignore
+**/storage/framework/sessions/*
+!**/storage/framework/sessions/.gitignore
+**/storage/framework/views/*
+!**/storage/framework/views/.gitignore
+**/storage/framework/testing/*
+!**/storage/framework/testing/.gitignore
+**/bootstrap/cache/*.php
+
+# ------------------------------------------------------------------------------
+# 8. Dependensi Paket (Dependencies)
+# ------------------------------------------------------------------------------
+node_modules/
+**/node_modules/
+vendor/
+**/vendor/
+
+# ------------------------------------------------------------------------------
+# 9. IDE, Editor & Sistem Operasi (OS & IDE Artifacts)
+# ------------------------------------------------------------------------------
+.idea/
+.vscode/
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+*.swp
+*.swo

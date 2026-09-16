@@ -153,7 +153,7 @@ class SsoController extends Controller
 
             Auth::login($user, true);
 
-            return redirect()->route('dashboard')->with('success', "Selamat datang, {$user->name}! Berhasil masuk via SSO KPKNL Palembang sebagai [{$user->getRoleLabel()}].");
+            return redirect()->to(rtrim(url('/'), '/') . '/')->with('success', "Selamat datang, {$user->name}! Berhasil masuk via SSO KPKNL Palembang sebagai [{$user->getRoleLabel()}].");
 
         } catch (Exception $e) {
             Log::error('SSO Exception: ' . $e->getMessage());

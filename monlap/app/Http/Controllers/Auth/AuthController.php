@@ -22,6 +22,8 @@ class AuthController extends Controller
             $user = User::firstOrNew(['sso_id' => $ssoUser->id]);
             $user->name = $ssoUser->name;
             $user->email = $ssoUser->email;
+            $user->username = $ssoUser->nickname ?: ($ssoUser->user['username'] ?? \Illuminate\Support\Str::slug($ssoUser->name, '.') . '_' . $ssoUser->id);
+            $user->last_login_at = now();
             
             // Hanya update role dari SSO, dan gunakan primary_role
             if (isset($ssoUser->user['primary_role'])) {
@@ -30,13 +32,12 @@ class AuthController extends Controller
             
             $user->save();
 
-            $user->update(['last_login_at' => now()]);
-
             Auth::login($user);
 
             return redirect()->route('dashboard');
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Monlap SSO Login Error: ' . $e->getMessage());
             return redirect('/')->withErrors(['error' => 'Gagal login melalui SSO: ' . $e->getMessage()]);
         }
     }
