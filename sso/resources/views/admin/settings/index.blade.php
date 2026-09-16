@@ -115,12 +115,16 @@
                         </div>
                     </div>
 
-                    <!-- 1-Click Check Update Button -->
-                    <div>
+                    <!-- 1-Click Check Update Button & Host CLI Notice -->
+                    <div class="d-flex flex-wrap align-items-center gap-3">
                         <button type="button" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2" id="btnCheckUpdate" onclick="triggerCheckUpdate()">
                             <i class="fa-solid fa-magnifying-glass fs-5" id="iconCheckUpdate"></i>
                             <span id="textCheckUpdate">Cek Pembaruan Sekarang</span>
                         </button>
+                        <div class="badge bg-light text-secondary border px-3 py-2.5 rounded-pill d-inline-flex align-items-center gap-2">
+                            <i class="fa-solid fa-terminal text-primary"></i>
+                            <span>Host CLI: Jalankan <code>update.bat</code> di root server untuk sinkronisasi Git pull, migrasi, dan clear cache otomatis.</span>
+                        </div>
                     </div>
                 </div>
             </div>
