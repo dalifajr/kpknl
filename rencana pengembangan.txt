@@ -1,7 +1,13 @@
-RENCANA PENGEMBANGAN semua website dan aplikasi didalam sso.
+RENCANA PENGEMBANGAN APLIKASI BARU
 
-1. 
+DESKRIPSI;
+Saya ingin membangun aplikasi untuk menampilkan data kepegawaian KPKNL Palembang, dengan basis data spreadsheet sama seperti dashboard eksekutif bmn. dari link spreadsheet yang saya berikan dibawah ini, buatkan sebuah aplikasi yang dapat menampilkan data kepegawaian KPKNL Palembang, dengan menu kepegawaian, diagram, jabatan, unit kerja, dan diagram. untuk setiap data yang ada di tabel dapat di klik untuk melihat detailnya, dan pada tabel kepegawaian ada kolom search untuk mencari data. mungkin dari data spreadsheet yang saya beri kamu bisa mengusulkan ide untuk mengolah data dari database tersebut menjadi sebuah informasi. untuk saat ini saya juga belum ada ide penamaan untuk aplikasi ini. untuk desain, kamu bisa ambil referensi dari dashboard eksekutif bmn.
 
+link spreadsheet:https://docs.google.com/spreadsheets/d/1-pfEY_56CvIBaaCyxrfjv5nitEMHhPQCXKzuwdxX6hA/edit?gid=1668021245#gid=1668021245
+
+gunakan teknologi laravel 13 sebagai frontend dan backend, ataupun jika kamu ada ide teknologi lain yang bisa mendukung aplikasi ini bisa usulkan nanti. 
+
+aplikasi ini juga perlu untuk terhubung ke sso yang sudah ada dalam workspace ini. jadi jika ada form login pada aplikasi si-kep ini maka hapuslah dan ganti menjadi tombol untuk redirect ke sso.
 
 
 ==permintaan==
@@ -12,5 +18,5 @@ RENCANA PENGEMBANGAN semua website dan aplikasi didalam sso.
 - setelah itu lanjutkan dengan membuat gambar ERD dan UseCase Diagram dan Diagram BPMN.
 - tidak usah melakukan verifikasi menggunakan browser agent.
 - buatkan walktrough dan perencanaan serta laporan berupa file yang dapat saya baca.
-- lakukan brainstroming dan analisa kritik dan saran agar mendapatkan hasil yang maksimal.
+- lakukan brainstroming dan analisa mendalam serta kritik dan saran agar mendapatkan hasil yang maksimal.
 

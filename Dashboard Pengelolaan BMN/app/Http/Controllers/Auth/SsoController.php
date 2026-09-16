@@ -31,7 +31,7 @@ class SsoController extends Controller
      */
     public function redirect(Request $request)
     {
-        $ssoBaseUrl = env('SSO_BASE_URL', 'http://localhost/sso-kpknl-palembang/public');
+        $ssoBaseUrl = env('SSO_BASE_URL', 'http://localhost/sso/public');
         $clientId = env('SSO_CLIENT_ID', 'client_dashboard_bmn');
         $redirectUri = env('SSO_REDIRECT_URI', url('/auth/sso/callback'));
         $state = Str::random(40);
@@ -61,7 +61,7 @@ class SsoController extends Controller
         }
 
         try {
-            $ssoBaseUrl = env('SSO_BASE_URL', 'http://localhost/sso-kpknl-palembang/public');
+            $ssoBaseUrl = env('SSO_BASE_URL', 'http://localhost/sso/public');
             $clientId = env('SSO_CLIENT_ID', 'client_dashboard_bmn');
             $clientSecret = env('SSO_CLIENT_SECRET', 'secret_bmn_kpknl_2026');
             $redirectUri = env('SSO_REDIRECT_URI', url('/auth/sso/callback'));

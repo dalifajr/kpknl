@@ -792,6 +792,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('admin.maintenance.index') }}" class="sidebar-link {{ request()->routeIs('admin.maintenance.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-code-branch"></i>
+                            <span>Maintenance Orchestrator</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('admin.settings.index') }}" class="sidebar-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                             <i class="fa-solid fa-gear"></i>
                             <span>Pengaturan</span>

@@ -33,11 +33,19 @@ class ApplicationController extends Controller
 
     public function create()
     {
+        if (!auth()->user()->isMaintenance()) {
+            abort(403, 'Hanya tim Maintenance yang berwenang menambah aplikasi baru.');
+        }
+
         return view('admin.applications.create');
     }
 
     public function store(Request $request)
     {
+        if (!auth()->user()->isMaintenance()) {
+            abort(403, 'Hanya tim Maintenance yang berwenang menambah aplikasi baru.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:100|unique:applications,slug|alpha_dash',

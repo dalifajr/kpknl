@@ -28,6 +28,12 @@ class RoleSeeder extends Seeder
                 'description' => 'Akses ke aplikasi yang di-assign dan melihat aktivitas login sendiri.',
                 'level' => 3,
             ],
+            [
+                'name' => 'maintenance',
+                'display_name' => 'Tim Pemeliharaan (Maintenance)',
+                'description' => 'Akses eksklusif ke pemeliharaan sistem, manajemen aplikasi, lifecycle orchestrator, backup/restore, dan pengaturan server.',
+                'level' => 1,
+            ],
         ];
 
         foreach ($roles as $roleData) {

@@ -1,4 +1,4 @@
-RENCANA PERAIKAN SSO DAN APLIKASI DIDALAMNYA;
+RENCANA PERBAIKAN SSO DAN APLIKASI DIDALAMNYA;
 
 1. 
 
@@ -7,3 +7,4 @@ catat untuk kamu;
 - pelajari error dengan seksama.
 - jika ragu, tanyakan dan diskusikan.
 - dokumentasikan setiap langkah perbaikan.
+- lakukan pengetesan pada setiap perubahan guna mendapatkan hasil clean code dan fungsionalitas yang maksimal.

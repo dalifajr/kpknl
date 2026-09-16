@@ -12,9 +12,6 @@
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 py-2">
             <i class="fa-solid fa-user-plus me-1"></i> Tambah User Baru
         </a>
-        <a href="{{ route('admin.applications.create') }}" class="btn btn-tonal btn-sm rounded-pill px-3 py-2">
-            <i class="fa-solid fa-cube me-1"></i> Tambah Aplikasi
-        </a>
     </div>
 </div>
 

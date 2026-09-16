@@ -107,3 +107,25 @@ $RECYCLE.BIN/
 .DS_Store
 *.swp
 *.swo
+
+# ------------------------------------------------------------------------------
+# 10. Dokumen Analisis, Notulensi, Perencanaan & Diagram (Docs, .md, .txt, .xlsx)
+# ------------------------------------------------------------------------------
+*.md
+!README.md
+!**/README.md
+*.txt
+!robots.txt
+rencana pengembangan.txt
+rencana*.txt
+ANALISIS_*.md
+DOKUMENTASI_*.md
+WALKTHROUGH_*.md
+RENCANA_*.md
+*.xlsx
+*.xls
+*.csv
+diagram_assets/
+
+
+/referensi_desain

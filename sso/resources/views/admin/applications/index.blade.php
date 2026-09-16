@@ -7,10 +7,11 @@
     <div>
         <h3 class="mb-1 fw-bold text-dark">Manajemen Aplikasi Terintegrasi</h3>
         <p class="text-muted mb-0">Daftarkan aplikasi internal baru dan dapatkan Client ID serta Client Secret untuk OAuth2 SSO integration.</p>
-    </div>
+    @if(auth()->user()->isMaintenance())
     <a href="{{ route('admin.applications.create') }}" class="btn btn-primary rounded-pill px-4 py-2">
         <i class="fa-solid fa-plus me-1"></i> Tambah Aplikasi Baru
     </a>
+    @endif
 </div>
 
 <style>

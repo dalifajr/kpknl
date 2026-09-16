@@ -85,4 +85,46 @@ class Application extends Model
         $fullPath = $parent . DIRECTORY_SEPARATOR . $this->folder_path;
         return file_exists($fullPath) ? realpath($fullPath) : $fullPath;
     }
+
+    /**
+     * Adapt target URL to current browsing environment (localhost dev vs private server host).
+     */
+    public function adaptHostToCurrentRequest(?string $targetUrl): string
+    {
+        if (empty($targetUrl) || !request()) {
+            return $targetUrl ?? '';
+        }
+
+        $currentHost = request()->getHost(); // e.g. "localhost", "10.66.159.40", "sso.test"
+        $parsed = parse_url($targetUrl);
+        $targetHost = $parsed['host'] ?? '';
+
+        if (!$targetHost || strtolower($targetHost) === strtolower($currentHost)) {
+            return $targetUrl;
+        }
+
+        $isCurrentDev = in_array(strtolower($currentHost), ['localhost', '127.0.0.1']) || str_ends_with(strtolower($currentHost), '.test');
+        $isTargetDev = in_array(strtolower($targetHost), ['localhost', '127.0.0.1']) || str_ends_with(strtolower($targetHost), '.test');
+
+        // If environment mismatch (dev accessing prod link or vice-versa), adapt host!
+        if ($isCurrentDev !== $isTargetDev) {
+            $newScheme = request()->getScheme();
+            $newPort = request()->getPort() && !in_array(request()->getPort(), [80, 443]) ? ':' . request()->getPort() : '';
+            $path = $parsed['path'] ?? '';
+            $query = isset($parsed['query']) ? '?' . $parsed['query'] : '';
+            return "{$newScheme}://{$currentHost}{$newPort}{$path}{$query}";
+        }
+
+        return $targetUrl;
+    }
+
+    public function getResolvedUrlAttribute(): string
+    {
+        return $this->adaptHostToCurrentRequest($this->attributes['url'] ?? '');
+    }
+
+    public function getResolvedRedirectUriAttribute(): string
+    {
+        return $this->adaptHostToCurrentRequest($this->attributes['redirect_uri'] ?? '');
+    }
 }

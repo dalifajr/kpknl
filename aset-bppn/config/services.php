@@ -36,10 +36,10 @@ return [
     ],
 
     'sso' => [
-        'client_id' => env('SSO_CLIENT_ID'),
-        'client_secret' => env('SSO_CLIENT_SECRET'),
-        'redirect' => env('SSO_REDIRECT_URI'),
-        'url' => env('SSO_URL'),
+        'client_id' => env('SSO_CLIENT_ID', 'client_aset123'),
+        'client_secret' => env('SSO_CLIENT_SECRET', 'asetSecretKey123'),
+        'redirect' => env('SSO_REDIRECT_URI', 'http://localhost/aset-bppn/public/auth/callback'),
+        'url' => env('SSO_URL', 'http://localhost/sso/public'),
     ],
 
 ];

@@ -36,7 +36,9 @@ class AuthorizationController extends Controller
         // If direct access from SSO dashboard or auto-approve
         $code = OAuthService::createAuthCode($user, $app);
 
-        $targetUrl = $app->redirect_uri;
+        $rawTarget = $request->input('redirect_uri') ?: $app->redirect_uri;
+        $targetUrl = $app->adaptHostToCurrentRequest($rawTarget);
+
         if (str_contains($targetUrl, '?')) {
             $targetUrl .= "&code={$code}";
         } else {

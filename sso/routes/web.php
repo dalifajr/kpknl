@@ -64,8 +64,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', UserController::class);
     });
 
-    // Maintenance & Technical Admin Routes (Kelola Aplikasi, Pengaturan, Backup, Orchestrator)
-    Route::middleware(['role:superadmin,maintenance'])->prefix('admin')->name('admin.')->group(function () {
+    // Maintenance & Technical Admin Routes (Eksklusif Role Maintenance: Kelola Aplikasi, Pengaturan, Backup, Orchestrator)
+    Route::middleware(['role:maintenance'])->prefix('admin')->name('admin.')->group(function () {
         // Application Management
         Route::resource('applications', ApplicationController::class);
         Route::post('applications/{application}/regenerate-secret', [ApplicationController::class, 'regenerateSecret'])->name('applications.regenerate-secret');

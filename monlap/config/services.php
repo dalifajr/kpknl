@@ -25,8 +25,8 @@ return [
     'sso' => [
         'client_id' => env('SSO_CLIENT_ID'),
         'client_secret' => env('SSO_CLIENT_SECRET'),
-        'redirect' => env('SSO_REDIRECT_URI'),
-        'url' => env('SSO_URL', 'http://sso-kpknl-palembang.test'),
+        'redirect' => env('SSO_REDIRECT_URI', 'http://localhost/monlap/public/auth/callback'),
+        'url' => env('SSO_URL', 'http://localhost/sso/public'),
     ],
 
     'ses' => [
