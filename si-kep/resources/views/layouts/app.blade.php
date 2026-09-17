@@ -30,6 +30,30 @@
     <!-- Chart.js 4.4 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
+    <style>
+        .dataTables_wrapper, table.dataTable {
+            width: 100% !important;
+        }
+        .table-responsive {
+            width: 100% !important;
+            overflow-x: auto;
+        }
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
+        .transition-all {
+            transition: all 0.2s ease-in-out;
+        }
+        .transition-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+        }
+        .card-clickable {
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+
     @stack('styles')
 </head>
 <body class="bg-body-tertiary">
@@ -42,11 +66,9 @@
                 <i class="fas fa-bars text-secondary fs-5"></i>
             </button>
 
-            <!-- Brand Identity -->
+            <!-- Brand Identity with Logo KPKNL Palembang -->
             <a href="{{ route('dashboard') }}" class="navbar-brand d-flex align-items-center gap-2 text-decoration-none m-0">
-                <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);">
-                    <i class="fas fa-users-rectangle fs-6"></i>
-                </div>
+                <img src="{{ asset('images/logo-kpknl.png') }}" alt="Logo KPKNL Palembang" style="height: 38px; width: auto; object-fit: contain;">
                 <div class="d-flex flex-column">
                     <span class="fw-bold fs-5 text-dark lh-1">
                         SI-KEP <span class="fw-light text-secondary fs-6">| Kepegawaian</span>
@@ -160,27 +182,23 @@
                     <div class="menu-header mt-3">Pangkalan Data</div>
 
                     @auth
-                        @if(in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance']))
+                        @if(in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance', 'administrator']))
                             <a href="{{ route('spreadsheet.raw') }}" class="menu-item {{ request()->routeIs('spreadsheet.raw') ? 'active' : '' }}">
                                 <i class="fas fa-table-cells"></i> <span>Spreadsheet Mentah</span>
                             </a>
                         @endif
-                    @endauth
 
-                    <a href="javascript:void(0)" class="menu-item" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                        <i class="fas fa-sliders"></i> <span>Pengaturan</span>
-                    </a>
+                        @if(in_array(auth()->user()->role, ['superadmin', 'maintenance', 'administrator']))
+                            <a href="{{ route('change_log.index') }}" class="menu-item {{ request()->routeIs('change_log.*') ? 'active' : '' }}">
+                                <i class="fas fa-clock-rotate-left"></i> <span>Log Perubahan</span>
+                            </a>
+                        @endif
 
-                    <div class="menu-header mt-3">Sistem</div>
-
-                    @auth
-                        <a href="javascript:void(0)" class="menu-item text-danger" onclick="$('#btnLogoutTrigger').click()">
-                            <i class="fas fa-sign-out-alt"></i> <span>Keluar Sistem</span>
-                        </a>
-                    @else
-                        <a href="{{ route('sso.redirect') }}" class="menu-item text-primary">
-                            <i class="fas fa-key"></i> <span>Masuk SSO</span>
-                        </a>
+                        @if(auth()->user()->role === 'maintenance')
+                            <a href="javascript:void(0)" class="menu-item" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                                <i class="fas fa-sliders"></i> <span>Pengaturan</span>
+                            </a>
+                        @endif
                     @endauth
                 </div>
             </div>
@@ -195,46 +213,48 @@
                 <!-- Page Title & Header Bar -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 text-white">
                     <div>
-                        <h2 class="mb-1 text-white fw-bold">@yield('hero-title', 'Dashboard Eksekutif Kepegawaian')</h2>
-                        <p class="mb-0 text-white-50">@yield('hero-subtitle', 'Sistem Informasi Manajemen Profil & Analitika Terpadu Kepegawaian (SIMPATIK) KPKNL Palembang')</p>
+                        <h4 class="fw-bold mb-1">@yield('hero-title', 'SIMPATIK Kepegawaian')</h4>
+                        <p class="mb-0 text-white-50 small">
+                            @yield('hero-subtitle', 'Sistem Informasi Manajemen Profil & Analitika Terpadu Kepegawaian KPKNL Palembang')
+                        </p>
                     </div>
+
                     <div class="d-flex align-items-center gap-2">
                         @yield('header-actions')
-                        <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-10 backdrop-blur rounded-pill px-3 py-1 border border-white border-opacity-20 text-start">
-                            <i class="fas fa-clock-rotate-left text-warning"></i>
-                            <div class="small text-white" style="font-size: 0.75rem;">
-                                <span class="opacity-75">Sync:</span> <strong id="lastSyncDisplay">{{ \App\Models\AppSetting::get('last_synced_at') ? \Carbon\Carbon::parse(\App\Models\AppSetting::get('last_synced_at'))->translatedFormat('d M H:i') . ' WIB' : 'Belum Pernah' }}</strong>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Toast / Flash Notification -->
+                <!-- Alert Messages -->
                 @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 d-flex align-items-center gap-2 mb-4" role="alert">
-                        <i class="fas fa-circle-check fs-5"></i>
-                        <div>{{ session('success') }}</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 d-flex align-items-center gap-2 mb-4" role="alert">
-                        <i class="fas fa-triangle-exclamation fs-5"></i>
-                        <div>{{ session('error') }}</div>
+                    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle-check fs-5 me-2"></i>
+                            <div>{{ session('success') }}</div>
+                        </div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
 
-                <!-- Dynamic Page Content -->
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-triangle-exclamation fs-5 me-2"></i>
+                            <div>{{ session('error') }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                <!-- Yield Page Content -->
                 @yield('content')
 
-                <!-- Integrated Executive Footer -->
+                <!-- Footer (From referensi_desain) -->
                 <footer class="mt-5 pt-4 pb-2 border-top text-muted small d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
                     <div>
-                        <strong>SI-KEP SIMPATIK</strong> &copy; {{ date('Y') }} &bull; KPKNL Palembang &bull; DJKN Kementerian Keuangan RI.
+                        &copy; {{ date('Y') }} <strong>KPKNL Palembang</strong> &bull; DJKN Kementerian Keuangan RI
                     </div>
-                    <div class="text-secondary">
-                        Terintegrasi Google Spreadsheet &amp; SSO KPKNL Palembang.
+                    <div>
+                        SI-KEP SIMPATIK v2.5 &bull; Terintegrasi Google Spreadsheet &amp; SSO
                     </div>
                 </footer>
             </div>
@@ -242,20 +262,179 @@
     </div>
 
     <!-- Universal Employee Detail Modal -->
-    <div class="modal fade" id="pegawaiDetailModal" tabindex="-1" aria-labelledby="pegawaiDetailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;" id="pegawaiModalBody">
+    <div class="modal fade" id="pegawaiDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;" id="pegawaiModalBody">
+                <!-- Content loaded via AJAX from pegawai.detail -->
                 <div class="modal-body text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Memuat...</span>
-                    </div>
+                    <div class="spinner-border text-primary" role="status"></div>
                     <div class="mt-2 text-muted fw-semibold">Memuat profil pegawai...</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Aggregate List Modal (For clickable cards & charts drill-down) -->
+    <div class="modal fade" id="aggregateListModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;" id="aggregateListModalContent">
+                <!-- Loaded via AJAX from pegawai.filter_modal -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Pegawai Form Modal (Create & Edit Pegawai with Avatar Upload) -->
+    <div class="modal fade" id="pegawaiFormModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <div class="modal-header border-bottom px-4 py-3 bg-white d-flex align-items-center justify-content-between">
+                    <h5 class="modal-title fw-bold text-dark" id="pegawaiFormModalTitle">
+                        <i class="fas fa-user-pen text-primary me-2"></i> Form Pegawai
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="pegawaiForm" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" id="formPegawaiId" name="id" value="">
+                    <div class="modal-body p-4 bg-white" style="max-height: 70vh; overflow-y: auto;">
+                        <div class="row g-3">
+                            <!-- Avatar Upload Section -->
+                            <div class="col-12 text-center pb-3 border-bottom">
+                                <div class="position-relative d-inline-block mb-2">
+                                    <img id="formAvatarPreview" src="" alt="Avatar Preview" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover; display: none;">
+                                    <div id="formAvatarPlaceholder" class="avatar-initial shadow-sm fs-3 text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #0c306b, #2563eb);">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="formInputAvatar" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                        <i class="fas fa-camera me-1"></i> Pilih Foto Profil
+                                    </label>
+                                    <input type="file" id="formInputAvatar" name="avatar" class="d-none" accept="image/*" onchange="previewFormAvatar(this)">
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">Maksimal 2MB (JPG, PNG, WEBP)</small>
+                                </div>
+                            </div>
+
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">NAMA PANGGILAN / UTAMA <span class="text-danger">*</span></label>
+                                <input type="text" name="nama" id="formNama" class="form-control" required placeholder="Contoh: Muhammad Syukur">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">NAMA LENGKAP DENGAN GELAR</label>
+                                <input type="text" name="nama_lengkap_gelar" id="formNamaGelar" class="form-control" placeholder="Contoh: Muhammad Syukur, S.E., M.M.">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">NIP PEGAWAI (18 DIGIT)</label>
+                                <input type="text" name="nip" id="formNip" class="form-control font-monospace" placeholder="197011221996021001">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">NIK KEPENDUDUKAN (16 DIGIT)</label>
+                                <input type="text" name="nik" id="formNik" class="form-control font-monospace" placeholder="1671042211700001">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">TIPE PEGAWAI</label>
+                                <select name="tipe_pegawai" id="formTipePegawai" class="form-select">
+                                    <option value="pns">PNS Definitif</option>
+                                    <option value="ppnpn">PPNPN</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">JENIS KELAMIN</label>
+                                <select name="jenis_kelamin" id="formGender" class="form-select">
+                                    <option value="L">Laki-laki (L)</option>
+                                    <option value="P">Perempuan (P)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">TEMPAT LAHIR</label>
+                                <input type="text" name="tempat_lahir" id="formTempatLahir" class="form-control" placeholder="Kota Kelahiran">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">TANGGAL LAHIR</label>
+                                <input type="date" name="tanggal_lahir" id="formTanggalLahir" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">UNIT KERJA / SEKSI</label>
+                                <select name="unit_kerja_id" id="formUnitKerja" class="form-select">
+                                    <option value="">-- Pilih Unit Kerja --</option>
+                                </select>
+                            </div>
+
+                            <!-- Position & Rank -->
+                            <div class="col-md-8">
+                                <label class="form-label small fw-bold text-muted">JABATAN DEFINITIF <span class="text-danger">*</span></label>
+                                <input type="text" name="nama_jabatan_raw" id="formJabatan" class="form-control" required placeholder="Contoh: Pelelang Ahli Muda">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">JOB GRADE (KELAS JABATAN)</label>
+                                <input type="number" name="job_grade" id="formJobGrade" class="form-control" placeholder="7 - 18">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">PANGKAT &amp; GOLONGAN RUANG</label>
+                                <select name="pangkat_golongan_id" id="formPangkat" class="form-select">
+                                    <option value="">-- Pilih Pangkat/Gol --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">TMT GOLONGAN TERAKHIR</label>
+                                <input type="date" name="tmt_golongan" id="formTmtGolongan" class="form-control">
+                            </div>
+
+                            <!-- Dates & Early Alerts -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">TMT PENUGASAN PALEMBANG</label>
+                                <input type="date" name="tmt_palembang" id="formTmtPalembang" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">TMT KGB TERAKHIR</label>
+                                <input type="date" name="tmt_kgb" id="formTmtKgb" class="form-control">
+                                <div class="form-text" style="font-size: 0.7rem;">Jatuh tempo KGB berikutnya otomatis dihitung +2 tahun.</div>
+                            </div>
+
+                            <!-- Education & Title Status -->
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">JENJANG PENDIDIKAN</label>
+                                <input type="text" name="pendidikan_terakhir" id="formPendidikan" class="form-control" placeholder="S1 / S2 / D3">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">PROGRAM STUDI / JURUSAN</label>
+                                <input type="text" name="jurusan" id="formJurusan" class="form-control" placeholder="Manajemen / Hukum">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">TAHUN LULUS</label>
+                                <input type="number" name="tahun_lulus" id="formTahunLulus" class="form-control" placeholder="2015">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">PERGURUAN TINGGI / UNIVERSITAS</label>
+                                <input type="text" name="nama_universitas" id="formUniversitas" class="form-control" placeholder="Universitas Sriwijaya">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">STATUS VERIFIKASI GELAR HRIS</label>
+                                <select name="status_gelar" id="formStatusGelar" class="form-select">
+                                    <option value="Sudah Clear (sesuai dengan HRIS)">Sudah Clear (sesuai dengan HRIS)</option>
+                                    <option value="Data tidak sesuai di HRIS">Data tidak sesuai di HRIS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer px-4 py-3 bg-light border-top d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm" id="btnSubmitPegawaiForm">
+                            <i class="fas fa-save me-1"></i> Simpan Data Pegawai
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal (Maintenance Only) -->
     <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
@@ -287,13 +466,36 @@
                             <input type="url" name="sheet_url" id="inputSheetUrl" class="form-control" required
                                    value="{{ \App\Models\AppSetting::get('google_sheet_url', \App\Services\GoogleSheetSyncService::DEFAULT_SPREADSHEET_URL) }}">
                         </div>
-                        <div class="form-text small text-muted">
+                        <div class="form-text small text-muted mb-3">
                             Pastikan spreadsheet telah diset dengan akses <em>"Anyone with the link can view"</em>. Lembar kerja default yang diproses adalah <strong>Daftar Pegawai</strong>.
                         </div>
+
+                        <label class="form-label fw-bold small text-muted text-uppercase">Tautan Webhook Apps Script (Opsional)</label>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text bg-light"><i class="fas fa-cloud-arrow-up text-muted"></i></span>
+                            <input type="url" name="webhook_url" id="inputWebhookUrl" class="form-control" placeholder="https://script.google.com/macros/s/.../exec"
+                                   value="{{ \App\Models\AppSetting::get('google_sheet_webhook_url', '') }}">
+                        </div>
+                        <div class="form-text small text-muted">
+                            Untuk mekanisme Dual-Write langsung saat pegawai dibuat/diedit ke Google Spreadsheet.
+                        </div>
+
+                        @if(auth()->check() && auth()->user()->role === 'maintenance')
+                            <hr class="my-3 text-danger opacity-25">
+                            <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold text-danger small"><i class="fas fa-triangle-exclamation me-1"></i> Wipe Data Pegawai</div>
+                                    <div class="text-danger-emphasis" style="font-size: 0.72rem;">Hapus seluruh 33 data pegawai di database lokal.</div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 fw-semibold" id="btnWipeDataTrigger">
+                                    Wipe Data
+                                </button>
+                            </div>
+                        @endif
                     </div>
                     <div class="modal-footer px-4 py-3 bg-light border-0">
                         <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4">Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Simpan Pengaturan</button>
                     </div>
                 </form>
             </div>
@@ -321,6 +523,12 @@
 
         // Universal Function to open employee detail modal
         function showPegawaiDetail(id) {
+            // Close list modal if open
+            const listModalEl = bootstrap.Modal.getInstance(document.getElementById('aggregateListModal'));
+            if (listModalEl) {
+                listModalEl.hide();
+            }
+
             const modalEl = new bootstrap.Modal(document.getElementById('pegawaiDetailModal'));
             $('#pegawaiModalBody').html(`
                 <div class="modal-body text-center py-5">
@@ -330,9 +538,11 @@
             `);
             modalEl.show();
 
-            $.get(`{{ url('/pegawai') }}/${id}/detail`, function(html) {
+            const detailUrl = "{{ route('pegawai.detail', ['id' => ':id']) }}".replace(':id', id);
+            $.get(detailUrl, function(html) {
                 $('#pegawaiModalBody').html(html);
-            }).fail(function() {
+            }).fail(function(xhr) {
+                console.error("Gagal memuat profil pegawai:", xhr);
                 $('#pegawaiModalBody').html(`
                     <div class="modal-body text-center py-5 text-danger">
                         <i class="fas fa-triangle-exclamation fs-1 mb-2"></i>
@@ -343,6 +553,220 @@
                 `);
             });
         }
+
+        // Universal Function for Clickable Cards & Charts Modal Drill-Down
+        function showAggregateModal(type, value = '', title = '') {
+            const modalEl = new bootstrap.Modal(document.getElementById('aggregateListModal'));
+            $('#aggregateListModalContent').html(`
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-2 text-muted fw-semibold">Memuat daftar personil...</div>
+                </div>
+            `);
+            modalEl.show();
+
+            $.get("{{ route('pegawai.filter_modal') }}", { type: type, value: value, title: title }, function(html) {
+                $('#aggregateListModalContent').html(html);
+            }).fail(function(xhr) {
+                $('#aggregateListModalContent').html(`
+                    <div class="modal-body text-center py-5 text-danger">
+                        <i class="fas fa-triangle-exclamation fs-1 mb-2"></i>
+                        <h5>Gagal Memuat Data</h5>
+                        <p class="text-muted">Terjadi kesalahan saat memfilter data pegawai.</p>
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                `);
+            });
+        }
+
+        // Toggle NIK Visibility (Sensitive Data Privacy)
+        function toggleNikVisibility(btn) {
+            const span = document.getElementById('nikDisplay');
+            const icon = document.getElementById('iconEyeNik');
+            if (!span || !icon) return;
+
+            const isMasked = span.innerText.includes('*');
+            if (isMasked) {
+                span.innerText = btn.getAttribute('data-unmasked');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                btn.setAttribute('title', 'Sembunyikan NIK Lengkap');
+            } else {
+                span.innerText = btn.getAttribute('data-masked');
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                btn.setAttribute('title', 'Tampilkan NIK Lengkap');
+            }
+        }
+
+        // Open Pegawai Form Modal (Create or Edit)
+        function openPegawaiFormModal(id = null) {
+            // Close detail modal if open
+            const detailModalEl = bootstrap.Modal.getInstance(document.getElementById('pegawaiDetailModal'));
+            if (detailModalEl) {
+                detailModalEl.hide();
+            }
+
+            const formModal = new bootstrap.Modal(document.getElementById('pegawaiFormModal'));
+            $('#pegawaiForm')[0].reset();
+            $('#formPegawaiId').val(id || '');
+            $('#formAvatarPreview').hide();
+            $('#formAvatarPlaceholder').show();
+
+            $('#pegawaiFormModalTitle').html(id ? '<i class="fas fa-user-pen text-primary me-2"></i> Edit Data Pegawai' : '<i class="fas fa-user-plus text-primary me-2"></i> Tambah Pegawai Baru');
+
+            const url = id ? "{{ route('pegawai.form_data', ['id' => ':id']) }}".replace(':id', id) : "{{ route('pegawai.form_data') }}";
+
+            $.get(url, function(res) {
+                // Populate Unit Kerjas
+                let unitOptions = '<option value="">-- Pilih Unit Kerja --</option>';
+                (res.unit_kerjas || []).forEach(u => {
+                    unitOptions += `<option value="${u.id}">${u.nama_unit}</option>`;
+                });
+                $('#formUnitKerja').html(unitOptions);
+
+                // Populate Pangkats
+                let pangkatOptions = '<option value="">-- Pilih Pangkat/Gol --</option>';
+                (res.pangkats || []).forEach(p => {
+                    pangkatOptions += `<option value="${p.id}">${p.golongan_ruang} - ${p.nama_pangkat}</option>`;
+                });
+                $('#formPangkat').html(pangkatOptions);
+
+                // If Edit, populate form values
+                if (res.pegawai) {
+                    const p = res.pegawai;
+                    $('#formNama').val(p.nama || '');
+                    $('#formNamaGelar').val(p.nama_lengkap_gelar || '');
+                    $('#formNip').val(p.nip || '');
+                    $('#formNik').val(p.nik || '');
+                    $('#formTipePegawai').val(p.tipe_pegawai || 'pns');
+                    $('#formGender').val(p.jenis_kelamin || 'L');
+                    $('#formTempatLahir').val(p.tempat_lahir || '');
+                    $('#formTanggalLahir').val(p.tanggal_lahir ? p.tanggal_lahir.substring(0, 10) : '');
+                    $('#formUnitKerja').val(p.unit_kerja_id || '');
+                    $('#formJabatan').val(p.nama_jabatan_raw || '');
+                    $('#formJobGrade').val(p.job_grade || '');
+                    $('#formPangkat').val(p.pangkat_golongan_id || '');
+                    $('#formTmtGolongan').val(p.tmt_golongan ? p.tmt_golongan.substring(0, 10) : '');
+                    $('#formTmtPalembang').val(p.tmt_palembang ? p.tmt_palembang.substring(0, 10) : '');
+                    $('#formTmtKgb').val(p.tmt_kgb ? p.tmt_kgb.substring(0, 10) : '');
+                    $('#formPendidikan').val(p.pendidikan_terakhir || '');
+                    $('#formJurusan').val(p.jurusan || '');
+                    $('#formTahunLulus').val(p.tahun_lulus || '');
+                    $('#formUniversitas').val(p.nama_universitas || '');
+                    $('#formStatusGelar').val(p.status_gelar || 'Sudah Clear (sesuai dengan HRIS)');
+
+                    if (p.avatar_url) {
+                        $('#formAvatarPreview').attr('src', '/storage/' + p.avatar_url).show();
+                        $('#formAvatarPlaceholder').hide();
+                    }
+                }
+
+                formModal.show();
+            }).fail(function() {
+                Swal.fire('Error', 'Gagal memuat form pegawai.', 'error');
+            });
+        }
+
+        // Preview Avatar
+        function previewFormAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#formAvatarPreview').attr('src', e.target.result).show();
+                    $('#formAvatarPlaceholder').hide();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Handle Pegawai Form Submit (Create & Update)
+        $('#pegawaiForm').on('submit', function(e) {
+            e.preventDefault();
+            const id = $('#formPegawaiId').val();
+            const url = id ? "{{ route('pegawai.update', ['id' => ':id']) }}".replace(':id', id) : "{{ route('pegawai.store') }}";
+            const formData = new FormData(this);
+            const submitBtn = $('#btnSubmitPegawaiForm');
+
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Data Pegawai');
+                    if (res.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('pegawaiFormModal')).hide();
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: res.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Gagal', res.message || 'Terjadi kesalahan.', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Data Pegawai');
+                    let errMsg = 'Gagal menyimpan data pegawai.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errMsg = xhr.responseJSON.message;
+                    }
+                    Swal.fire('Validasi Gagal', errMsg, 'error');
+                }
+            });
+        });
+
+        // Wipe Data Trigger with Double Confirmation SweetAlert
+        $('#btnWipeDataTrigger').on('click', function() {
+            Swal.fire({
+                title: 'PERINGATAN: WIPE DATA!',
+                text: 'Tindakan ini akan MENGHAPUS SEMUA DATA PEGAWAI di database lokal! Ketik "WIPE" untuk melanjutkan:',
+                input: 'text',
+                inputPlaceholder: 'Ketik WIPE',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6e7881',
+                confirmButtonText: '<i class="fas fa-trash-can me-1"></i> Ya, Hapus Semua Data!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                preConfirm: (val) => {
+                    if (val !== 'WIPE') {
+                        Swal.showValidationMessage('Teks konfirmasi salah. Harap ketik WIPE secara tepat.');
+                        return false;
+                    }
+                    return true;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Sedang membersihkan basis data...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    $.post("{{ route('settings.wipe_data') }}", function(res) {
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success').then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire('Gagal!', res.message, 'error');
+                        }
+                    }).fail(function() {
+                        Swal.fire('Error!', 'Terjadi kesalahan saat memproses Wipe Data.', 'error');
+                    });
+                }
+            });
+        });
 
         // Logout Confirmation via SweetAlert2
         $('#btnLogoutTrigger').on('click', function(e) {
@@ -400,7 +824,7 @@
                                 title: 'Sinkronisasi Berhasil!',
                                 text: response.message || 'Data kepegawaian berhasil diperbarui.',
                                 icon: 'success',
-                                timer: 1500,
+                                timer: 1800,
                                 showConfirmButton: false
                             }).then(() => {
                                 window.location.reload();
@@ -427,6 +851,11 @@
                     });
                 }
             });
+        });
+
+        // Auto-Adjust DataTables columns when switching tabs
+        $('button[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="tab"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function () {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         });
     </script>
     @stack('scripts')

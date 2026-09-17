@@ -58,6 +58,14 @@ class DiagramController extends Controller
             $q->where('is_active', true);
         }])->orderBy('urutan')->get();
 
+        // 8. Job Grade Breakdown (Pindahan dari menu Jabatan)
+        $grades = Pegawai::where('is_active', true)
+            ->whereNotNull('job_grade')
+            ->selectRaw('job_grade, count(*) as total')
+            ->groupBy('job_grade')
+            ->orderByDesc('job_grade')
+            ->get();
+
         $totalPegawai = Pegawai::where('is_active', true)->count();
 
         return view('diagram.index', compact(
@@ -75,6 +83,7 @@ class DiagramController extends Controller
             'tod2to4',
             'todOver4',
             'unitDist',
+            'grades',
             'totalPegawai'
         ));
     }

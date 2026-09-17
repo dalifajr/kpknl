@@ -111,7 +111,10 @@ class Pegawai extends Model
     }
 
     /**
-     * Batas Usia Pensiun (BUP): 60 tahun untuk Struktural Eselon II/III & Madya, 58 tahun untuk Pelaksana/Eselon IV
+     * Batas Usia Pensiun (BUP) berdasarkan PP No. 17 Tahun 2020:
+     * - 58 Tahun: Pejabat Administrasi (Kepala Seksi, Kasubbag, Kepala KPKNL), Pejabat Fungsional Ahli Pertama & Muda, Pejabat Pelaksana
+     * - 60 Tahun: Pejabat Pimpinan Tinggi & Pejabat Fungsional Ahli Madya
+     * - 65 Tahun: Pejabat Fungsional Ahli Utama
      */
     public function getBupUsiaAttribute(): int
     {
@@ -120,14 +123,31 @@ class Pegawai extends Model
         }
 
         $jabatan = strtolower($this->nama_jabatan_raw ?? '');
-        if (str_contains($jabatan, 'kepala kpknl') || str_contains($jabatan, 'madya')) {
+
+        // 65 Tahun: Fungsional Ahli Utama
+        if (str_contains($jabatan, 'ahli utama')) {
+            return 65;
+        }
+
+        // 60 Tahun: Pimpinan Tinggi (JPT) dan Fungsional Ahli Madya
+        if (str_contains($jabatan, 'madya') || str_contains($jabatan, 'pimpinan tinggi') || str_contains($jabatan, 'eselon i') || str_contains($jabatan, 'eselon ii')) {
             return 60;
         }
+
+        // 58 Tahun: Pejabat Administrasi (Kepala Kantor/KPKNL, Kasi, Kasubbag), Fungsional Pertama/Muda, dan Pelaksana
         return 58;
     }
 
     /**
-     * Tanggal Pensiun
+     * Alias bup_tahun untuk view blade
+     */
+    public function getBupTahunAttribute(): int
+    {
+        return $this->bup_usia;
+    }
+
+    /**
+     * Tanggal Pensiun (Tanggal 1 bulan berikutnya setelah mencapai BUP)
      */
     public function getTanggalPensiunAttribute(): ?Carbon
     {
@@ -135,9 +155,16 @@ class Pegawai extends Model
             return null;
         }
 
-        // Pensiun pada tanggal 1 bulan berikutnya setelah mencapai BUP
         $bupDate = $this->tanggal_lahir->copy()->addYears($this->bup_usia);
         return $bupDate->copy()->startOfMonth()->addMonth();
+    }
+
+    /**
+     * Alias tgl_pensiun untuk view blade
+     */
+    public function getTglPensiunAttribute(): ?Carbon
+    {
+        return $this->tanggal_pensiun;
     }
 
     /**
@@ -150,7 +177,7 @@ class Pegawai extends Model
             return null;
         }
 
-        $now = Carbon::now();
+        $now = Carbon::now()->startOfDay();
         if ($now->greaterThan($tglPensiun)) {
             return 0;
         }
@@ -158,24 +185,73 @@ class Pegawai extends Model
     }
 
     /**
-     * Status Early Warning System KGB
+     * Sisa Masa Dinas Tahun
+     */
+    public function getSisaDinasTahunAttribute(): int
+    {
+        $sisaBulan = $this->sisa_pensiun_bulan;
+        if ($sisaBulan === null) return 0;
+        return (int) floor($sisaBulan / 12);
+    }
+
+    /**
+     * Sisa Masa Dinas Bulan
+     */
+    public function getSisaDinasBulanAttribute(): int
+    {
+        $sisaBulan = $this->sisa_pensiun_bulan;
+        if ($sisaBulan === null) return 0;
+        return (int) ($sisaBulan % 12);
+    }
+
+    /**
+     * Relasi ke ChangeLog
+     */
+    public function changeLogs()
+    {
+        return $this->hasMany(ChangeLog::class, 'pegawai_id')->latest();
+    }
+
+    /**
+     * TMT KGB Berikutnya (Jatuh Tempo 2 Tahun setelah TMT KGB Terakhir)
+     */
+    public function getNextTmtKgbAttribute(): ?Carbon
+    {
+        return $this->tmt_kgb ? $this->tmt_kgb->copy()->addYears(2) : null;
+    }
+
+    /**
+     * Status Early Warning System KGB (Dihitung 2 tahun dari TMT KGB Terakhir di Spreadsheet)
      */
     public function getKgbStatusAttribute(): array
     {
         if (!$this->tmt_kgb) {
-            return ['status' => 'unknown', 'label' => 'Belum Ada Data', 'badge' => 'secondary', 'days_diff' => null];
+            return [
+                'status' => 'unknown',
+                'label' => 'Belum Ada Data',
+                'badge' => 'secondary',
+                'days_diff' => null,
+                'overdue_days' => 0,
+                'days_left' => 0,
+                'next_tmt' => null,
+            ];
         }
 
         $now = Carbon::now()->startOfDay();
-        $kgb = $this->tmt_kgb->copy()->startOfDay();
-        $days = (int) $now->diffInDays($kgb, false);
+        // TMT KGB di spreadsheet adalah TMT terakhir, maka jatuh tempo berikutnya adalah +2 tahun
+        $nextKgb = $this->tmt_kgb->copy()->addYears(2)->startOfDay();
+        $days = (int) $now->diffInDays($nextKgb, false);
 
         if ($days < 0) {
+            $absDays = abs($days);
             return [
                 'status' => 'overdue',
-                'label' => 'Lewat Tempo (' . abs($days) . ' hari)',
+                'label' => 'Lewat Tempo (' . $absDays . ' hari)',
                 'badge' => 'danger',
                 'days_diff' => $days,
+                'overdue_days' => $absDays,
+                'days_left' => 0,
+                'next_tmt' => $nextKgb,
             ];
         } elseif ($days <= 90) {
             return [
@@ -183,13 +259,19 @@ class Pegawai extends Model
                 'label' => 'Jatuh Tempo (' . $days . ' hari lagi)',
                 'badge' => 'warning',
                 'days_diff' => $days,
+                'overdue_days' => 0,
+                'days_left' => $days,
+                'next_tmt' => $nextKgb,
             ];
         } else {
             return [
                 'status' => 'safe',
-                'label' => 'Masih Aman (' . round($days / 30) . ' bln)',
+                'label' => 'Aman (' . round($days / 30) . ' bln)',
                 'badge' => 'success',
                 'days_diff' => $days,
+                'overdue_days' => 0,
+                'days_left' => $days,
+                'next_tmt' => $nextKgb,
             ];
         }
     }

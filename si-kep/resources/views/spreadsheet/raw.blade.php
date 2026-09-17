@@ -113,7 +113,7 @@
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <h6 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
             <i class="fas fa-table text-primary"></i>
-            Matriks Lengkap Spreadsheet Pegawai ({{ $pegawais->count() }} Baris)
+            Matriks Lengkap Spreadsheet Pegawai ({{ $pegawais->total() }} Baris)
         </h6>
         <span class="badge bg-light text-secondary border">Akses Terbatas: Superadmin &bull; Admin &bull; Maintenance</span>
     </div>
@@ -252,12 +252,12 @@
             </table>
         </div>
     </div>
-    <div class="card-footer bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+    <div class="card-footer bg-white py-3 px-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
         <small class="text-muted">
-            Menampilkan {{ $pegawais->count() }} baris data &bull; Format kolom disinkronkan langsung dari Google Spreadsheet SIMPATIK
+            Menampilkan {{ $pegawais->firstItem() ?: 0 }} s.d. {{ $pegawais->lastItem() ?: 0 }} dari total {{ $pegawais->total() }} baris data &bull; Format kolom disinkronkan langsung dari Google Spreadsheet SIMPATIK
         </small>
-        <div class="small text-muted font-monospace">
-            KPKNL Palembang &bull; Seksi Kepatuhan Internal &bull; Subbagian Umum
+        <div class="d-flex align-items-center gap-3">
+            {{ $pegawais->links() }}
         </div>
     </div>
 </div>

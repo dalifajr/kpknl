@@ -1,254 +1,34 @@
-RENCANA PERBAIKAN SSO DAN APLIKASI DIDALAMNYA;
+RENCANA PERBAIKAN SI-KEP DIDALAMNYA;
 
-1. tolong perbaiki aplikasi risalah lelang, karena saat aplikasi berada pada server, client tidak bisa mengakses aplikasi tersebut dan malah terpental kembali ke dashboard. khusus untuk user maintenance
+1. saya ingin agar semua card, diagram yang menampilkan data ketika diklik dapat menampilkan data melalui popup modal, data yang berkaitan dengan informasi card atau diagramnya.
 
-2. hapus deretan tombol pada elemen #mainContentArea > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) dirisalah lelang pada bagian dashboard dan elemen yang sama #mainContentArea > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) pada halaman statistik dan tren. pada aplikasi risalah lelang.
+2. ukuran data tabel colgroup tidak sesuai dengan lebar class="row mt-2 justify-content-md-center"
 
-3. aplikasi si-kep, tombol pengaturan spreadsheet pada header dihapus, diganti dengan informasi last sync dari spreadsheet. kemudian pada section pangkalan data di sidebar, menu sinkronisasi data dan pengaturan spreadsheet digabung menjadi satu menu dengan nama pengaturan. kemudian kamu buatkan juga spreadsheet mentah untuk view data yang lebih lengkap. menu ini hanya untuk user superadmin, admin dan maintenance.
+3. pada modal popup profil dibagian usia dan pensiun belum terisi datanya. Berdasarkan regulasi manajemen PNS yang berlaku (PP No. 17 Tahun 2020), berikut adalah rincian pembagian usia pensiun pegawai KPKNL:58 TahunPejabat Administrasi (Kepala Seksi, Kepala Subbagian, dan Kepala KPKNL dengan jabatan struktural tertentu).Pejabat Fungsional Ahli Pertama dan Ahli Muda (seperti Pelelang Ahli Pertama/Muda, Penilai Pemerintah Ahli Pertama/Muda).Pejabat Pelaksana (Staf/pelaksana teknis maupun administrasi).60 TahunPejabat Pimpinan Tinggi dan Pejabat Fungsional Madya (seperti Penilai Pemerintah Ahli Madya atau Pelelang Ahli Madya).65 TahunPejabat Fungsional Ahli Utama (jabatan fungsional tertinggi di tingkat pusat/kementerian).
 
-4. ubah style popup modal detail pegawai pada si-kep pada elemen <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;" id="pegawaiModalBody"><div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%); color: #ffffff;">
-    <div class="d-flex align-items-center gap-3">
-        <div class="avatar-initial fs-3" style="width: 58px; height: 58px; border-radius: 14px; background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.35);">
-            MU
-        </div>
-        <div>
-            <div class="badge bg-warning text-dark fw-bold mb-1" style="font-size: 0.72rem; letter-spacing: 0.04em;">
-                PNS DEFINITIF
-            </div>
-            <h5 class="modal-title fw-bold text-white mb-0" id="pegawaiDetailModalLabel">Muhammad Syukur S.H</h5>
-            <div class="text-white-50 small mt-1">
-                NIP: 197011221996031001 • NIK: 167108******0004
-            </div>
-        </div>
-    </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-</div>
+4. pada modal popup profil pegawai dibagian pendidikan dan gelar, data yang tidak sesuai dengan HRIS masih diberi warna hijau.
 
-<div class="modal-body p-4 bg-white">
-    <!-- Highlight Cards Bar (From referensi_desain) -->
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-md-3">
-            <div class="p-3 rounded-3 bg-light border text-center h-100">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Pangkat / Gol.</div>
-                <div class="fw-bold text-primary fs-6 mt-1">IV/b</div>
-                <div class="text-muted" style="font-size: 0.72rem;">Pembina Tk.I</div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="p-3 rounded-3 bg-light border text-center h-100">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Kelas Jabatan</div>
-                <div class="fw-bold text-success fs-6 mt-1">Grade 18</div>
-                <div class="text-muted" style="font-size: 0.72rem;">Remunerasi DJKN</div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="p-3 rounded-3 bg-light border text-center h-100">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Unit Penempatan</div>
-                <div class="fw-bold text-dark fs-6 mt-1 text-truncate" title="Pimpinan KPKNL Palembang">
-                    Pimpinan
-                </div>
-                <div class="text-muted" style="font-size: 0.72rem;">Palembang</div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="p-3 rounded-3 bg-light border text-center h-100">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Status KGB</div>
-                                <div class="mt-1">
-                    <span class="badge bg-danger px-2 py-1" style="font-size: 0.72rem;">
-                        Lewat Tempo (200 hari)
-                    </span>
-                </div>
-                <div class="text-muted" style="font-size: 0.7rem;">01/03/2026</div>
-            </div>
-        </div>
-    </div>
+5. body > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(2) card info struktural pada dashboard tiap bagian harap beri ilurtrasi ikon.
 
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs nav-fill mb-3" id="profileTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active fw-bold small py-2" id="tab-profil-tab" data-bs-toggle="tab" data-bs-target="#tab-profil" type="button" role="tab">
-                <i class="fas fa-user-tie me-1"></i> Profil &amp; Jabatan
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold small py-2" id="tab-masa-tab" data-bs-toggle="tab" data-bs-target="#tab-masa" type="button" role="tab">
-                <i class="fas fa-business-time me-1"></i> Masa Kerja &amp; KGB
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold small py-2" id="tab-usia-tab" data-bs-toggle="tab" data-bs-target="#tab-usia" type="button" role="tab">
-                <i class="fas fa-hourglass-half me-1"></i> Usia &amp; Pensiun
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold small py-2" id="tab-pendidikan-tab" data-bs-toggle="tab" data-bs-target="#tab-pendidikan" type="button" role="tab">
-                <i class="fas fa-graduation-cap me-1"></i> Pendidikan &amp; Gelar
-            </button>
-        </li>
-    </ul>
+6. body > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) diagram grading pada menu struktural dipindah ke menu diagram analitik. sehingga 4 card info dipindah ke posisi semula. 
 
-    <div class="tab-content" id="profileTabContent">
-        <!-- Tab 1: Profil & Jabatan -->
-        <div class="tab-pane fade show active" id="tab-profil" role="tabpanel">
-            <div class="table-responsive">
-                <table class="table table-sm table-borderless align-middle mb-0">
-                    <tbody>
-                        <tr>
-                            <td class="text-muted" style="width: 38%;">Nama Lengkap (HRIS)</td>
-                            <td class="fw-semibold">: Muhammad Syukur S.H</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Jabatan Definitif</td>
-                            <td class="fw-semibold">: Kepala KPKNL Palembang</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Jenis Jabatan</td>
-                            <td>: <span class="badge bg-primary-subtle text-primary text-uppercase">struktural</span></td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Pangkat / Golongan Ruang</td>
-                            <td class="fw-semibold">: Pembina Tk.I  / IV.b</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">TMT Golongan Terakhir</td>
-                            <td>: 01 Oktober 2014</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">TMT Pengangkatan CPNS/PNS</td>
-                            <td>: 01 Maret 1996</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Validasi Data Jabatan HRIS</td>
-                            <td>: 
-                                                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fas fa-check me-1"></i> Sesuai HRIS</span>
-                                                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+7. hapus tombol keluar pada sidebar. #sidebar > div:nth-of-type(2) > div > a:nth-of-type(8)
 
-        <!-- Tab 2: Masa Kerja & KGB -->
-        <div class="tab-pane fade" id="tab-masa" role="tabpanel">
-            <div class="table-responsive">
-                <table class="table table-sm table-borderless align-middle mb-0">
-                    <tbody>
-                        <tr>
-                            <td class="text-muted" style="width: 38%;">Total Masa Kerja ASN</td>
-                            <td class="fw-semibold text-primary">: 30 Tahun 6 Bulan</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">TMT Mulai Tugas di Palembang</td>
-                            <td>: 10 September 2026</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Lama Penugasan di Palembang</td>
-                            <td class="fw-semibold">: 0 Tahun 0 Bulan</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Kesiapan Rotasi (Tour of Duty)</td>
-                            <td>: 
-                                                                    <span class="badge bg-light text-muted border"><i class="fas fa-check me-1"></i> Normal (&lt; 4 Tahun)</span>
-                                                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Jatuh Tempo KGB Berikutnya</td>
-                            <td class="fw-bold text-danger">: 01 Maret 2026</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Status KGB Terkini</td>
-                            <td>: <span class="badge bg-danger">Lewat Tempo (200 hari)</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+8. saya ingin agar user dapat superadmin dan maintenance dapat mengubah data pegawai via tombol edit pada popup detail pegawai disebelah tombol cetak, kemudian bahkan dapat menambahkan pegawai baru. serta tambahkan tombol mata untuk menampilkan dan menyembunyikan detail sensitif pegawai(berlaku hanya pada user superadmin, admin dan maintenance)
 
-        <!-- Tab 3: Usia & Pensiun -->
-        <div class="tab-pane fade" id="tab-usia" role="tabpanel">
-            <div class="table-responsive">
-                <table class="table table-sm table-borderless align-middle mb-0">
-                    <tbody>
-                        <tr>
-                            <td class="text-muted" style="width: 38%;">Tempat &amp; Tanggal Lahir</td>
-                            <td class="fw-semibold">: Palembang, 22 November 1970</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Usia Saat Ini</td>
-                            <td class="fw-bold text-dark">: 55 Tahun 9 Bulan</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Jenis Kelamin</td>
-                            <td>: Laki-laki</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Batas Usia Pensiun (BUP)</td>
-                            <td>: 60 Tahun</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Proyeksi Tanggal Pensiun</td>
-                            <td class="fw-bold text-primary">: 01 Desember 2030</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Sisa Masa Pengabdian</td>
-                            <td>: 
-                                                                                                                                        <span class="fw-bold text-success">
-                                        4 Tahun 2 Bulan
-                                    </span>
-                                                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+9. ganti logo pada bagian header dengan logo KPKNL Palembang
 
-        <!-- Tab 4: Pendidikan & Gelar -->
-        <div class="tab-pane fade" id="tab-pendidikan" role="tabpanel">
-            <div class="table-responsive">
-                <table class="table table-sm table-borderless align-middle mb-0">
-                    <tbody>
-                        <tr>
-                            <td class="text-muted" style="width: 38%;">Jenjang Pendidikan Terakhir</td>
-                            <td>: <span class="badge bg-primary-subtle text-primary">S1</span></td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Fakultas / Program Studi</td>
-                            <td class="fw-semibold">: Hukum / Hukum</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Perguruan Tinggi / Universitas</td>
-                            <td class="fw-semibold">: Universitas Padjajaran</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Tahun Kelulusan</td>
-                            <td>: 1994</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Status Pencantuman Gelar</td>
-                            <td>: 
-                                <span class="badge bg-success-subtle text-success border border-success-subtle">
-                                    Sudah Clear (sesuai dengan HRIS)
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+10. ganti bahasa #pegawaiModalBody > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)  DOSSIER KEPEGAWAIAN dengan bahasa yang umum.
 
-<div class="modal-footer border-top px-4 py-3 bg-light d-flex justify-content-between">
-    <div class="small text-muted">
-        <i class="fas fa-database text-primary me-1"></i> Data diverifikasi dari Google Spreadsheet SIMPATIK
-    </div>
-    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup Profil</button>
-</div>
-</div> buat agar mengikuti styling yang ada pada referensi.
+11. #pegawaiModalBody > div:nth-of-type(3) > div ganti teks dalam elemen ini menjadi "Data diperoleh dari spreadsheet"
 
-5. pada si-kep Distribusi Kelas Jabatan (Job Grading Kemenkeu) buat saja menjadi diagram donat. dengan 4 elemen card body > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(3) disamping diagramnya dan untuk 4 card disusun menurun.
+12. menu pengaturan harus disembunyikan selain akun maintenance. dan tambahkan tombol wipe data untuk menghapus semua data yang sudah ada.
 
-6. http://10.24.7.207/si-kep/public/unit-kerja saat ini, semua data ditampilkan secara gamblang dan membuat penuh layar. buatkan saran perbaikannya.
+13. tambahkan support untuk mengupload photo profil pegawai melalui tombol edit pada popup modal detail pegawai.
+
+14. mekanisme edit data pegawai dan create pegawai dengan cara melakukan write secara langsung ke database dan google spreadsheet. sehingga data yang ada di database dan google spreadsheet selalu sinkron. jika google spreadsheet tidak bisa diakses, maka data disimpan dalam database terlebih dahulu, kemudian akan disinkronkan ketika user menekan tombol sinkron.
+
+15. buatkan menu log perubahan dan statusnya sudah sync atau belum dengan google spreadsheet khsusu untuk role superadmin dan maintenance. untuk referensi desain ada pada folder referensi dan bisa kamu kembangkan mengikuti kebutuhan sistem.
 
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.

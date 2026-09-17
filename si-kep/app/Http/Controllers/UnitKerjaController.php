@@ -14,10 +14,15 @@ class UnitKerjaController extends Controller
             $q->with(['jabatan', 'pangkatGolongan'])->orderBy('no_urut');
         }])->orderBy('urutan')->get();
 
+        $allPegawai = Pegawai::with(['unitKerja', 'jabatan', 'pangkatGolongan'])
+            ->where('is_active', true)
+            ->orderBy('no_urut')
+            ->get();
+
         $totalPegawai = Pegawai::where('is_active', true)->count();
         $totalPns = Pegawai::where('is_active', true)->where('tipe_pegawai', 'pns')->count();
         $totalPpnpn = Pegawai::where('is_active', true)->where('tipe_pegawai', 'ppnpn')->count();
 
-        return view('unit_kerja.index', compact('unitKerjas', 'totalPegawai', 'totalPns', 'totalPpnpn'));
+        return view('unit_kerja.index', compact('unitKerjas', 'allPegawai', 'totalPegawai', 'totalPns', 'totalPpnpn'));
     }
 }

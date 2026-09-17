@@ -255,12 +255,20 @@ class GoogleSheetSyncService
 
             DB::commit();
 
+            // Push pending local changes to spreadsheet
+            $pendingPushResult = $this->pushPendingChanges();
+            $pushInfo = '';
+            if ($pendingPushResult['total'] > 0) {
+                $pushInfo = " ({$pendingPushResult['synced']} perubahan lokal disinkronkan ke spreadsheet)";
+            }
+
             return [
                 'success' => true,
-                'message' => "Sinkronisasi berhasil! {$importedCount} data pegawai ({$pnsCount} PNS, {$ppnpnCount} PPNPN) berhasil diperbarui.",
+                'message' => "Sinkronisasi berhasil! {$importedCount} data pegawai ({$pnsCount} PNS, {$ppnpnCount} PPNPN) berhasil diperbarui{$pushInfo}.",
                 'total' => $importedCount,
                 'pns' => $pnsCount,
                 'ppnpn' => $ppnpnCount,
+                'pending_pushed' => $pendingPushResult,
                 'duration' => round(microtime(true) - $startTime, 2) . 's',
             ];
         } catch (Exception $e) {
@@ -533,5 +541,94 @@ class GoogleSheetSyncService
             }
         }
         return '';
+    }
+
+    /**
+     * Push a change log entry to Google Spreadsheet via Apps Script Webhook
+     */
+    public function pushRowUpdate(\App\Models\ChangeLog $log): array
+    {
+        $webhookUrl = AppSetting::get('google_sheet_webhook_url');
+
+        if (empty($webhookUrl)) {
+            // Webhook belum diatur, tandai pending
+            $log->update([
+                'sync_status' => 'pending',
+                'sync_error' => 'Webhook Google Spreadsheet belum diatur di Pengaturan Sistem. Data tersimpan aman di database lokal.',
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Tersimpan lokal (Webhook spreadsheet belum dikonfigurasi).',
+                'pending' => true,
+            ];
+        }
+
+        try {
+            $response = Http::timeout(15)->post($webhookUrl, [
+                'action' => $log->action,
+                'nip' => $log->nip,
+                'nama' => $log->nama_pegawai,
+                'data' => $log->payload_after,
+                'timestamp' => now()->toIso8601String(),
+            ]);
+
+            if ($response->successful()) {
+                $log->update([
+                    'sync_status' => 'synced',
+                    'sync_error' => null,
+                    'synced_at' => now(),
+                ]);
+                return [
+                    'success' => true,
+                    'message' => 'Berhasil disinkronkan ke Google Spreadsheet.',
+                ];
+            } else {
+                $errMsg = "HTTP " . $response->status() . ": " . substr($response->body(), 0, 200);
+                $log->update([
+                    'sync_status' => 'pending',
+                    'sync_error' => $errMsg,
+                ]);
+                return [
+                    'success' => false,
+                    'message' => "Gagal sinkron ke spreadsheet: {$errMsg}",
+                    'pending' => true,
+                ];
+            }
+        } catch (Exception $e) {
+            $log->update([
+                'sync_status' => 'pending',
+                'sync_error' => $e->getMessage(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Koneksi ke Google Spreadsheet terputus. Data disimpan di database lokal.',
+                'pending' => true,
+            ];
+        }
+    }
+
+    /**
+     * Push all pending change logs to Google Spreadsheet
+     */
+    public function pushPendingChanges(): array
+    {
+        $pending = \App\Models\ChangeLog::where('sync_status', 'pending')->get();
+        $successCount = 0;
+        $failCount = 0;
+
+        foreach ($pending as $log) {
+            $res = $this->pushRowUpdate($log);
+            if ($res['success']) {
+                $successCount++;
+            } else {
+                $failCount++;
+            }
+        }
+
+        return [
+            'total' => $pending->count(),
+            'synced' => $successCount,
+            'failed' => $failCount,
+        ];
     }
 }
