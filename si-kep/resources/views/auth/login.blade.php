@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk Sistem — SIMPATIK KPKNL Palembang</title>
+    <title>Masuk Sistem — SI-KEP KPKNL Palembang</title>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Outfit (From referensi_desain) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,7 +25,7 @@
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #07193b 0%, #0c306b 50%, #1e40af 100%);
             min-height: 100vh;
             display: flex;
@@ -85,7 +85,7 @@
             height: 68px;
             margin: 0 auto 16px;
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-            border-radius: 16px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -95,7 +95,7 @@
         }
 
         .brand-title {
-            font-size: 1.55rem;
+            font-size: 1.65rem;
             font-weight: 800;
             color: var(--primary-color);
             letter-spacing: -0.02em;
@@ -172,9 +172,9 @@
         <!-- Login Header -->
         <div class="login-header">
             <div class="brand-icon-box">
-                <i class="fa-solid fa-users-rectangle"></i>
+                <i class="fas fa-users-rectangle"></i>
             </div>
-            <h1 class="brand-title">SIMPATIK <span class="text-warning">KPKNL</span></h1>
+            <h1 class="brand-title">SI-KEP <span class="text-warning">KPKNL</span></h1>
             <div class="brand-subtitle">
                 Sistem Informasi Manajemen Profil &amp; Analitika Terpadu Kepegawaian<br>
                 <strong class="text-dark">KPKNL Palembang &bull; DJKN Kemenkeu</strong>
@@ -186,36 +186,36 @@
             <!-- Flash Notification -->
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show rounded-3 small p-3 mb-3" role="alert">
-                    <i class="fa-solid fa-circle-check me-1"></i> {{ session('success') }}
+                    <i class="fas fa-circle-check me-1"></i> {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show rounded-3 small p-3 mb-3" role="alert">
-                    <i class="fa-solid fa-triangle-exclamation me-1"></i> {{ session('error') }}
+                    <i class="fas fa-triangle-exclamation me-1"></i> {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
             <!-- SSO Integration Guide Notice -->
             <div class="info-box">
-                <i class="fa-solid fa-shield-halved text-primary fs-5 mt-1"></i>
+                <i class="fas fa-shield-halved text-primary fs-5 mt-1"></i>
                 <div>
                     <strong>Otentikasi Terpusat SSO:</strong><br>
                     Aplikasi ini menggunakan sistem keamanan Single Sign-On (SSO). Seluruh pegawai dapat masuk langsung menggunakan akun terpadu KPKNL Palembang.
                 </div>
             </div>
 
-            <!-- Single Sign-On Action Button (Replaces conventional login form) -->
+            <!-- Single Sign-On Action Button -->
             <a href="{{ route('sso.redirect') }}" class="btn-sso">
-                <i class="fa-solid fa-key text-warning"></i>
+                <i class="fas fa-key text-warning"></i>
                 <span>Masuk Melalui SSO KPKNL</span>
-                <i class="fa-solid fa-arrow-right ms-auto"></i>
+                <i class="fas fa-arrow-right ms-auto"></i>
             </a>
 
             <div class="text-center mt-3">
                 <span class="badge bg-light text-muted border px-3 py-1">
-                    <i class="fa-solid fa-lock me-1 text-success"></i> 256-Bit SSL Encrypted &bull; OAuth 2.0
+                    <i class="fas fa-lock me-1 text-success"></i> 256-Bit SSL Encrypted &bull; OAuth 2.0
                 </span>
             </div>
         </div>

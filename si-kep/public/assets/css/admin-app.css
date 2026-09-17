@@ -1,0 +1,293 @@
+/* ==========================================================================
+   SI-KEP (SIMPATIK KPKNL Palembang) - Executive Admin Portal Design System
+   Replicated & Enhanced from referensi_desain (desain1 & desain2)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --primary-color: #0c306b;       /* DJKN Navy Master */
+    --primary-light: #1e40af;       /* Royal Blue */
+    --accent-color: #d97706;        /* DJKN Gold */
+    --accent-light: #f59e0b;
+    --bg-color: #f1f5f9;            /* Slate light background */
+    --text-color: #1e293b;
+    --sidebar-width: 280px;
+    --topbar-height: 60px;
+}
+
+[data-bs-theme="dark"] {
+    --primary-color: #3b82f6;
+    --primary-light: #60a5fa;
+    --bg-color: #0f172a;
+    --text-color: #e2e8f0;
+}
+
+/* Base Body Setup */
+body {
+    background-color: var(--bs-body-bg, #f8fafc);
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    overflow-x: hidden;
+}
+
+/* Top Fixed Navbar */
+.navbar-top-fixed {
+    height: var(--topbar-height);
+    background-color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    z-index: 1030;
+    transition: all 0.2s ease;
+}
+
+/* Two-Panel App Container */
+.app-container {
+    display: flex;
+    margin-top: var(--topbar-height);
+    height: calc(100vh - var(--topbar-height));
+    overflow: hidden;
+}
+
+/* Left Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background: #ffffff;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+    z-index: 100;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+.sidebar-header {
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+}
+
+.menu-group {
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+}
+
+.menu-header {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    font-weight: 700;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 0.9rem;
+    color: #334155;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-weight: 500;
+    font-size: 0.92rem;
+    margin-bottom: 2px;
+}
+
+.menu-item:hover {
+    background: #f1f5f9;
+    color: var(--primary-color);
+    font-weight: 600;
+    transform: translateX(3px);
+}
+
+.menu-item.active {
+    background: #e2e8f0;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.menu-item i {
+    width: 25px;
+    text-align: center;
+    margin-right: 10px;
+    font-size: 0.95rem;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background: #f1f5f9;
+    position: relative;
+    scrollbar-width: thin;
+}
+
+.main-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 240px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    z-index: 0;
+}
+
+/* Cards System */
+.card {
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    background-color: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07) !important;
+}
+
+.card-header {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding: 1.25rem 1.5rem !important;
+    font-weight: 600;
+}
+
+.card-footer {
+    background-color: #ffffff !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding: 1rem 1.5rem !important;
+}
+
+/* Primary Button Theming */
+.btn-primary {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: var(--primary-light) !important;
+    border-color: var(--primary-light) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(12, 48, 107, 0.2);
+}
+
+/* KPI Summary Cards with Accent Border-Start (From referensi_desain/desain2.html) */
+.kpi-accent-card {
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+    background-color: #ffffff;
+    height: 100%;
+}
+
+.border-4 {
+    border-width: 4px !important;
+}
+
+/* Avatar Inisial */
+.avatar-initial {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    flex-shrink: 0;
+}
+
+/* Tables */
+.table-hover tbody tr:hover {
+    background-color: #f8fafc;
+    cursor: pointer;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+}
+
+.table td {
+    font-size: 0.9rem;
+}
+
+/* Badge Refinements */
+.badge-subtle {
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+}
+
+/* Spin Animation for Sync Icon */
+.spin {
+    animation: spin 1s infinite linear;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Mobile Sidebar (From referensi_desain/desain1_files/admin-app.css) */
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        top: var(--topbar-height);
+        bottom: 0;
+        left: calc(-1 * var(--sidebar-width));
+        height: auto;
+        z-index: 1050;
+        transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 5px 0 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: var(--topbar-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(2px);
+        z-index: 1040;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+        opacity: 1;
+    }
+
+    .main-content {
+        padding: 1.25rem 1rem;
+    }
+}

@@ -1,6 +1,6 @@
 RENCANA PERBAIKAN SSO DAN APLIKASI DIDALAMNYA;
 
-1. 
+1. perbaiki desain layout, css, tata letak dll aplikasi si-kep untuk mengacu pada file pada folder referensi_desain. kamu harus maksimalkan untuk menggunakan desain referensi yang saya berikan untuk diterapkan ke aplikasi si-kep.
 
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.

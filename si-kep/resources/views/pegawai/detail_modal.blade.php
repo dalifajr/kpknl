@@ -1,6 +1,6 @@
-<div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between" style="background: linear-gradient(135deg, #0c306b 0%, #1e40af 100%); color: #ffffff;">
+<div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%); color: #ffffff;">
     <div class="d-flex align-items-center gap-3">
-        <div class="avatar-initial fs-3" style="width: 58px; height: 58px; border-radius: 12px; background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.35);">
+        <div class="avatar-initial fs-3" style="width: 58px; height: 58px; border-radius: 14px; background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.35);">
             {{ strtoupper(substr($pegawai->nama, 0, 2)) }}
         </div>
         <div>
@@ -16,8 +16,8 @@
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<div class="modal-body p-4">
-    <!-- Highlight Cards Bar -->
+<div class="modal-body p-4 bg-white">
+    <!-- Highlight Cards Bar (From referensi_desain) -->
     <div class="row g-3 mb-4">
         <div class="col-sm-6 col-md-3">
             <div class="p-3 rounded-3 bg-light border text-center h-100">
@@ -60,22 +60,22 @@
     <ul class="nav nav-tabs nav-fill mb-3" id="profileTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active fw-bold small py-2" id="tab-profil-tab" data-bs-toggle="tab" data-bs-target="#tab-profil" type="button" role="tab">
-                <i class="fa-solid fa-user-tie me-1"></i> Profil & Jabatan
+                <i class="fas fa-user-tie me-1"></i> Profil & Jabatan
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold small py-2" id="tab-masa-tab" data-bs-toggle="tab" data-bs-target="#tab-masa" type="button" role="tab">
-                <i class="fa-solid fa-business-time me-1"></i> Masa Kerja & KGB
+                <i class="fas fa-business-time me-1"></i> Masa Kerja & KGB
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold small py-2" id="tab-usia-tab" data-bs-toggle="tab" data-bs-target="#tab-usia" type="button" role="tab">
-                <i class="fa-solid fa-hourglass-half me-1"></i> Usia & Pensiun
+                <i class="fas fa-hourglass-half me-1"></i> Usia & Pensiun
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold small py-2" id="tab-pendidikan-tab" data-bs-toggle="tab" data-bs-target="#tab-pendidikan" type="button" role="tab">
-                <i class="fa-solid fa-graduation-cap me-1"></i> Pendidikan & Gelar
+                <i class="fas fa-graduation-cap me-1"></i> Pendidikan & Gelar
             </button>
         </li>
     </ul>
@@ -96,7 +96,7 @@
                         </tr>
                         <tr>
                             <td class="text-muted">Jenis Jabatan</td>
-                            <td>: <span class="badge badge-subtle badge-navy text-uppercase">{{ $pegawai->jabatan?->jenis_jabatan ?: 'Pelaksana' }}</span></td>
+                            <td>: <span class="badge bg-primary-subtle text-primary text-uppercase">{{ $pegawai->jabatan?->jenis_jabatan ?: 'Pelaksana' }}</span></td>
                         </tr>
                         <tr>
                             <td class="text-muted">Pangkat / Golongan Ruang</td>
@@ -114,9 +114,9 @@
                             <td class="text-muted">Validasi Data Jabatan HRIS</td>
                             <td>: 
                                 @if($pegawai->validasi_jabatan)
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fa-solid fa-check me-1"></i> Sesuai HRIS</span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fas fa-check me-1"></i> Sesuai HRIS</span>
                                 @else
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fa-solid fa-xmark me-1"></i> Perlu Verifikasi</span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-xmark me-1"></i> Perlu Verifikasi</span>
                                 @endif
                             </td>
                         </tr>
@@ -146,9 +146,9 @@
                             <td class="text-muted">Kesiapan Rotasi (Tour of Duty)</td>
                             <td>: 
                                 @if($pegawai->is_tour_of_duty_due)
-                                    <span class="badge bg-warning text-dark"><i class="fa-solid fa-arrows-split-up-and-left me-1"></i> Siap Rotasi (&gt; 4 Tahun)</span>
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-arrows-split-up-and-left me-1"></i> Siap Rotasi (&gt; 4 Tahun)</span>
                                 @else
-                                    <span class="badge bg-light text-muted border"><i class="fa-solid fa-check me-1"></i> Normal (&lt; 4 Tahun)</span>
+                                    <span class="badge bg-light text-muted border"><i class="fas fa-check me-1"></i> Normal (&lt; 4 Tahun)</span>
                                 @endif
                             </td>
                         </tr>
@@ -216,7 +216,7 @@
                     <tbody>
                         <tr>
                             <td class="text-muted" style="width: 38%;">Jenjang Pendidikan Terakhir</td>
-                            <td>: <span class="badge badge-subtle badge-navy">{{ $pegawai->pendidikan_terakhir ?: '-' }}</span></td>
+                            <td>: <span class="badge bg-primary-subtle text-primary">{{ $pegawai->pendidikan_terakhir ?: '-' }}</span></td>
                         </tr>
                         <tr>
                             <td class="text-muted">Fakultas / Program Studi</td>
@@ -247,7 +247,7 @@
 
 <div class="modal-footer border-top px-4 py-3 bg-light d-flex justify-content-between">
     <div class="small text-muted">
-        <i class="fa-solid fa-database text-primary me-1"></i> Data diverifikasi dari Google Spreadsheet SIMPATIK
+        <i class="fas fa-database text-primary me-1"></i> Data diverifikasi dari Google Spreadsheet SIMPATIK
     </div>
     <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup Profil</button>
 </div>
