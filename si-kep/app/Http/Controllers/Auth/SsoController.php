@@ -54,10 +54,19 @@ class SsoController extends Controller
     {
         $code = $request->input('code');
         $state = $request->input('state');
+        $savedState = session('sso_state');
 
         if (!$code) {
             return redirect()->route('login')->with('error', 'Otorisasi SSO dibatalkan atau tidak menerima kode otorisasi.');
         }
+
+        // Anti-OAuth Login CSRF validation (RFC 6749 Section 10.12)
+        if (!$state || !$savedState || !hash_equals((string) $savedState, (string) $state)) {
+            return redirect()->route('login')->with('error', 'Validasi token keamanan sesi (OAuth state) gagal atau sesi Anda telah kedaluwarsa. Silakan ulangi proses masuk.');
+        }
+
+        // Clear used state to prevent replay
+        session()->forget('sso_state');
 
         try {
             $ssoBaseUrl = rtrim(env('SSO_BASE_URL', 'http://sso.test'), '/');
@@ -114,7 +123,12 @@ class SsoController extends Controller
                 ]
             );
 
-            // 4. Authenticate in SI-KEP Application
+            // 4. Authenticate in SI-KEP Application and persist SSO token in session
+            session([
+                'sso_access_token' => $accessToken,
+                'sso_user_id' => $ssoUser['id'],
+            ]);
+
             Auth::login($localUser, true);
 
             return redirect()->intended(route('dashboard'))

@@ -17,11 +17,9 @@ use Illuminate\Support\Facades\Route;
 | Arsitektur Fullstack Laravel Blade terintegrasi Single Sign-On (SSO).
 */
 
-// SSO Authentication Routes
+// SSO Authentication Routes (Single Sign-On KPKNL Palembang)
 Route::get('/auth/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
 Route::get('/auth/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
-Route::match(['get', 'post'], '/auth/sso/switch-role', [SsoController::class, 'switchRolePost'])->name('sso.switch-role-post');
-Route::get('/auth/sso/switch-role/{role}', [SsoController::class, 'switchRole'])->name('sso.switch-role');
 Route::match(['get', 'post'], '/logout', [SsoController::class, 'logout'])->name('logout');
 
 // Eliminasi Login & Register Manual: dialihkan langsung ke SSO terpusat

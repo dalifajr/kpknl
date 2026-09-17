@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Background Squircle: Deep Navy to Royal Blue -->
+    <linearGradient id="aset-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1c3d"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+    <!-- Pediment / Building Base: Pure White to Ice White -->
+    <linearGradient id="aset-card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <!-- Roof Pediment: Crisp White with Sky Blue Highlight -->
+    <linearGradient id="aset-roof" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+    <!-- Shield Emblem Gradient: Royal Blue to Sky Blue -->
+    <linearGradient id="aset-shield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="aset-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#051329" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="url(#aset-bg)" filter="url(#aset-shadow)"/>
+  
+  <!-- Subtle Glow Accent -->
+  <circle cx="96" cy="32" r="28" fill="#ffffff" opacity="0.10"/>
+
+  <!-- Building / Architecture Pediment Base -->
+  <rect x="24" y="32" width="80" height="74" rx="12" fill="url(#aset-card)"/>
+
+  <!-- Roof Triangle / Pediment (White & Blue Accents) -->
+  <path d="M28 44 L64 22 L100 44 Z" fill="url(#aset-roof)" stroke="#bfdbfe" stroke-width="1"/>
+  <circle cx="64" cy="34" r="4.5" fill="#1d4ed8"/>
+  <circle cx="64" cy="34" r="2" fill="#ffffff"/>
+
+  <!-- Classical Pillars (Crisp Sky & Royal Blue) -->
+  <rect x="34" y="48" width="10" height="42" rx="3" fill="#3b82f6" opacity="0.85"/>
+  <rect x="52" y="48" width="10" height="42" rx="3" fill="#3b82f6" opacity="0.85"/>
+  <rect x="66" y="48" width="10" height="42" rx="3" fill="#3b82f6" opacity="0.85"/>
+  <rect x="84" y="48" width="10" height="42" rx="3" fill="#3b82f6" opacity="0.85"/>
+
+  <!-- Foundation Base (Deep Corporate Blue) -->
+  <rect x="28" y="90" width="72" height="8" rx="4" fill="#1e3a8a"/>
+
+  <!-- Blue & White Asset Shield Emblem -->
+  <circle cx="64" cy="68" r="16" fill="#ffffff" filter="url(#aset-shadow)"/>
+  <path d="M64 57 L75 61 C75 72 64 78 64 78 C64 78 53 72 53 61 Z" fill="url(#aset-shield)"/>
+  <path d="M60 68 L63 71 L69 64" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -8,6 +8,7 @@ use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckApplicationAccess;
 use App\Http\Middleware\EnsureSessionIsActive;
 use App\Http\Middleware\CheckMaintenanceMode;
+use App\Http\Middleware\SecurityHeaders;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => CheckRole::class,
             'app.access' => CheckApplicationAccess::class,
         ]);
+        $middleware->appendToGroup('web', SecurityHeaders::class);
         $middleware->appendToGroup('web', EnsureSessionIsActive::class);
         $middleware->appendToGroup('web', CheckMaintenanceMode::class);
         $middleware->validateCsrfTokens(except: [

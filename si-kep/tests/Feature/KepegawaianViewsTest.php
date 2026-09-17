@@ -383,7 +383,8 @@ class KepegawaianViewsTest extends TestCase
         $response->assertSee('Tentang SI-KEP');
         $response->assertSee('Tentang Aplikasi');
         $response->assertSee('Pengembang Sistem');
-        $response->assertSee('Tim KP UIN Raden Fatah 2026 dan Utoro Yogi Wiratama A.Md.Pnl.');
+        $response->assertSee('Tim KP UIN Raden Fatah 2026');
+        $response->assertSee('Utoro Yogi Wiratama A.Md.Pnl.');
         $response->assertSee('logo-kpknl.png');
         $response->assertDontSee('Sistem Informasi Resmi KPKNL Palembang');
         $response->assertDontSee('Aparatur Terkelola');
@@ -393,6 +394,11 @@ class KepegawaianViewsTest extends TestCase
         $dashResponse->assertStatus(200);
         $dashResponse->assertSee(route('about'));
         $dashResponse->assertSee('Tentang Aplikasi');
+
+        // Check borderless logos in about page (per perbaikan.txt)
+        $response->assertDontSee('border-opacity-20');
+        $response->assertDontSee('border shadow-xs');
+        $response->assertSee('border: none !important;');
     }
 
     /**

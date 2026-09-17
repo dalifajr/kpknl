@@ -78,11 +78,11 @@
             <div class="col-md-6">
                 <label for="icon" class="form-label fw-semibold text-dark fs-7">Ikon Aplikasi (Opsional)</label>
                 <div class="d-flex align-items-center gap-3">
-                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center text-muted flex-shrink-0 overflow-hidden" style="width: 46px; height: 46px; border: 1px dashed var(--md-sys-color-outline-variant);">
-                        @if($application->icon && !in_array($application->icon, ['box', 'desktop', 'window-maximize']))
-                            <img src="{{ asset('storage/' . $application->icon) }}" alt="Icon" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="bg-white rounded-3 d-flex align-items-center justify-content-center text-muted flex-shrink-0 overflow-hidden shadow-xs" style="width: 50px; height: 50px; border: 1px dashed var(--md-sys-color-outline-variant);">
+                        @if($application->icon_url)
+                            <img src="{{ $application->icon_url }}" alt="Icon" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;">
                         @else
-                            <i class="fa-solid fa-{{ $application->icon ?: 'image' }}"></i>
+                            <i class="fa-solid fa-{{ $application->icon ?: 'image' }} text-primary fs-5"></i>
                         @endif
                     </div>
                     <input type="file" name="icon" id="icon" class="form-control m3e-input rounded-3 py-2" accept="image/jpeg,image/png,image/svg+xml">

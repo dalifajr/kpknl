@@ -127,4 +127,120 @@ class Application extends Model
     {
         return $this->adaptHostToCurrentRequest($this->attributes['redirect_uri'] ?? '');
     }
+
+    /**
+     * Get accessible URL for application icon (custom upload or default illustration SVG).
+     */
+    public function getIconUrlAttribute(): ?string
+    {
+        $icon = $this->attributes['icon'] ?? null;
+
+        // 1. If custom upload file exists (starts with applications/ or contains extension)
+        if (!empty($icon) && (str_contains($icon, '/') || str_contains($icon, '.'))) {
+            $basename = basename($icon);
+
+            // If file exists in public/images/apps/
+            if (file_exists(public_path('images/apps/' . $basename))) {
+                return asset('images/apps/' . $basename);
+            }
+
+            // If public/storage exists
+            if (file_exists(public_path('storage/' . $icon))) {
+                return asset('storage/' . $icon);
+            }
+
+            // If storage/app/public exists
+            if (file_exists(storage_path('app/public/' . $icon)) || file_exists(storage_path('app/public/applications/' . $basename))) {
+                return route('application.icon', ['path' => $icon]);
+            }
+
+            return asset('storage/' . $icon);
+        }
+
+        // 2. Map known application slug / name to dedicated official SVG illustration
+        $slug = strtolower($this->slug ?? '');
+        $name = strtolower($this->name ?? '');
+
+        if (str_contains($slug, 'monlap') || str_contains($name, 'monitoring') || str_contains($slug, 'monitoring')) {
+            return asset('images/apps/monlap.svg');
+        }
+        if (str_contains($slug, 'aset') || str_contains($name, 'aset') || str_contains($name, 'bppn')) {
+            return asset('images/apps/aset-bppn.svg');
+        }
+        if (str_contains($slug, 'bmn') || str_contains($name, 'bmn') || str_contains($slug, 'dashboard')) {
+            return asset('images/apps/dashboard-bmn.svg');
+        }
+        if (str_contains($slug, 'lelang') || str_contains($name, 'lelang') || str_contains($name, 'peminjaman')) {
+            return asset('images/apps/peminjaman-lelang.svg');
+        }
+        if (str_contains($slug, 'kep') || str_contains($name, 'kepegawaian') || str_contains($slug, 'simpatik')) {
+            return asset('images/apps/si-kep.svg');
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine if the application has an image/SVG icon or FontAwesome icon.
+     */
+    public function getHasImageIconAttribute(): bool
+    {
+        return !empty($this->icon_url);
+    }
+    /**
+     * Determine if the application is in maintenance mode (503).
+     */
+    public function getIsMaintenanceAttribute(): bool
+    {
+        if ($this->maintenance_mode) {
+            return true;
+        }
+
+        if (($this->health_status ?? '') === 'maintenance') {
+            return true;
+        }
+
+        if (($this->status ?? '') === 'maintenance') {
+            return true;
+        }
+
+        $appPath = $this->resolved_path;
+        if ($appPath && file_exists($appPath . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'down')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get user-friendly status label.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        if ($this->is_maintenance) {
+            return 'PEMELIHARAAN (503)';
+        }
+
+        if ($this->status === 'inactive') {
+            return 'NONAKTIF';
+        }
+
+        return 'TERSEDIA';
+    }
+
+    /**
+     * Get badge CSS classes for application status.
+     */
+    public function getStatusBadgeClassAttribute(): string
+    {
+        if ($this->is_maintenance) {
+            return 'bg-warning-subtle text-warning border border-warning-subtle';
+        }
+
+        if ($this->status === 'inactive') {
+            return 'bg-secondary-subtle text-secondary';
+        }
+
+        return 'bg-success-subtle text-success';
+    }
 }

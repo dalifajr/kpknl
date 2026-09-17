@@ -107,7 +107,12 @@ class UserTaskController extends Controller
             }
             
             // Bypass Laravel's store() which relies on getRealPath() that sometimes fails on Windows Temp
-            $filename = \Illuminate\Support\Str::random(40) . '.' . $file->getClientOriginalExtension();
+            $ext = strtolower($file->extension() ?: ($file->guessExtension() ?: 'pdf'));
+            $allowedExts = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+            if (!in_array($ext, $allowedExts, true)) {
+                $ext = 'pdf';
+            }
+            $filename = \Illuminate\Support\Str::random(40) . '.' . $ext;
             $path = 'attachments/' . $filename;
             \Illuminate\Support\Facades\Storage::disk('public')->put($path, file_get_contents($file->getPathname()));
             

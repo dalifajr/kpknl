@@ -1,10 +1,6 @@
-RENCANA PERBAIKAN APLIKASI DIDALAMNYA;
+RENCANA PERBAIKAN APLIKASI SSO DIDALAMNYA;
 
-1. buang kata-kata "SIMPATIK" pada seluruh bagian si-kep dan ganti dengan SI-KEP.
-
-2. perbaiki layout halaman http://localhost/sso/public/admin/applications
-
-3. ganti style aplikasi sso. ubahlah styling layout, css, dan lain-lain untuk memperbagus tampilan. gunakan referensi sso pada folder referensi dengan kamu kustomisasi sesuai kebutuhan sso. 
+1. saya ingin kamu melakukan analisa sistem keamanan aplikasi sso, dan aplikasi yang terintegerasi didalamnya. karena ini aplikasi untuk instansi, maka keamanan data adalah yang terpenting. silakan kamu coba analisa celah, kekurangan dari sisi keamanan, dan berikan saran perbaikan yang diperlukan. dan bahkan kamu bisa coba lakukan pentest ke aplikasi saya ini di localhost untuk memastikan aplikasi saya ini aman saat saya deploy.
 
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.
@@ -12,3 +8,4 @@ catat untuk kamu;
 - jika ragu, tanyakan dan diskusikan.
 - dokumentasikan setiap langkah perbaikan.
 - lakukan pengetesan pada setiap perubahan guna mendapatkan hasil clean code dan fungsionalitas yang maksimal.
+- tidak usah melakukan test menggunakan browser agent.

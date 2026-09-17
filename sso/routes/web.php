@@ -23,6 +23,52 @@ Route::get('/login', [LoginController::class, 'showLoginForm']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// Application Icon Direct Asset / Fallback Route (guarantees icon availability on all environments safely)
+Route::get('/app-icon/{path}', function ($path) {
+    $allowedExtensions = ['png', 'jpg', 'jpeg', 'svg', 'webp', 'ico', 'gif'];
+    $filename = basename($path);
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+    if (!in_array($ext, $allowedExtensions, true)) {
+        abort(404);
+    }
+
+    $candidatePaths = [
+        storage_path('app/public/' . $path),
+        storage_path('app/public/applications/' . $filename),
+        public_path('images/apps/' . $filename),
+    ];
+
+    $allowedRoots = [
+        realpath(storage_path('app/public')),
+        realpath(public_path('images/apps')),
+    ];
+
+    $targetFile = null;
+    foreach ($candidatePaths as $candidate) {
+        $real = realpath($candidate);
+        if ($real && file_exists($real)) {
+            foreach ($allowedRoots as $root) {
+                if ($root && str_starts_with($real, $root)) {
+                    $targetFile = $real;
+                    break 2;
+                }
+            }
+        }
+    }
+
+    if (!$targetFile) {
+        abort(404);
+    }
+
+    $mime = mime_content_type($targetFile) ?: 'image/png';
+    if ($ext === 'svg') {
+        $mime = 'image/svg+xml';
+    }
+
+    return response()->file($targetFile, ['Content-Type' => $mime]);
+})->where('path', '.*')->name('application.icon');
+
 // Authenticated Routes
 Route::middleware(['auth'])->group(function () {
     // Dashboard
@@ -115,5 +161,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-// OAuth Server Public Endpoints
-Route::post('/oauth/token', [TokenController::class, 'token'])->name('oauth.token');
+// OAuth Server Public Endpoints (Protected by Rate Limiter)
+Route::post('/oauth/token', [TokenController::class, 'token'])
+    ->middleware('throttle:60,1')
+    ->name('oauth.token');

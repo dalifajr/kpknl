@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Background Squircle: Classic Corporate Blue -->
+    <linearGradient id="sikep-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b2559"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <!-- ID Card Base: Pure Crisp White -->
+    <linearGradient id="sikep-card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <!-- Person Avatar: Royal Blue -->
+    <linearGradient id="sikep-person" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#0b2559"/>
+    </linearGradient>
+    <!-- Lanyard Ribbon: Sky Blue -->
+    <linearGradient id="sikep-lanyard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="sikep-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#071b40" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="url(#sikep-bg)" filter="url(#sikep-shadow)"/>
+  
+  <!-- Subtle Glow Accent -->
+  <circle cx="96" cy="32" r="28" fill="#ffffff" opacity="0.10"/>
+
+  <!-- ID Badge Lanyard Ribbon (Sky Blue) -->
+  <path d="M52 10 L64 26 L76 10" stroke="url(#sikep-lanyard)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Lanyard Chrome Clip -->
+  <rect x="58" y="24" width="12" height="7" rx="2.5" fill="#ffffff" stroke="#bfdbfe" stroke-width="1"/>
+
+  <!-- Employee ID Card (Pure White) -->
+  <rect x="26" y="28" width="76" height="84" rx="12" fill="url(#sikep-card)" filter="url(#sikep-shadow)"/>
+
+  <!-- ID Card Top Banner (KPKNL Royal Blue) -->
+  <path d="M26 38 C26 32.48 30.48 28 36 28 L92 28 C97.52 28 102 32.48 102 38 L102 46 L26 46 Z" fill="#1d4ed8"/>
+  <rect x="36" y="35" width="22" height="4" rx="2" fill="#ffffff" opacity="0.9"/>
+
+  <!-- Avatar Circle (Ice Blue Background) -->
+  <circle cx="64" cy="62" r="16" fill="#eff6ff"/>
+  <!-- Person Head -->
+  <circle cx="64" cy="58" r="6.5" fill="url(#sikep-person)"/>
+  <!-- Person Shoulders -->
+  <path d="M52 74 C52 68 57 66 64 66 C71 66 76 68 76 74 Z" fill="url(#sikep-person)"/>
+
+  <!-- Employee Details Lines (Blue & Gray Tones) -->
+  <rect x="42" y="84" width="44" height="4.5" rx="2.25" fill="#1d4ed8"/>
+  <rect x="48" y="92" width="32" height="3.5" rx="1.75" fill="#60a5fa"/>
+  <rect x="52" y="99" width="24" height="3" rx="1.5" fill="#cbd5e1"/>
+
+  <!-- Verified Blue Badge with White Checkmark -->
+  <circle cx="82" cy="74" r="5.5" fill="#1d4ed8"/>
+  <path d="M79.5 74 L81 75.5 L84.5 72.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

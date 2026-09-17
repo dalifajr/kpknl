@@ -11,7 +11,7 @@
     <div class="card-body p-4 p-md-5 text-white position-relative">
         <div class="row align-items-center g-4">
             <div class="col-lg-8">
-                <h2 class="fw-bold mb-2 display-6">SI-KEP Palembang</h2>
+                <h2 class="fw-bold mb-2 display-6">SI-KEP KPKNL Palembang</h2>
                 <p class="text-white text-opacity-90 fs-6 mb-4" style="max-width: 680px; line-height: 1.6;">
                     <strong>Sistem Informasi Kepegawaian (SI-KEP)</strong> adalah platform manajemen data aparatur sipil negara dan personil pendukung yang dirancang khusus untuk mewujudkan tata kelola SDM yang modern, akuntabel, transparan di lingkungan KPKNL Palembang.
                 </p>
@@ -22,12 +22,8 @@
                 </div>
             </div>
             <div class="col-lg-4 text-center text-lg-end">
-                <div class="d-inline-block p-4 rounded-4 bg-white bg-opacity-10 shadow-lg border border-white border-opacity-20" style="backdrop-filter: blur(12px);">
-                    <div class="d-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle bg-white shadow p-2" style="width: 80px; height: 80px;">
-                        <img src="{{ asset('images/logo-kpknl.png') }}" alt="Logo KPKNL Palembang" style="max-height: 52px; max-width: 52px; object-fit: contain;">
-                    </div>
-                    <h5 class="fw-bold text-white mb-1">KPKNL Palembang</h5>
-                    <small class="text-white text-opacity-75 d-block">DJKN &bull; Kemenkeu RI</small>
+                <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-4 bg-white shadow-sm border-0" style="border: none !important;">
+                    <img src="{{ asset('images/logo-kpknl.png') }}" alt="Logo KPKNL Palembang" style="max-height: 75px; width: auto; object-fit: contain;">
                 </div>
             </div>
         </div>
@@ -104,8 +100,8 @@
             </div>
             <div class="card-body p-4">
                 <div class="d-flex align-items-start gap-3 mb-4">
-                    <div class="p-1 rounded-3 bg-white d-flex align-items-center justify-content-center border shadow-xs" style="width: 54px; height: 54px;">
-                        <img src="{{ asset('images/logo-kpknl.png') }}" alt="Logo KPKNL" style="max-height: 44px; max-width: 44px; object-fit: contain;">
+                    <div class="d-flex align-items-center justify-content-center flex-shrink-0 border-0" style="width: 54px; height: 54px; border: none !important;">
+                        <img src="{{ asset('images/logo-kpknl.png') }}" alt="Logo KPKNL" style="max-height: 48px; max-width: 54px; object-fit: contain;">
                     </div>
                     <div>
                         <h6 class="fw-bold text-dark mb-1">Kantor Pelayanan Kekayaan Negara dan Lelang Palembang</h6>
@@ -131,7 +127,7 @@
                         <div class="p-3 bg-light rounded-3 border h-100">
                             <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.68rem;">Pengembang Sistem</small>
                             <div class="small text-dark fw-semibold">
-                                Tim KP UIN Raden Fatah 2026 dan Utoro Yogi Wiratama A.Md.Pnl.
+                                Tim KP UIN Raden Fatah 2026 <br> Utoro Yogi Wiratama A.Md.Pnl.
                             </div>
                         </div>
                     </div>

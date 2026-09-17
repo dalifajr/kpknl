@@ -11,13 +11,13 @@ class AuthController extends Controller
 {
     public function redirect()
     {
-        return Socialite::driver('sso')->stateless()->redirect();
+        return Socialite::driver('sso')->redirect();
     }
 
     public function callback()
     {
         try {
-            $ssoUser = Socialite::driver('sso')->stateless()->user();
+            $ssoUser = Socialite::driver('sso')->user();
             
             $user = User::firstOrNew(['sso_id' => $ssoUser->id]);
             $user->name = $ssoUser->name;
@@ -31,6 +31,11 @@ class AuthController extends Controller
             $user->save();
 
             $user->update(['last_login_at' => now()]);
+
+            session([
+                'sso_access_token' => $ssoUser->token,
+                'sso_user_id' => $ssoUser->id,
+            ]);
 
             Auth::login($user);
 

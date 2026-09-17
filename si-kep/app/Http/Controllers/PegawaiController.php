@@ -543,7 +543,10 @@ class PegawaiController extends Controller
             return null;
         }
 
-        $extension = $file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'jpg');
+        $extension = strtolower($file->extension() ?: ($file->guessExtension() ?: 'jpg'));
+        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+            $extension = 'jpg';
+        }
         $filename = 'avatar_' . ($pegawaiId ?: uniqid()) . '_' . time() . '.' . $extension;
 
         // Direct binary content write prevents FilesystemAdapter::putFileAs fopen('', 'r') on Windows

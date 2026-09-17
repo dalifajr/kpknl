@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Background Squircle: Deep Sapphire to Vibrant Blue -->
+    <linearGradient id="bmn-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1936"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="bmn-card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f0f7ff"/>
+    </linearGradient>
+    <!-- Bar 1 (Low): Sky Blue -->
+    <linearGradient id="bmn-bar1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+    <!-- Bar 2 (Medium): Cyan / Cobalt Blue -->
+    <linearGradient id="bmn-bar2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <!-- Bar 3 (High): Bright Royal Blue -->
+    <linearGradient id="bmn-bar3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+    <filter id="bmn-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#071836" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="url(#bmn-bg)" filter="url(#bmn-shadow)"/>
+  
+  <!-- Subtle Grid Accent -->
+  <circle cx="36" cy="32" r="28" fill="#ffffff" opacity="0.10"/>
+
+  <!-- Analytics Display Card -->
+  <rect x="22" y="24" width="84" height="80" rx="14" fill="url(#bmn-card)"/>
+
+  <!-- Card Top Header Bar (Blue & White) -->
+  <rect x="30" y="32" width="28" height="5" rx="2.5" fill="#1d4ed8"/>
+  <circle cx="86" cy="34.5" r="3.5" fill="#38bdf8"/>
+
+  <!-- 3D Analytics Trend Bars (Trio of Blue Shades) -->
+  <!-- Bar 1 (Low) -->
+  <rect x="32" y="66" width="14" height="26" rx="4" fill="url(#bmn-bar1)"/>
+  <!-- Bar 2 (Medium) -->
+  <rect x="50" y="52" width="14" height="40" rx="4" fill="url(#bmn-bar2)"/>
+  <!-- Bar 3 (High) -->
+  <rect x="68" y="42" width="14" height="50" rx="4" fill="url(#bmn-bar3)"/>
+
+  <!-- Crisp White Trend Curve Indicator with Glowing Dot -->
+  <path d="M39 62 Q 57 44, 75 36" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" fill="none" filter="url(#bmn-shadow)"/>
+  <circle cx="75" cy="36" r="5" fill="#1d4ed8"/>
+  <circle cx="75" cy="36" r="2.5" fill="#ffffff"/>
+
+  <!-- Baseline Grid -->
+  <line x1="28" y1="94" x2="90" y2="94" stroke="#bfdbfe" stroke-width="2" stroke-linecap="round"/>
+</svg>

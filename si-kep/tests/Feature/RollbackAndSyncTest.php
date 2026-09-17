@@ -258,7 +258,7 @@ class RollbackAndSyncTest extends TestCase
      */
     public function test_check_spreadsheet_permission_endpoint(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
 
         $sampleCsv = "NO,NAMA,NIP,JABATAN\n1,Ahmad Yani,198001012005011001,Pelelang";
         Http::fake([

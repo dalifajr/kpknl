@@ -25,15 +25,16 @@ class AuthController extends Controller
     public function callback()
     {
         try {
-            $ssoUser = Socialite::driver('sso')->stateless()->user();
+            $ssoUser = Socialite::driver('sso')->user();
 
             $rawUser = $ssoUser->user ?? [];
-            $role = $rawUser['primary_role'] ?? ($rawUser['role'] ?? ($rawUser['jabatan'] ?? 'user'));
-            
-            // Smart detection based on username/email/name
-            $identifier = strtolower(($ssoUser->nickname ?? '') . ' ' . ($ssoUser->name ?? '') . ' ' . ($ssoUser->email ?? ''));
-            if (str_contains($identifier, 'mardanus') || str_contains($identifier, 'superadmin') || !empty($rawUser['is_superadmin'])) {
+            $role = 'user';
+            if (!empty($rawUser['is_superadmin']) || ($rawUser['primary_role'] ?? null) === 'superadmin') {
                 $role = 'superadmin';
+            } elseif (!empty($rawUser['is_admin']) || ($rawUser['primary_role'] ?? null) === 'admin') {
+                $role = 'admin';
+            } elseif (!empty($rawUser['primary_role'])) {
+                $role = $rawUser['primary_role'];
             }
 
             $user = User::updateOrCreate(

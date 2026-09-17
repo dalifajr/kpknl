@@ -180,8 +180,41 @@ class DashboardController extends Controller
      */
     public function checkSpreadsheetPermission(Request $request, GoogleSheetSyncService $syncService)
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->role, ['superadmin', 'maintenance', 'admin'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses Ditolak: Hanya Administrator yang dapat melakukan pengecekan izin.',
+            ], 403);
+        }
+
         $sheetUrl = $request->input('sheet_url');
         $webhookUrl = $request->input('webhook_url');
+
+        // SSRF Protection: Validate allowed Google domains
+        if ($sheetUrl) {
+            $parsed = parse_url($sheetUrl);
+            $scheme = strtolower($parsed['scheme'] ?? '');
+            $host = strtolower($parsed['host'] ?? '');
+            if ($scheme !== 'https' || !in_array($host, ['docs.google.com', 'drive.google.com'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'SSRF Alert: Tautan spreadsheet harus menggunakan protokol HTTPS dan domain resmi Google Docs (docs.google.com).',
+                ], 422);
+            }
+        }
+
+        if ($webhookUrl) {
+            $parsed = parse_url($webhookUrl);
+            $scheme = strtolower($parsed['scheme'] ?? '');
+            $host = strtolower($parsed['host'] ?? '');
+            if ($scheme !== 'https' || !in_array($host, ['script.google.com', 'script.googleusercontent.com'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'SSRF Alert: Tautan webhook harus menggunakan protokol HTTPS dan domain resmi Google Apps Script (script.google.com).',
+                ], 422);
+            }
+        }
 
         $result = $syncService->checkPermissions($sheetUrl, $webhookUrl);
 

@@ -139,9 +139,9 @@
                 <div>
                     <!-- Top Bar in Card: App Icon + Status Badge -->
                     <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="app-icon-wrapper rounded-3 border d-inline-flex align-items-center justify-content-center bg-light overflow-hidden">
-                            @if($app->icon && !in_array($app->icon, ['box', 'desktop', 'window-maximize', 'cube', 'cubes']))
-                                <img src="{{ asset('storage/' . $app->icon) }}" alt="{{ $app->name }}" class="app-icon-img" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-cube text-primary fs-5\'></i>';">
+                        <div class="app-icon-wrapper rounded-3 border d-inline-flex align-items-center justify-content-center bg-white overflow-hidden shadow-xs" style="width: 52px; height: 52px;">
+                            @if($app->icon_url)
+                                <img src="{{ $app->icon_url }}" alt="{{ $app->name }}" class="app-icon-img" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-cube text-primary fs-5\'></i>';">
                             @else
                                 <i class="fa-solid fa-{{ $app->icon ?: 'cube' }} text-primary fs-5"></i>
                             @endif

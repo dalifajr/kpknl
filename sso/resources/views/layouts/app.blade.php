@@ -317,6 +317,56 @@
             box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.1);
         }
 
+        /* Clickable App Launcher Cards (Direct Click, No Button) */
+        .app-launch-card {
+            background-color: var(--md-sys-color-surface-container-high);
+            border: 1px solid var(--gcp-border-subtle) !important;
+            transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.22s cubic-bezier(0.2, 0, 0, 1), border-color 0.22s ease, background-color 0.22s ease;
+            cursor: pointer;
+            text-decoration: none !important;
+            position: relative;
+            outline: none;
+        }
+
+        .app-launch-card:hover, .app-launch-card:focus-visible {
+            transform: translateY(-3px);
+            background-color: #ffffff;
+            border-color: #1a73e8 !important;
+            box-shadow: 0 10px 24px -4px rgba(26, 115, 232, 0.16), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+            text-decoration: none !important;
+        }
+
+        .app-launch-card:hover .app-title, .app-launch-card:focus-visible .app-title {
+            color: var(--gcp-primary) !important;
+        }
+
+        .app-launch-card .app-launch-indicator {
+            opacity: 0;
+            transform: translate(-3px, 3px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            color: var(--gcp-primary);
+        }
+
+        .app-launch-card:hover .app-launch-indicator, .app-launch-card:focus-visible .app-launch-indicator {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+
+        [data-bs-theme="dark"] .app-launch-card {
+            background-color: #292a2d;
+            border-color: #3c4043 !important;
+        }
+
+        [data-bs-theme="dark"] .app-launch-card:hover, [data-bs-theme="dark"] .app-launch-card:focus-visible {
+            background-color: #303134;
+            border-color: #8ab4f8 !important;
+            box-shadow: 0 10px 24px -4px rgba(138, 180, 248, 0.2);
+        }
+
+        [data-bs-theme="dark"] .app-launch-card:hover .app-title {
+            color: #8ab4f8 !important;
+        }
+
         /* Buttons */
         .btn {
             font-family: var(--font-heading);
@@ -676,12 +726,6 @@
                 <span class="text-muted fs-8">KPKNL Palembang</span>
             </div>
         </a>
-
-        <div class="navbar-brand-project d-none d-md-flex align-items-center">
-            <i class="fa-solid fa-shield-halved text-primary fs-7"></i>
-            <span>Portal SSO & IAM</span>
-            <span class="badge bg-success-subtle text-success py-0.5 px-1.5 rounded" style="font-size: 0.65rem;">v2.5</span>
-        </div>
 
         <div class="ms-auto d-flex align-items-center gap-2">
             <!-- Dark Mode Toggle Button -->

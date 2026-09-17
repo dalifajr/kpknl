@@ -62,7 +62,10 @@ class NotificationController extends Controller
         if ($notif) {
             $notif->update(['read_at' => now()]);
             if ($notif->link) {
-                return redirect($notif->link);
+                $cleanLink = trim($notif->link);
+                if (preg_match('/^(https?:\/\/|\/)/i', $cleanLink) && !preg_match('/javascript:/i', $cleanLink)) {
+                    return redirect()->away($cleanLink);
+                }
             }
         }
 

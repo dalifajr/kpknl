@@ -4,7 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 
 Route::get('/', function () {
-    return view('welcome'); // Can be login prompt or redirect
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return view('welcome');
 })->name('login');
 
 Route::get('/auth/redirect', [AuthController::class, 'redirect'])->name('auth.redirect');

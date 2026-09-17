@@ -63,4 +63,44 @@ class UserInfoController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Fast session & token validation endpoint for integrated client apps (Single Sign-Out).
+     */
+    public function verifySession(Request $request)
+    {
+        $authHeader = $request->header('Authorization');
+        $token = null;
+
+        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+            $token = substr($authHeader, 7);
+        } elseif ($request->filled('token')) {
+            $token = $request->input('token');
+        }
+
+        if (!$token) {
+            return response()->json([
+                'valid' => false,
+                'error' => 'unauthorized',
+                'message' => 'Token otentikasi tidak disertakan.',
+            ], 401);
+        }
+
+        $user = OAuthService::validateAccessToken($token);
+
+        if (!$user) {
+            return response()->json([
+                'valid' => false,
+                'error' => 'session_terminated',
+                'message' => 'Sesi SSO telah berakhir atau token telah dicabut (logout dari SSO).',
+            ], 401);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'name' => $user->name,
+        ]);
+    }
 }
