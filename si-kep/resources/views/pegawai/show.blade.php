@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Profil Pegawai: ' . $pegawai->display_name . ' — SIMPATIK KPKNL Palembang')
+@section('title', 'Profil Pegawai: ' . $pegawai->display_name . ' — SI-KEP KPKNL Palembang')
 @section('hero-title', $pegawai->display_name)
 @section('hero-subtitle', 'NIP: ' . ($pegawai->nip ?: '-') . ' &bull; ' . ($pegawai->nama_jabatan_raw ?: 'Pegawai KPKNL Palembang'))
 

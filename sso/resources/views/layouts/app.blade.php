@@ -6,10 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SSO KPKNL Palembang')</title>
 
-    <!-- Google Fonts: Outfit (Display/Headings) & Inter (Body/Labels) -->
+    <!-- Google Fonts: Google Sans, Roboto & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5 & FontAwesome Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,77 +20,94 @@
 
     <style>
         :root {
-            /* M3 Expressive Color Tokens (Seed: #2563EB) */
-            --md-sys-color-primary: #3B5FE5;
-            --md-sys-color-on-primary: #FFFFFF;
-            --md-sys-color-primary-container: #D8E2FF;
-            --md-sys-color-on-primary-container: #001A41;
+            /* Google Cloud Console Design System Tokens */
+            --gcp-primary: #1a73e8;
+            --gcp-primary-hover: #1557b0;
+            --gcp-primary-container: #e8f0fe;
+            --gcp-on-primary-container: #174ea6;
             
-            --md-sys-color-secondary: #575E71;
-            --md-sys-color-secondary-container: #DBE2F9;
-            --md-sys-color-on-secondary-container: #141B2C;
+            --gcp-surface: #f8f9fa;
+            --gcp-surface-container: #ffffff;
+            --gcp-surface-variant: #f1f3f4;
+            --gcp-border: #dadce0;
+            --gcp-border-subtle: #e8eaed;
             
-            --md-sys-color-tertiary: #725572;
-            --md-sys-color-tertiary-container: #FDD7FA;
-            --md-sys-color-on-tertiary-container: #2B122C;
+            --gcp-text-primary: #202124;
+            --gcp-text-secondary: #5f6368;
+            --gcp-text-muted: #70757a;
             
-            --md-sys-color-surface: #FBF8FF;
-            --md-sys-color-surface-dim: #DCD9E1;
-            --md-sys-color-surface-container-lowest: #FFFFFF;
-            --md-sys-color-surface-container-low: #F5F3FB;
-            --md-sys-color-surface-container: #EFEDF5;
-            --md-sys-color-surface-container-high: #E9E7EF;
-            --md-sys-color-surface-container-highest: #E3E1E9;
-            
-            --md-sys-color-on-surface: #1B1B21;
-            --md-sys-color-on-surface-variant: #44464F;
-            --md-sys-color-outline: #757780;
-            --md-sys-color-outline-variant: #C5C6D0;
-            
-            --md-sys-color-error: #BA1A1A;
-            --md-sys-color-error-container: #FFDAD6;
-            --md-sys-color-on-error-container: #410002;
+            --gcp-success: #1e8e3e;
+            --gcp-success-container: #e6f4ea;
+            --gcp-warning: #f9ab00;
+            --gcp-warning-container: #fef7e0;
+            --gcp-error: #d93025;
+            --gcp-error-container: #fce8e6;
 
-            /* M3 Expressive Shape Tokens */
-            --md-shape-corner-xs: 8px;
-            --md-shape-corner-sm: 12px;
-            --md-shape-corner-md: 16px;
-            --md-shape-corner-lg: 20px;
-            --md-shape-corner-xl: 28px;
+            /* Backward-compatible Material Design tokens */
+            --md-sys-color-primary: var(--gcp-primary);
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: var(--gcp-primary-container);
+            --md-sys-color-on-primary-container: var(--gcp-on-primary-container);
+            
+            --md-sys-color-secondary: var(--gcp-text-secondary);
+            --md-sys-color-secondary-container: var(--gcp-surface-variant);
+            --md-sys-color-on-secondary-container: var(--gcp-text-primary);
+            
+            --md-sys-color-tertiary: #137333;
+            --md-sys-color-tertiary-container: var(--gcp-success-container);
+            --md-sys-color-on-tertiary-container: #0d652d;
+            
+            --md-sys-color-surface: var(--gcp-surface);
+            --md-sys-color-surface-dim: var(--gcp-surface-variant);
+            --md-sys-color-surface-container-lowest: #FFFFFF;
+            --md-sys-color-surface-container-low: #FFFFFF;
+            --md-sys-color-surface-container: #FFFFFF;
+            --md-sys-color-surface-container-high: var(--gcp-surface);
+            --md-sys-color-surface-container-highest: var(--gcp-surface-variant);
+            
+            --md-sys-color-on-surface: var(--gcp-text-primary);
+            --md-sys-color-on-surface-variant: var(--gcp-text-secondary);
+            --md-sys-color-outline: var(--gcp-border);
+            --md-sys-color-outline-variant: var(--gcp-border-subtle);
+            
+            --md-sys-color-error: var(--gcp-error);
+            --md-sys-color-error-container: var(--gcp-error-container);
+            --md-sys-color-on-error-container: #a50e0e;
+
+            /* Standardized shapes */
+            --md-shape-corner-xs: 4px;
+            --md-shape-corner-sm: 8px;
+            --md-shape-corner-md: 8px;
+            --md-shape-corner-lg: 12px;
+            --md-shape-corner-xl: 16px;
             --md-shape-corner-full: 9999px;
 
-            /* M3 Expressive Motion Physics Tokens */
-            --md-motion-easing-expressive: cubic-bezier(0.05, 0.7, 0.1, 1.0);
-            --md-motion-duration-short: 200ms;
-            --md-motion-duration-medium: 400ms;
-
-            --font-heading: 'Outfit', sans-serif;
-            --font-body: 'Inter', sans-serif;
+            --font-heading: 'Google Sans', 'Roboto', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-body: 'Roboto', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        /* SweetAlert2 M3E Theme Overrides */
+        /* SweetAlert2 Google Cloud Theme */
         .swal2-popup.swal2-m3e {
-            background-color: var(--md-sys-color-surface-container-low) !important;
-            border-radius: var(--md-shape-corner-xl) !important;
-            color: var(--md-sys-color-on-surface) !important;
+            background-color: var(--gcp-surface-container) !important;
+            border-radius: 12px !important;
+            color: var(--gcp-text-primary) !important;
             padding: 2rem !important;
-            box-shadow: 0 16px 40px rgba(27, 27, 33, 0.15) !important;
-            border: none !important;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+            border: 1px solid var(--gcp-border) !important;
         }
 
         .swal2-title.swal2-m3e-title {
             font-family: var(--font-heading) !important;
             font-weight: 700 !important;
-            color: var(--md-sys-color-on-surface) !important;
-            font-size: 1.35rem !important;
+            color: var(--gcp-text-primary) !important;
+            font-size: 1.25rem !important;
             margin-bottom: 0.5rem !important;
         }
 
-
         body {
             font-family: var(--font-body);
-            background-color: var(--md-sys-color-surface);
-            color: var(--md-sys-color-on-surface);
+            background-color: var(--gcp-surface);
+            color: var(--gcp-text-primary);
             margin: 0;
             padding: 0;
             -webkit-font-smoothing: antialiased;
@@ -98,16 +115,17 @@
 
         h1, h2, h3, h4, h5, h6, .brand-font {
             font-family: var(--font-heading);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: var(--md-sys-color-on-surface);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--gcp-text-primary);
         }
 
-        /* Top Expressive Navbar */
+        /* Top Google Cloud Console App Bar */
         .main-navbar {
-            background-color: var(--md-sys-color-surface-container-lowest);
-            box-shadow: 0 4px 20px rgba(27, 27, 33, 0.05);
-            height: 72px;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--gcp-border);
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.08);
+            height: 56px;
             position: fixed;
             top: 0;
             left: 0;
@@ -115,108 +133,159 @@
             z-index: 1030;
             display: flex;
             align-items: center;
-            padding: 0 1.75rem;
-            border-bottom-left-radius: var(--md-shape-corner-lg);
-            border-bottom-right-radius: var(--md-shape-corner-lg);
-            transition: all var(--md-motion-duration-medium) var(--md-motion-easing-expressive);
+            padding: 0 1.25rem;
+            border-radius: 0;
         }
 
         .navbar-brand-custom {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             text-decoration: none;
-            color: var(--md-sys-color-on-surface);
-            font-weight: 700;
-            font-size: 1.15rem;
+            color: var(--gcp-text-primary);
+            font-weight: 500;
+            font-size: 1rem;
         }
 
         .navbar-brand-custom img {
-            height: 40px;
+            height: 32px;
             width: auto;
-            border-radius: var(--md-shape-corner-xs);
+            border-radius: 4px;
+        }
+
+        .navbar-brand-project {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background-color: #f1f3f4;
+            border: 1px solid transparent;
+            font-size: 0.85rem;
+            color: #3c4043;
+            font-weight: 500;
+            cursor: default;
+        }
+
+        /* Global Header Search in Google Cloud Console */
+        .gcp-header-search {
+            background-color: #f1f3f4;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            width: 320px;
+            display: flex;
+            align-items: center;
+            padding: 4px 12px;
+            transition: all 0.2s ease;
+        }
+
+        .gcp-header-search:focus-within {
+            background-color: #ffffff;
+            border-color: var(--gcp-primary);
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.2);
+        }
+
+        .gcp-header-search input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 0.875rem;
+            width: 100%;
+            padding-left: 8px;
+            color: var(--gcp-text-primary);
         }
 
         /* Layout Structure */
         .wrapper {
             display: flex;
             min-height: 100vh;
-            padding-top: 72px;
+            padding-top: 56px;
         }
 
-        /* Expressive Sidebar Navigation */
+        /* Google Cloud Console Left Sidebar */
         .sidebar {
-            width: 280px;
-            background-color: var(--md-sys-color-surface-container);
+            width: 256px;
+            background-color: #ffffff;
+            border-right: 1px solid var(--gcp-border);
             position: fixed;
-            top: 72px;
+            top: 56px;
             bottom: 0;
             left: 0;
             overflow-y: auto;
-            padding: 1.5rem 1rem;
+            padding: 0.75rem 0;
             z-index: 1020;
-            border-top-right-radius: var(--md-shape-corner-xl);
-            transition: transform var(--md-motion-duration-medium) var(--md-motion-easing-expressive);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #dadce0;
+            border-radius: 3px;
         }
 
         .sidebar-heading {
             font-family: var(--font-heading);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--md-sys-color-on-surface-variant);
-            padding: 0.75rem 1.25rem 0.35rem;
+            color: var(--gcp-text-muted);
+            padding: 0.85rem 1.25rem 0.35rem;
         }
 
         .sidebar-menu {
             list-style: none;
             padding: 0;
-            margin: 0 0 1.25rem 0;
+            margin: 0 0 0.5rem 0;
         }
 
         .sidebar-link {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 0.75rem 1.25rem;
-            color: var(--md-sys-color-on-surface-variant);
+            gap: 12px;
+            padding: 0.55rem 1rem;
+            margin: 1px 8px;
+            color: #3c4043;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.95rem;
-            border-radius: var(--md-shape-corner-full);
-            transition: background-color 0.2s ease, color 0.2s ease;
-            margin-bottom: 4px;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            transition: background-color 0.15s ease, color 0.15s ease;
         }
 
         .sidebar-link i {
-            font-size: 1.15rem;
-            width: 24px;
+            font-size: 1rem;
+            width: 20px;
             text-align: center;
-            transition: color 0.2s ease;
+            color: var(--gcp-text-secondary);
+            transition: color 0.15s ease;
         }
 
         .sidebar-link:hover {
-            color: var(--md-sys-color-primary);
-            background-color: rgba(59, 95, 229, 0.08);
+            color: #202124;
+            background-color: #f1f3f4;
         }
 
         .sidebar-link.active {
-            color: var(--md-sys-color-on-secondary-container);
-            background-color: var(--md-sys-color-secondary-container);
-            font-weight: 700;
+            color: var(--gcp-primary);
+            background-color: #e8f0fe;
+            font-weight: 600;
         }
 
         .sidebar-link.active i {
-            color: var(--md-sys-color-primary);
+            color: var(--gcp-primary);
         }
 
         /* Main Content */
         .main-content {
-            margin-left: 280px;
+            margin-left: 256px;
             flex: 1;
-            padding: 2.25rem;
-            transition: margin-left 0.3s ease;
+            padding: 1.75rem 2rem;
+            background-color: var(--gcp-surface);
+            min-height: calc(100vh - 56px);
+            transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @media (max-width: 991.98px) {
@@ -225,138 +294,126 @@
             }
             .sidebar.show {
                 transform: translateX(0);
-                box-shadow: 10px 0 30px rgba(0,0,0,0.15);
+                box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
             }
             .main-content {
                 margin-left: 0;
-                padding: 1.5rem 1rem;
+                padding: 1.25rem 1rem;
             }
         }
 
-        /* Material You Expressive Card Component */
-        .card-flat, .card-m3 {
-            background-color: var(--md-sys-color-surface-container-low);
-            border: none;
-            border-radius: var(--md-shape-corner-xl);
-            padding: 1.5rem;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        /* Google Cloud Console Cards */
+        .card-flat, .card-m3, .card {
+            background-color: #ffffff;
+            border: 1px solid var(--gcp-border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.05);
         }
 
         .card-flat:hover, .card-m3:hover {
-            background-color: var(--md-sys-color-surface-container);
-            box-shadow: 0 8px 24px rgba(27, 27, 33, 0.06);
+            border-color: #bdc1c6;
+            box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.1);
         }
 
-        /* Buttons (Non-bouncy hover) */
-        .btn, .btn-primary, .btn-tonal {
-            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+        /* Buttons */
+        .btn {
+            font-family: var(--font-heading);
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: 4px;
+            padding: 0.45rem 1rem;
+            transition: all 0.15s ease;
         }
 
         .btn-primary {
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
-            border: none;
-            border-radius: var(--md-shape-corner-lg);
-            font-family: var(--font-heading);
-            font-weight: 600;
-            padding: 0.7rem 1.5rem;
+            background-color: var(--gcp-primary);
+            border-color: var(--gcp-primary);
+            color: #ffffff;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.25);
         }
 
         .btn-primary:hover, .btn-primary:focus {
-            background-color: #2F50C6;
-            color: #FFFFFF;
-            box-shadow: 0 4px 12px rgba(59, 95, 229, 0.25);
+            background-color: var(--gcp-primary-hover);
+            border-color: var(--gcp-primary-hover);
+            color: #ffffff;
+            box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.3);
         }
 
-        .btn-tonal {
-            background-color: var(--md-sys-color-primary-container);
-            color: var(--md-sys-color-on-primary-container);
-            border: none;
-            border-radius: var(--md-shape-corner-lg);
-            font-family: var(--font-heading);
-            font-weight: 600;
-            padding: 0.7rem 1.5rem;
+        .btn-tonal, .btn-outline-secondary {
+            background-color: #ffffff;
+            border: 1px solid var(--gcp-border);
+            color: #3c4043;
         }
 
-        .btn-tonal:hover {
-            background-color: #C5D4FF;
-            color: var(--md-sys-color-on-primary-container);
+        .btn-tonal:hover, .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            border-color: #bdc1c6;
+            color: #202124;
         }
 
+        .btn-outline-primary {
+            border-color: var(--gcp-border);
+            color: var(--gcp-primary);
+            background-color: #ffffff;
+        }
 
-        /* Form Inputs M3 Expressive */
+        .btn-outline-primary:hover {
+            background-color: #f8fafd;
+            border-color: var(--gcp-primary);
+            color: var(--gcp-primary-hover);
+        }
+
+        /* Form Inputs */
         .form-control, .form-select {
-            background-color: var(--md-sys-color-surface-container-high);
-            border: 1px solid transparent;
-            border-radius: var(--md-shape-corner-md);
-            padding: 0.75rem 1.15rem;
-            color: var(--md-sys-color-on-surface);
-            font-size: 0.95rem;
-            transition: all var(--md-motion-duration-short) var(--md-motion-easing-expressive);
+            background-color: #ffffff;
+            border: 1px solid var(--gcp-border);
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+            color: var(--gcp-text-primary);
+            font-size: 0.875rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .form-control:focus, .form-select:focus {
-            background-color: var(--md-sys-color-surface-container-lowest);
-            border-color: var(--md-sys-color-primary);
-            box-shadow: 0 0 0 3px rgba(59, 95, 229, 0.2);
-            color: var(--md-sys-color-on-surface);
+            background-color: #ffffff;
+            border-color: var(--gcp-primary);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+            color: var(--gcp-text-primary);
         }
 
-        /* Expressive Badges / Chips */
-        .badge-role {
-            padding: 0.45em 0.95em;
-            font-size: 0.75rem;
-            font-family: var(--font-heading);
-            font-weight: 700;
-            border-radius: var(--md-shape-corner-xs);
-            letter-spacing: 0.03em;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .badge-superadmin { 
-            background-color: var(--md-sys-color-error-container); 
-            color: var(--md-sys-color-on-error-container); 
-        }
-        .badge-admin { 
-            background-color: var(--md-sys-color-primary-container); 
-            color: var(--md-sys-color-on-primary-container); 
-        }
-        .badge-user { 
-            background-color: var(--md-sys-color-tertiary-container); 
-            color: var(--md-sys-color-on-tertiary-container); 
-        }
-
-        /* Expressive Tables */
+        /* Tables Google Cloud style */
         .table-expressive-container {
-            background-color: var(--md-sys-color-surface-container-low);
-            border-radius: var(--md-shape-corner-xl);
+            background-color: #ffffff;
+            border: 1px solid var(--gcp-border);
+            border-radius: 8px;
             overflow: hidden;
         }
 
         .table-expressive-container .table {
             margin-bottom: 0;
             --bs-table-bg: transparent;
-            --bs-table-color: var(--md-sys-color-on-surface);
+            --bs-table-color: var(--gcp-text-primary);
         }
 
         .table-expressive-container thead th {
-            background-color: var(--md-sys-color-surface-container-high);
-            color: var(--md-sys-color-on-surface-variant);
+            background-color: #f8f9fa;
+            color: var(--gcp-text-secondary);
             font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: 0.8rem;
+            font-weight: 600;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            letter-spacing: 0.05em;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gcp-border);
         }
 
         .table-expressive-container tbody td {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--md-sys-color-surface-container-highest);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f1f3f4;
             vertical-align: middle;
+            font-size: 0.875rem;
         }
 
         .table-expressive-container tbody tr:last-child td {
@@ -364,98 +421,109 @@
         }
 
         .table-expressive-container tbody tr:hover {
-            background-color: rgba(59, 95, 229, 0.04);
+            background-color: #f8f9fa;
         }
 
-        /* Expressive Alerts */
-        .alert-expressive {
-            border-radius: var(--md-shape-corner-md);
-            border: none;
-            padding: 1rem 1.25rem;
-            display: flex;
+        /* Badges */
+        .badge-role {
+            padding: 0.25em 0.6em;
+            font-size: 0.72rem;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            border-radius: 4px;
+            display: inline-flex;
             align-items: center;
-            gap: 12px;
-            font-weight: 500;
+            gap: 4px;
         }
 
-        .alert-expressive-success {
-            background-color: var(--md-sys-color-tertiary-container);
-            color: var(--md-sys-color-on-tertiary-container);
+        .badge-superadmin { 
+            background-color: #fce8e6; 
+            color: #c5221f; 
+            border: 1px solid #fad2cf;
+        }
+        .badge-admin { 
+            background-color: #e8f0fe; 
+            color: #1a73e8; 
+            border: 1px solid #d2e3fc;
+        }
+        .badge-user { 
+            background-color: #f1f3f4; 
+            color: #5f6368; 
+            border: 1px solid #dadce0;
         }
 
-        .alert-expressive-danger {
-            background-color: var(--md-sys-color-error-container);
-            color: var(--md-sys-color-on-error-container);
-        }
-
-        /* Expressive Pagination Styling (M3E) */
+        /* Pagination */
         .pagination {
-            gap: 6px;
+            gap: 4px;
             margin-bottom: 0;
             align-items: center;
         }
 
         .pagination .page-item .page-link {
-            border: none !important;
-            background-color: var(--md-sys-color-surface-container-high);
-            color: var(--md-sys-color-on-surface);
+            border: 1px solid var(--gcp-border) !important;
+            background-color: #ffffff;
+            color: #3c4043;
             font-family: var(--font-heading);
-            font-weight: 600;
-            font-size: 0.875rem;
-            border-radius: var(--md-shape-corner-full) !important;
-            padding: 0.5rem 1rem;
+            font-weight: 500;
+            font-size: 0.825rem;
+            border-radius: 4px !important;
+            padding: 0.35rem 0.75rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 38px;
-            height: 38px;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-
-        .pagination .page-item:first-child .page-link,
-        .pagination .page-item:last-child .page-link {
-            border-radius: var(--md-shape-corner-full) !important;
-            padding: 0.5rem 1.15rem;
-            background-color: var(--md-sys-color-primary-container);
-            color: var(--md-sys-color-on-primary-container);
+            min-width: 32px;
+            height: 32px;
+            transition: all 0.15s ease;
         }
 
         .pagination .page-item.active .page-link {
-            background-color: var(--md-sys-color-primary) !important;
-            color: var(--md-sys-color-on-primary) !important;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(59, 95, 229, 0.25);
+            background-color: var(--gcp-primary) !important;
+            border-color: var(--gcp-primary) !important;
+            color: #ffffff !important;
+            font-weight: 600;
         }
 
         .pagination .page-item .page-link:hover {
-            background-color: var(--md-sys-color-secondary-container);
-            color: var(--md-sys-color-on-secondary-container);
+            background-color: #f1f3f4;
+            color: #202124;
         }
 
         .pagination .page-item.disabled .page-link {
-            background-color: var(--md-sys-color-surface-container) !important;
-            color: var(--md-sys-color-outline) !important;
-            opacity: 0.5;
-            cursor: not-allowed;
+            background-color: #f8f9fa !important;
+            color: #9aa0a6 !important;
+            border-color: #e8eaed !important;
+            opacity: 0.6;
         }
 
-        /* Nav & Pagination Arrows / Links Fallback */
-        nav[role="navigation"] a, nav[role="navigation"] span {
-            border-radius: var(--md-shape-corner-full) !important;
-            font-family: var(--font-heading) !important;
-            border: none !important;
+        /* Notification Dropdown Card */
+        .notification-dropdown-card {
+            width: 360px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--gcp-border);
+            overflow: hidden;
+            background-color: #ffffff;
         }
 
-        /* Simple Full-Screen Loading Overlay */
+        .notification-item {
+            transition: background-color 0.15s ease;
+            text-decoration: none;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Full Screen Loading Overlay */
         .global-loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             z-index: 999999;
             display: flex;
             align-items: center;
@@ -466,10 +534,6 @@
             transition: opacity 0.15s ease, visibility 0.15s ease;
         }
 
-        [data-bs-theme="dark"] .global-loading-overlay {
-            background-color: rgba(19, 19, 24, 0.65);
-        }
-
         .global-loading-overlay.show {
             opacity: 1;
             visibility: visible;
@@ -478,134 +542,112 @@
 
         .simple-loading-box {
             text-align: center;
-            --md-sys-color-surface-container-lowest: #1B1B21;
-            --md-sys-color-surface-container-low: #1B1B21;
-            --md-sys-color-surface-container: #23232B;
-            --md-sys-color-surface-container-high: #2B2B35;
-            --md-sys-color-surface-container-highest: #363642;
-            
-            --md-sys-color-on-surface: #E3E1E9;
-            --md-sys-color-on-surface-variant: #C5C6D0;
+        }
 
-            --md-sys-color-primary: #B4C5FF;
-            --md-sys-color-on-primary: #002A78;
-            --md-sys-color-primary-container: #2342B3;
-            --md-sys-color-on-primary-container: #D8E2FF;
-
-            --md-sys-color-secondary-container: #3E4658;
-            --md-sys-color-on-secondary-container: #DBE2F9;
-
-            --md-sys-color-tertiary-container: #4D334E;
-            --md-sys-color-on-tertiary-container: #FDD7FA;
+        /* Dark Mode Styling (Google Cloud Dark Theme) */
+        [data-bs-theme="dark"] {
+            --gcp-surface: #1f1f1f;
+            --gcp-surface-container: #292a2d;
+            --gcp-surface-variant: #303134;
+            --gcp-border: #3c4043;
+            --gcp-border-subtle: #444746;
+            --gcp-text-primary: #e8eaed;
+            --gcp-text-secondary: #9aa0a6;
+            --gcp-text-muted: #80868b;
         }
 
         [data-bs-theme="dark"] body {
-            background-color: #131318 !important;
-            color: #E3E1E9 !important;
+            background-color: #1f1f1f !important;
+            color: #e8eaed !important;
         }
 
         [data-bs-theme="dark"] .main-navbar {
-            background-color: rgba(23, 23, 30, 0.92) !important;
-            border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+            background-color: #202124 !important;
+            border-bottom-color: #3c4043 !important;
         }
 
-        /* Sidebar Dark Mode Font & Colors (#mainSidebar) */
         [data-bs-theme="dark"] .sidebar {
-            background-color: #1B1B21 !important;
-            border-right-color: rgba(255, 255, 255, 0.1) !important;
+            background-color: #202124 !important;
+            border-right-color: #3c4043 !important;
         }
 
         [data-bs-theme="dark"] .sidebar-heading {
-            color: #9094A6 !important;
+            color: #80868b !important;
         }
 
         [data-bs-theme="dark"] .sidebar-link {
-            color: #D5D8E6 !important;
+            color: #bdc1c6 !important;
         }
 
         [data-bs-theme="dark"] .sidebar-link i {
-            color: #B4C5FF !important;
+            color: #9aa0a6 !important;
         }
 
         [data-bs-theme="dark"] .sidebar-link:hover {
-            background-color: rgba(180, 197, 255, 0.15) !important;
-            color: #FFFFFF !important;
+            background-color: #303134 !important;
+            color: #ffffff !important;
         }
 
         [data-bs-theme="dark"] .sidebar-link.active {
-            background-color: #2342B3 !important;
-            color: #FFFFFF !important;
+            background-color: #004a77 !important;
+            color: #8ab4f8 !important;
         }
 
         [data-bs-theme="dark"] .sidebar-link.active i {
-            color: #B4C5FF !important;
+            color: #8ab4f8 !important;
+        }
+
+        [data-bs-theme="dark"] .main-content {
+            background-color: #1f1f1f !important;
         }
 
         [data-bs-theme="dark"] .card-m3, 
         [data-bs-theme="dark"] .card-flat,
-        [data-bs-theme="dark"] .table-expressive-container,
-        [data-bs-theme="dark"] div[style*="background-color: var(--md-sys-color-surface-container-high)"] {
-            background-color: #1E1E26 !important;
-            color: #E3E1E9 !important;
+        [data-bs-theme="dark"] .card,
+        [data-bs-theme="dark"] .notification-dropdown-card,
+        [data-bs-theme="dark"] .table-expressive-container {
+            background-color: #292a2d !important;
+            border-color: #3c4043 !important;
+            color: #e8eaed !important;
         }
 
         [data-bs-theme="dark"] .text-dark {
-            color: #E3E1E9 !important;
+            color: #e8eaed !important;
         }
 
         [data-bs-theme="dark"] .text-secondary,
         [data-bs-theme="dark"] .text-muted {
-            color: #A0A2B0 !important;
+            color: #9aa0a6 !important;
         }
 
         [data-bs-theme="dark"] .bg-light {
-            background-color: #272732 !important;
-            color: #E3E1E9 !important;
+            background-color: #303134 !important;
+            color: #e8eaed !important;
+        }
+
+        [data-bs-theme="dark"] .navbar-brand-project,
+        [data-bs-theme="dark"] .gcp-header-search {
+            background-color: #303134 !important;
+            color: #bdc1c6 !important;
         }
 
         [data-bs-theme="dark"] .form-control, 
         [data-bs-theme="dark"] .form-select {
-            background-color: #272732 !important;
-            color: #E3E1E9 !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            background-color: #292a2d !important;
+            color: #e8eaed !important;
+            border-color: #3c4043 !important;
         }
 
         [data-bs-theme="dark"] .dropdown-menu {
-            background-color: #1E1E26 !important;
-            color: #E3E1E9 !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            background-color: #292a2d !important;
+            color: #e8eaed !important;
+            border: 1px solid #3c4043 !important;
         }
 
-        /* Notification Hub Floating Card Dropdown Dark Mode */
-        .notification-dropdown-card {
-            width: 380px;
-            border-radius: var(--md-shape-corner-xl);
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
-            border: none;
-            overflow: hidden;
-            background-color: var(--md-sys-color-surface-container-low);
-        }
-
-        [data-bs-theme="dark"] .notification-dropdown-card {
-            background-color: #1E1E26 !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        }
-
-        .notification-item {
-            transition: background-color 0.2s ease;
-            text-decoration: none;
-        }
-
-        .notification-item:hover {
-            background-color: var(--md-sys-color-surface-container);
-        }
-
-        [data-bs-theme="dark"] .notification-item:hover {
-            background-color: #282834 !important;
+        [data-bs-theme="dark"] .global-loading-overlay {
+            background-color: rgba(31, 31, 31, 0.7);
         }
     </style>
-
-
 
     @yield('styles')
 </head>
@@ -614,34 +656,37 @@
     <!-- Simple Full-Screen Loading Overlay -->
     <div id="globalLoadingOverlay" class="global-loading-overlay">
         <div class="simple-loading-box">
-            <div class="spinner-border text-primary" role="status" style="width: 2.5rem; height: 2.5rem; border-width: 0.22em;">
+            <div class="spinner-border text-primary" role="status" style="width: 2.25rem; height: 2.25rem; border-width: 0.2em;">
                 <span class="visually-hidden">Memuat...</span>
             </div>
-            <span class="d-block mt-2 fw-semibold text-secondary fs-7" id="globalLoadingText" style="font-family: var(--font-heading); letter-spacing: 0.02em;">Memuat...</span>
+            <span class="d-block mt-2 fw-medium text-secondary fs-7" id="globalLoadingText" style="font-family: var(--font-heading); letter-spacing: 0.02em;">Memuat...</span>
         </div>
     </div>
 
-
-
-    <!-- Top Expressive Navbar -->
+    <!-- Top Google Cloud Console App Bar -->
     <nav class="main-navbar">
-        <button class="btn btn-link text-dark d-lg-none me-3 p-0" id="sidebarToggle" aria-label="Toggle Sidebar">
+        <button class="btn btn-link text-secondary d-lg-none me-2 p-1" id="sidebarToggle" aria-label="Toggle Sidebar">
             <i class="fa-solid fa-bars fa-lg"></i>
         </button>
-        <a href="{{ route('dashboard') }}" class="navbar-brand-custom">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo KPKNL Palembang" onerror="this.onerror=null; this.src='https://placehold.co/150x40/3b5fe5/ffffff?text=KPKNL+Palembang';">
-            <div>
-                <span class="d-block lh-1 text-primary brand-font" style="font-size: 1.05rem;">SSO INTEGRATED</span>
-                <small class="text-muted fs-7 fw-normal">KPKNL Palembang</small>
+
+        <a href="{{ route('dashboard') }}" class="navbar-brand-custom me-3">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo KPKNL Palembang" onerror="this.onerror=null; this.src='https://placehold.co/150x40/1a73e8/ffffff?text=KPKNL';">
+            <div class="d-none d-sm-block">
+                <span class="fw-bold text-dark fs-6 lh-1 d-block" style="font-family: var(--font-heading);">SSO PLATFORM</span>
+                <span class="text-muted fs-8">KPKNL Palembang</span>
             </div>
         </a>
 
-        <div class="ms-auto d-flex align-items-center" style="gap: 1.15rem;">
+        <div class="navbar-brand-project d-none d-md-flex align-items-center">
+            <i class="fa-solid fa-shield-halved text-primary fs-7"></i>
+            <span>Portal SSO & IAM</span>
+            <span class="badge bg-success-subtle text-success py-0.5 px-1.5 rounded" style="font-size: 0.65rem;">v2.5</span>
+        </div>
 
-
+        <div class="ms-auto d-flex align-items-center gap-2">
             <!-- Dark Mode Toggle Button -->
-            <button type="button" class="btn btn-tonal rounded-circle d-flex align-items-center justify-content-center p-0" id="darkModeToggle" style="width: 40px; height: 40px;" title="Ganti Mode Gelap / Terang">
-                <i class="fa-solid fa-moon fs-6" id="darkModeIcon"></i>
+            <button type="button" class="btn btn-tonal rounded-circle d-flex align-items-center justify-content-center p-0" id="darkModeToggle" style="width: 36px; height: 36px;" title="Ganti Mode Gelap / Terang">
+                <i class="fa-solid fa-moon fs-7" id="darkModeIcon"></i>
             </button>
 
             <!-- Notification Hub Dropdown -->
@@ -663,90 +708,89 @@
                     }
                 @endphp
 
-                <button type="button" class="btn btn-tonal rounded-circle d-flex align-items-center justify-content-center p-0 position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 40px; height: 40px;" title="Notification Hub">
-                    <i class="fa-regular fa-bell fs-6"></i>
+                <button type="button" class="btn btn-tonal rounded-circle d-flex align-items-center justify-content-center p-0 position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: 36px; height: 36px;" title="Pusat Notifikasi">
+                    <i class="fa-regular fa-bell fs-6 text-secondary"></i>
                     @if($unreadCount > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.65rem; padding: 0.25em 0.45em;">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.65rem; padding: 0.2em 0.4em;">
                             {{ $unreadCount > 99 ? '99+' : $unreadCount }}
                         </span>
                     @endif
                 </button>
 
-                <!-- Floating Notification Hub Card -->
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate notification-dropdown-card p-0" aria-labelledby="notificationDropdown">
-                    <div class="p-3 border-bottom d-flex align-items-center justify-content-between" style="background-color: var(--md-sys-color-surface-container-high);">
+                <!-- Notification Dropdown Panel -->
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown-card p-0" aria-labelledby="notificationDropdown">
+                    <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fa-solid fa-bell text-primary"></i>
-                            <h6 class="fw-bold mb-0 text-dark" style="font-family: var(--font-heading);">Notification Hub</h6>
+                            <h6 class="fw-bold mb-0 text-dark fs-7" style="font-family: var(--font-heading);">Pusat Notifikasi System</h6>
                         </div>
                         @if($unreadCount > 0)
-                            <span class="badge rounded-pill bg-primary fs-8">{{ $unreadCount }} Baru</span>
+                            <span class="badge rounded bg-primary fs-8">{{ $unreadCount }} Baru</span>
                         @endif
                     </div>
 
-                    <div class="list-group list-group-flush border-0" style="max-height: 340px; overflow-y: auto;">
+                    <div class="list-group list-group-flush border-0" style="max-height: 320px; overflow-y: auto;">
                         @forelse($sysNotifications as $notif)
-                            <a href="{{ route('notifications.read', $notif->id) }}" class="list-group-item list-group-item-action notification-item p-3 border-bottom d-flex align-items-start gap-3 bg-transparent {{ is_null($notif->read_at) ? 'bg-primary-subtle bg-opacity-10' : '' }}">
-                                <div class="p-2 rounded-circle text-primary bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                            <a href="{{ route('notifications.read', $notif->id) }}" class="list-group-item list-group-item-action notification-item p-2.5 border-bottom d-flex align-items-start gap-2.5 bg-transparent {{ is_null($notif->read_at) ? 'bg-primary-subtle bg-opacity-10' : '' }}">
+                                <div class="p-2 rounded text-primary bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px;">
                                     <i class="{{ $notif->icon ?? 'fa-solid fa-bell' }} fs-7"></i>
                                 </div>
                                 <div class="flex-grow-1 overflow-hidden" style="min-width: 0;">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="fw-bold text-dark fs-7 text-truncate" style="font-family: var(--font-heading);">
+                                    <div class="d-flex justify-content-between align-items-center mb-0.5">
+                                        <span class="fw-semibold text-dark fs-8 text-truncate" style="font-family: var(--font-heading);">
                                             {{ $notif->title }}
                                         </span>
-                                        <span class="badge bg-light text-secondary border rounded-pill fs-8 ms-1 flex-shrink-0">{{ $notif->app_name }}</span>
+                                        <span class="badge bg-light text-secondary border rounded fs-9 ms-1 flex-shrink-0">{{ $notif->app_name }}</span>
                                     </div>
-                                    <p class="text-secondary fs-8 mb-1 text-truncate" style="font-size: 0.78rem; font-weight: normal;">
+                                    <p class="text-secondary fs-8 mb-1 text-truncate" style="font-size: 0.75rem;">
                                         {{ $notif->message }}
                                     </p>
-                                    <small class="text-muted fs-8 d-block">
+                                    <small class="text-muted fs-9 d-block">
                                         <i class="fa-regular fa-clock me-1"></i>{{ $notif->created_at ? $notif->created_at->diffForHumans() : 'Baru saja' }}
                                     </small>
                                 </div>
                             </a>
                         @empty
-                            <div class="p-4 text-center text-muted fs-7">
+                            <div class="p-4 text-center text-muted fs-8">
                                 <i class="fa-solid fa-bell-slash fs-4 d-block mb-2 text-secondary opacity-50"></i>
                                 Belum ada notifikasi personal terbaru.
                             </div>
                         @endforelse
                     </div>
 
-                    <div class="p-2.5 text-center border-top" style="background-color: var(--md-sys-color-surface-container-high);">
-                        <a href="{{ route('notifications.index') }}" class="btn btn-tonal btn-sm w-100 rounded-pill fw-bold text-primary">
+                    <div class="p-2 text-center border-top bg-light">
+                        <a href="{{ route('notifications.index') }}" class="btn btn-link btn-sm text-primary text-decoration-none fw-medium fs-8">
                             Lihat Semua Notifikasi <i class="fa-solid fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                 </div>
             </div>
 
-
             <!-- User Profile Dropdown -->
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark p-1 rounded-pill bg-light" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <div class="avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-2" style="width: 38px; height: 38px; font-family: var(--font-heading);">
+            <div class="dropdown ms-1">
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark p-1 rounded-pill" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-1.5" style="width: 32px; height: 32px; font-size: 0.85rem; font-family: var(--font-heading);">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
-                    <div class="d-none d-md-block text-start me-2">
-                        <span class="d-block fw-bold text-dark lh-1 fs-6" style="font-family: var(--font-heading);">{{ auth()->user()->name }}</span>
-                        <span class="text-muted fs-7">@ {{ auth()->user()->username }}</span>
+                    <div class="d-none d-md-block text-start me-1.5">
+                        <span class="d-block fw-semibold text-dark lh-1 fs-7" style="font-family: var(--font-heading);">{{ auth()->user()->name }}</span>
+                        <span class="text-muted fs-9">@ {{ auth()->user()->username }}</span>
                     </div>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: var(--md-shape-corner-lg); min-width: 220px;" aria-labelledby="userDropdown">
-                    <li class="px-3 py-2 mb-1 rounded-3" style="background-color: var(--md-sys-color-surface-container-high);">
-                        <span class="d-block fw-bold text-dark fs-6" style="font-family: var(--font-heading);">{{ auth()->user()->name }}</span>
+                <ul class="dropdown-menu dropdown-menu-end shadow border p-2" style="border-radius: 8px; min-width: 220px;" aria-labelledby="userDropdown">
+                    <li class="px-3 py-2 mb-1 rounded bg-light">
+                        <span class="d-block fw-bold text-dark fs-7" style="font-family: var(--font-heading);">{{ auth()->user()->name }}</span>
                         <span class="badge badge-role badge-{{ auth()->user()->roles->first()?->name ?? 'user' }} mt-1">
                             {{ auth()->user()->roles->first()?->display_name ?? 'User' }}
                         </span>
                     </li>
-                    <li><a class="dropdown-item py-2 rounded-3 my-1" href="{{ route('profile.show') }}"><i class="fa-regular fa-user me-2 text-primary"></i> Profil Saya</a></li>
-                    <li><a class="dropdown-item py-2 rounded-3 my-1" href="{{ route('login-sessions.index') }}"><i class="fa-solid fa-laptop-code me-2 text-primary"></i> Aktivitas Sesi Login</a></li>
+                    <li><a class="dropdown-item py-1.5 rounded my-0.5 fs-7" href="{{ route('profile.show') }}"><i class="fa-regular fa-user me-2 text-primary"></i> Profil Saya</a></li>
+                    <li><a class="dropdown-item py-1.5 rounded my-0.5 fs-7" href="{{ route('login-sessions.index') }}"><i class="fa-solid fa-laptop-code me-2 text-primary"></i> Aktivitas Sesi Login</a></li>
                     <li><hr class="dropdown-divider my-1"></li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="dropdown-item py-2 rounded-3 text-danger fw-semibold">
+                            <button type="submit" class="dropdown-item py-1.5 rounded text-danger fw-semibold fs-7">
                                 <i class="fa-solid fa-right-from-bracket me-2"></i> Keluar / Logout
                             </button>
                         </form>
@@ -754,11 +798,10 @@
                 </ul>
             </div>
         </div>
-
     </nav>
 
     <div class="wrapper">
-        <!-- Expressive Sidebar Navigation -->
+        <!-- Google Cloud Console Sidebar Navigation -->
         <aside class="sidebar" id="mainSidebar">
             <div class="sidebar-heading">Menu Utama</div>
             <ul class="sidebar-menu">
@@ -788,7 +831,7 @@
                     <li>
                         <a href="{{ route('admin.applications.index') }}" class="sidebar-link {{ request()->routeIs('admin.applications.*') ? 'active' : '' }}">
                             <i class="fa-solid fa-cubes"></i>
-                            <span>Kelola Aplikasi</span>
+                            <span>Aplikasi Terintegrasi</span>
                         </a>
                     </li>
                     <li>
@@ -800,13 +843,11 @@
                     <li>
                         <a href="{{ route('admin.settings.index') }}" class="sidebar-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                             <i class="fa-solid fa-gear"></i>
-                            <span>Pengaturan</span>
+                            <span>Pengaturan Sistem</span>
                         </a>
                     </li>
                 </ul>
             @endif
-
-
 
             <div class="sidebar-heading">Aktivitas & Akun</div>
             <ul class="sidebar-menu">
@@ -822,7 +863,6 @@
                         <span>Log Aktivitas</span>
                     </a>
                 </li>
-
                 <li>
                     <a href="{{ route('login-sessions.index') }}" class="sidebar-link {{ request()->routeIs('login-sessions.*') ? 'active' : '' }}">
                         <i class="fa-solid fa-shield-halved"></i>
@@ -837,14 +877,13 @@
                 </li>
             </ul>
 
-            <div class="mt-auto pt-4 px-3 text-center border-top border-secondary-subtle">
-                <small class="text-muted d-block fs-7">KPKNL Palembang &copy; 2026</small>
+            <div class="mt-auto pt-4 px-3 text-center border-top">
+                <small class="text-muted d-block fs-8">KPKNL Palembang &copy; 2026</small>
             </div>
         </aside>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <!-- Expressive SweetAlert2 Notification Alerts -->
             @if(session('success'))
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
@@ -856,7 +895,7 @@
                             customClass: {
                                 popup: 'swal2-m3e',
                                 title: 'swal2-m3e-title',
-                                confirmButton: 'btn btn-primary rounded-pill px-4'
+                                confirmButton: 'btn btn-primary px-4'
                             },
                             buttonsStyling: false
                         });
@@ -875,7 +914,7 @@
                             customClass: {
                                 popup: 'swal2-m3e',
                                 title: 'swal2-m3e-title',
-                                confirmButton: 'btn btn-primary rounded-pill px-4'
+                                confirmButton: 'btn btn-primary px-4'
                             },
                             buttonsStyling: false
                         });
@@ -894,7 +933,7 @@
                             customClass: {
                                 popup: 'swal2-m3e',
                                 title: 'swal2-m3e-title',
-                                confirmButton: 'btn btn-primary rounded-pill px-4'
+                                confirmButton: 'btn btn-primary px-4'
                             },
                             buttonsStyling: false
                         });
@@ -904,7 +943,6 @@
 
             @yield('content')
         </main>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -921,9 +959,9 @@
             document.documentElement.setAttribute('data-bs-theme', theme);
             if (darkModeIcon) {
                 if (theme === 'dark') {
-                    darkModeIcon.className = 'fa-solid fa-sun text-warning fs-6';
+                    darkModeIcon.className = 'fa-solid fa-sun text-warning fs-7';
                 } else {
-                    darkModeIcon.className = 'fa-solid fa-moon text-dark fs-6';
+                    darkModeIcon.className = 'fa-solid fa-moon text-secondary fs-7';
                 }
             }
             localStorage.setItem('sso_theme', theme);
@@ -980,10 +1018,8 @@
                 }
             }
         });
+    </script>
     @yield('scripts')
     @stack('scripts')
 </body>
 </html>
-
-
-

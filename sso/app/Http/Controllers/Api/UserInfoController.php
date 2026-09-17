@@ -55,7 +55,7 @@ class UserInfoController extends Controller
                 'status' => $user->status,
                 'roles' => $roles,
                 'primary_role' => $primaryRole,
-                'app_role' => $appRole ?? ($user->isSuperadmin() || $user->isMaintenance() ? 'admin' : ($user->isAdmin() ? 'admin' : 'peminjam')),
+                'app_role' => $appRole ?? ($user->isSuperadmin() || $user->isMaintenance() ? 'admin' : ($user->isAdmin() ? 'pelelang' : 'peminjam')),
                 'is_superadmin' => $user->isSuperadmin(),
                 'is_admin' => $user->isAdmin(),
                 'is_maintenance' => $user->isMaintenance(),

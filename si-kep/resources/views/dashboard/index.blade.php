@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Dashboard — SI-KEP KPKNL Palembang')
-@section('hero-title', 'SI-KEP')
-@section('hero-subtitle', '')
+@section('hero-title', 'Dashboard')
+@section('hero-subtitle', 'Sistem Informasi Kepegawaian KPKNL Palembang.')
 
 @section('content')
 
@@ -35,7 +35,14 @@
                     <i class="fas fa-user-shield text-info opacity-50"></i>
                 </div>
                 <h3 class="fw-bold text-dark mb-0">{{ $totalPns }}</h3>
-                <small class="text-muted" style="font-size: 0.72rem;">100% Terverifikasi &bull; <span class="text-info fw-semibold">Lihat <i class="fas fa-chevron-right" style="font-size: 0.6rem;"></i></span></small>
+                <small class="text-muted" style="font-size: 0.72rem;">
+                    @if($pnsMismatchHris > 0)
+                        <span class="text-success fw-semibold">{{ $pnsClearHris }} Clear</span> &bull; <span class="text-warning-emphasis fw-semibold">{{ $pnsMismatchHris }} Beda HRIS</span>
+                    @else
+                        <span class="text-success fw-semibold">100% Sesuai HRIS</span>
+                    @endif
+                    &bull; <span class="text-info fw-semibold">Lihat <i class="fas fa-chevron-right" style="font-size: 0.6rem;"></i></span>
+                </small>
             </div>
         </div>
     </div>

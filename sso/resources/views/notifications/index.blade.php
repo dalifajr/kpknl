@@ -5,7 +5,7 @@
 @section('content')
 <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
     <div>
-        <h3 class="mb-1 fw-bold text-dark">Pusat Notifikasi Personal</h3>
+        <h3 class="mb-1 fw-bold text-dark">Pusat Notifikasi System & Personal</h3>
         <p class="text-muted mb-0">Pemberitahuan aktivitas login Anda dan notifikasi dari aplikasi terintegrasi.</p>
     </div>
     <div class="d-flex gap-2">

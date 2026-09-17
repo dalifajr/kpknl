@@ -3,9 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 
-Route::get('/', function () {
+Route::get('/', function (\Illuminate\Http\Request $request) {
     if (auth()->check()) {
         return redirect()->route('dashboard');
+    }
+    if (session()->has('sso_error') || session()->has('errors') || $request->has('login')) {
+        return view('auth.login', [
+            'ssoError' => session('sso_error') ?? (session('errors') ? session('errors')->first() : null),
+        ]);
     }
     return redirect()->route('auth.redirect');
 })->name('login');
@@ -20,7 +25,8 @@ Route::middleware(['auth'])->group(function () {
         $expiringLeases = $leasedAssets->filter(function($a) { return $a->is_sewa_expiring; });
         $totalSewaNilai = $leasedAssets->sum('sewa_lelang_nilai');
         
-        $leaseTrend = \App\Models\AssetLease::selectRaw('YEAR(tgl_mulai) as tahun, SUM(nilai_sewa) as total_nilai, COUNT(*) as total_kontrak')
+        $yearSql = config('database.default') === 'sqlite' ? "strftime('%Y', tgl_mulai)" : "YEAR(tgl_mulai)";
+        $leaseTrend = \App\Models\AssetLease::selectRaw("{$yearSql} as tahun, SUM(nilai_sewa) as total_nilai, COUNT(*) as total_kontrak")
             ->groupBy('tahun')
             ->orderBy('tahun', 'asc')
             ->get();

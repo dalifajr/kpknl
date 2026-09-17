@@ -15,6 +15,17 @@
 @endsection
 
 @section('content')
+<style>
+    .table-row-clickable {
+        transition: background-color 0.15s ease-in-out;
+    }
+    .table-row-clickable:hover {
+        background-color: rgba(13, 110, 253, 0.05) !important;
+    }
+    .table-row-clickable:hover td {
+        background-color: transparent !important;
+    }
+</style>
 
 <!-- Quick Summary Stats Bar (KPI Audit & Sinkronisasi) -->
 <div class="row g-3 mb-4">
@@ -153,38 +164,37 @@
                         <th>Aksi &amp; Ringkasan Perubahan</th>
                         <th>Operator</th>
                         <th style="width: 150px;">Status Sinkron</th>
-                        <th class="text-end pe-3" style="width: 90px;">Detail</th>
+                        <th class="text-end pe-3" style="width: 130px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($logs as $log)
-                        <tr>
+                        <tr class="table-row-clickable" onclick="showLogDiffModal({{ $log->id }})" style="cursor: pointer;" title="Klik untuk melihat rincian rekam perubahan">
                             <td class="text-center fw-bold text-muted ps-3">{{ $logs->firstItem() + $loop->index }}</td>
                             <td>
                                 <div class="fw-semibold text-dark small">{{ $log->created_at->translatedFormat('d M Y, H:i') }}</div>
                                 <div class="text-muted" style="font-size: 0.72rem;">{{ $log->created_at->diffForHumans() }}</div>
                             </td>
                             <td>
-                                @if($log->pegawai_id)
-                                    <div role="button" onclick="showPegawaiDetail({{ $log->pegawai_id }})" class="d-inline-flex align-items-center gap-2 text-decoration-none">
-                                        <div class="avatar-initial" style="width: 32px; height: 32px; font-size: 0.75rem;">
-                                            {{ strtoupper(substr($log->nama_pegawai, 0, 2)) }}
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-primary hover-underline">{{ $log->nama_pegawai }}</div>
-                                            <div class="small text-muted font-monospace">{{ $log->nip ?: '-' }}</div>
-                                        </div>
+                                <div class="d-inline-flex align-items-center gap-2">
+                                    <div class="avatar-initial" style="width: 32px; height: 32px; font-size: 0.75rem;">
+                                        {{ strtoupper(substr($log->nama_pegawai, 0, 2)) }}
                                     </div>
-                                @else
-                                    <div class="fw-bold text-dark">{{ $log->nama_pegawai }}</div>
-                                    <div class="small text-muted font-monospace">{{ $log->nip ?: '-' }}</div>
-                                @endif
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ $log->nama_pegawai }}</div>
+                                        <div class="small text-muted font-monospace">{{ $log->nip ?: '-' }}</div>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center gap-2 mb-1">
                                     @if(strtoupper($log->action) === 'CREATE')
                                         <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5 fw-bold" style="font-size: 0.68rem;">
                                             <i class="fas fa-plus me-1"></i>TAMBAH BARU
+                                        </span>
+                                    @elseif(strtoupper($log->action) === 'ROLLBACK')
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-0.5 fw-bold" style="font-size: 0.68rem;">
+                                            <i class="fas fa-rotate-left me-1"></i>ROLLBACK
                                         </span>
                                     @else
                                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5 fw-bold" style="font-size: 0.68rem;">
@@ -233,15 +243,29 @@
                                 @endif
                             </td>
                             <td class="text-end pe-3">
-                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" 
-                                        style="width: 32px; height: 32px; padding: 0;" 
-                                        onclick="showLogDiffModal({{ $log->id }})"
-                                        title="Lihat Detail Perubahan Payload">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" 
+                                            style="width: 32px; height: 32px; padding: 0;" 
+                                            onclick="event.stopPropagation(); showLogDiffModal({{ $log->id }})"
+                                            title="Lihat Detail Perubahan Payload">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+
+                                    @if($log->action !== 'rollback' && in_array(auth()->user()?->role, ['superadmin', 'maintenance', 'administrator']))
+                                        <button type="button" class="btn btn-sm btn-outline-warning text-warning-emphasis rounded-circle" 
+                                                style="width: 32px; height: 32px; padding: 0;" 
+                                                onclick="event.stopPropagation(); confirmRollback({{ $log->id }}, '{{ addslashes($log->nama_pegawai) }}', '{{ $log->action }}')"
+                                                title="Batalkan / Rollback Perubahan Ini">
+                                            <i class="fas fa-rotate-left"></i>
+                                        </button>
+                                    @endif
+                                </div>
                                 <!-- Hidden details payload for modal -->
                                 <div id="logData_{{ $log->id }}" class="d-none"
+                                     data-id="{{ $log->id }}"
                                      data-title="{{ $log->action }} - {{ $log->nama_pegawai }}"
+                                     data-action="{{ $log->action }}"
+                                     data-nama="{{ $log->nama_pegawai }}"
                                      data-user="{{ $log->user_name }}"
                                      data-time="{{ $log->created_at->translatedFormat('d F Y, H:i:s') }}"
                                      data-desc="{{ $log->description }}"
@@ -278,8 +302,10 @@
         </div>
     @endif
 </div>
+@endsection
 
-<!-- Modal Log Detail Diff -->
+@push('modals')
+<!-- Modal Log Detail Diff (Rendered at body root to prevent CSS stacking context backdrop traps) -->
 <div class="modal fade" id="logDiffModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
@@ -292,14 +318,20 @@
             <div class="modal-body p-4 bg-light" id="logDiffModalBody">
                 <!-- Injected via JavaScript -->
             </div>
-            <div class="modal-footer px-4 py-3 bg-white border-top">
+            <div class="modal-footer px-4 py-3 bg-white border-top d-flex justify-content-between">
+                <div>
+                    @if(in_array(auth()->user()?->role, ['superadmin', 'maintenance', 'administrator']))
+                        <button type="button" class="btn btn-warning rounded-pill px-3 shadow-sm d-none" id="btnModalRollback">
+                            <i class="fas fa-rotate-left me-1"></i> Batalkan Perubahan Ini (Rollback)
+                        </button>
+                    @endif
+                </div>
                 <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
 </div>
-
-@endsection
+@endpush
 
 @push('scripts')
 <script>
@@ -313,6 +345,8 @@
         const desc = holder.getAttribute('data-desc');
         const status = holder.getAttribute('data-status');
         const error = holder.getAttribute('data-error');
+        const action = holder.getAttribute('data-action') || '';
+        const nama = holder.getAttribute('data-nama') || '';
         const changes = JSON.parse(holder.getAttribute('data-changes') || '{}');
 
         let statusBadge = '';
@@ -325,10 +359,19 @@
         }
 
         let changesHtml = '';
-        if (Object.keys(changes).length > 0) {
-            changesHtml += '<div class="table-responsive bg-white rounded-3 border p-2 mb-3"><table class="table table-sm table-bordered mb-0"><thead class="table-light"><tr><th>Atribut / Kolom</th><th>Nilai Baru</th></tr></thead><tbody>';
+        const changeKeys = Object.keys(changes);
+        if (changeKeys.length > 0) {
+            changesHtml += '<div class="table-responsive bg-white rounded-3 border p-0 mb-3"><table class="table table-sm table-hover align-middle mb-0"><thead class="table-light"><tr><th class="ps-3 py-2">Atribut / Kolom</th><th class="py-2 text-danger">Nilai Sebelum (Before)</th><th class="py-2 text-success">Nilai Sesudah (After)</th></tr></thead><tbody>';
             for (const [key, val] of Object.entries(changes)) {
-                changesHtml += `<tr><td class="fw-bold font-monospace small text-primary">${key}</td><td class="font-monospace small">${val !== null ? val : '<em>(kosong)</em>'}</td></tr>`;
+                let beforeVal = '-';
+                let afterVal = '-';
+                if (val && typeof val === 'object' && ('before' in val || 'after' in val)) {
+                    beforeVal = val.before !== null && val.before !== undefined && val.before !== '' ? String(val.before) : '<span class="text-muted fst-italic">(kosong)</span>';
+                    afterVal = val.after !== null && val.after !== undefined && val.after !== '' ? `<strong class="text-success">${String(val.after)}</strong>` : '<span class="text-muted fst-italic">(dikosongkan)</span>';
+                } else {
+                    afterVal = val !== null && val !== undefined ? String(val) : '<span class="text-muted fst-italic">(kosong)</span>';
+                }
+                changesHtml += `<tr><td class="ps-3 fw-bold font-monospace small text-primary">${key}</td><td class="font-monospace small text-muted">${beforeVal}</td><td class="font-monospace small">${afterVal}</td></tr>`;
             }
             changesHtml += '</tbody></table></div>';
         } else {
@@ -347,12 +390,74 @@
                 <p class="text-secondary small mb-0">${desc}</p>
             </div>
 
-            <h6 class="fw-bold text-dark mb-2"><i class="fas fa-list-check text-primary me-1"></i> Nilai Field yang Diubah / Diinput:</h6>
+            <h6 class="fw-bold text-dark mb-2"><i class="fas fa-list-check text-primary me-1"></i> Rincian Perbedaan Kolom (Diff):</h6>
             ${changesHtml}
         `);
 
-        const modal = new bootstrap.Modal(document.getElementById('logDiffModal'));
+        const btnRollback = $('#btnModalRollback');
+        if (btnRollback.length) {
+            if (action.toLowerCase() !== 'rollback') {
+                btnRollback.removeClass('d-none').off('click').on('click', function() {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('logDiffModal'));
+                    if (modal) modal.hide();
+                    confirmRollback(id, nama, action);
+                });
+            } else {
+                btnRollback.addClass('d-none');
+            }
+        }
+
+        const modalEl = document.getElementById('logDiffModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
+    }
+
+    // Rollback Confirmation & Handler
+    function confirmRollback(id, nama, action) {
+        Swal.fire({
+            title: 'Batalkan Perubahan (Rollback)?',
+            html: `Apakah Anda yakin ingin membatalkan perubahan data pegawai <strong>${nama}</strong>?<br><br><small class="text-muted">Data pegawai akan dikembalikan ke kondisi sebelum log ini dibuat, dan tindakan ini akan tercatat di riwayat audit.</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-rotate-left me-1"></i> Ya, Rollback Sekarang',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                   title: 'Memproses Rollback...',
+                   text: 'Mengembalikan data pegawai dan mencatat log audit...',
+                   allowOutsideClick: false,
+                   didOpen: () => { Swal.showLoading(); }
+                });
+
+                $.ajax({
+                    url: `{{ url('/log-perubahan') }}/${id}/rollback`,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Rollback Berhasil!',
+                            text: res.message || 'Perubahan berhasil dibatalkan.',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Rollback Gagal',
+                            text: xhr.responseJSON?.message || 'Terjadi kesalahan saat memproses rollback.'
+                        });
+                    }
+                });
+            }
+        });
     }
 
     // Ajax Submit for Manual Sync

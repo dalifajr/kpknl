@@ -66,6 +66,27 @@ class DiagramController extends Controller
             ->orderByDesc('job_grade')
             ->get();
 
+        // 9. Analisis Masa Tugas Eselon IV (TMT UE IV) Terlama
+        $ueIvPegawais = Pegawai::where('is_active', true)
+            ->whereNotNull('tmt_ue_iv')
+            ->where('tmt_ue_iv', '!=', '')
+            ->where('tmt_ue_iv', '!=', '-')
+            ->with(['unitKerja', 'pangkatGolongan'])
+            ->get()
+            ->filter(function ($p) {
+                return $p->lama_ue_iv_bulan > 0;
+            })
+            ->sortByDesc('lama_ue_iv_bulan')
+            ->values();
+
+        $topUeIv = $ueIvPegawais->take(10);
+        $totalWithUeIv = $ueIvPegawais->count();
+        $avgUeIvMonths = $totalWithUeIv > 0 ? (int) round($ueIvPegawais->avg('lama_ue_iv_bulan')) : 0;
+        $avgUeIvFormatted = $avgUeIvMonths > 0 
+            ? (floor($avgUeIvMonths / 12) > 0 ? floor($avgUeIvMonths / 12) . ' Thn ' . ($avgUeIvMonths % 12) . ' Bln' : ($avgUeIvMonths % 12) . ' Bln')
+            : '-';
+        $topPersonilUeIv = $topUeIv->first();
+
         $totalPegawai = Pegawai::where('is_active', true)->count();
 
         return view('diagram.index', compact(
@@ -84,6 +105,11 @@ class DiagramController extends Controller
             'todOver4',
             'unitDist',
             'grades',
+            'topUeIv',
+            'totalWithUeIv',
+            'avgUeIvMonths',
+            'avgUeIvFormatted',
+            'topPersonilUeIv',
             'totalPegawai'
         ));
     }

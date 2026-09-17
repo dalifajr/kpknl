@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Data Mentah Spreadsheet — SI-KEP SIMPATIK KPKNL Palembang')
+@section('title', 'Data Mentah Spreadsheet — SI-KEP KPKNL Palembang')
 @section('hero-title', 'Data Mentah Google Spreadsheet')
-@section('hero-subtitle', 'Tampilan matriks terlengkap 35+ atribut personil langsung dari sumber Google Spreadsheet SIMPATIK Kepegawaian')
+@section('hero-subtitle', 'Tampilan matriks terlengkap 35+ atribut personil langsung dari sumber Google Spreadsheet Kepegawaian SI-KEP')
 
 @section('content')
 
@@ -254,10 +254,10 @@
     </div>
     <div class="card-footer bg-white py-3 px-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
         <small class="text-muted">
-            Menampilkan {{ $pegawais->firstItem() ?: 0 }} s.d. {{ $pegawais->lastItem() ?: 0 }} dari total {{ $pegawais->total() }} baris data &bull; Format kolom disinkronkan langsung dari Google Spreadsheet SIMPATIK
+            Menampilkan {{ $pegawais->firstItem() ?: 0 }} s.d. {{ $pegawais->lastItem() ?: 0 }} dari total {{ $pegawais->total() }} baris data &bull; Format kolom disinkronkan langsung dari Google Spreadsheet Kepegawaian SI-KEP
         </small>
         <div class="d-flex align-items-center gap-3">
-            {{ $pegawais->links() }}
+            {{ $pegawais->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>

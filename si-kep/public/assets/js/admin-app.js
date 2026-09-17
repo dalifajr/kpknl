@@ -1,5 +1,5 @@
 /**
- * SI-KEP (SIMPATIK KPKNL Palembang) - Layout & UI Logic
+ * SI-KEP KPKNL Palembang - Layout & UI Logic
  * Replicated & Enhanced from referensi_desain (desain1 & desain2)
  */
 

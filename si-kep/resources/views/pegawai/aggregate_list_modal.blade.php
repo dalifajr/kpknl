@@ -5,7 +5,7 @@
         </div>
         <div>
             <h6 class="modal-title fw-bold text-dark mb-0">{{ $title ?: 'Daftar Personil Pegawai' }}</h6>
-            <small class="text-muted" style="font-size: 0.72rem;">KPKNL Palembang &bull; SIMPATIK Kepegawaian</small>
+            <small class="text-muted" style="font-size: 0.72rem;">KPKNL Palembang &bull; SI-KEP Kepegawaian</small>
         </div>
     </div>
     <div class="d-flex align-items-center gap-2">
@@ -95,6 +95,16 @@
                             @elseif(isset($context) && $context === 'pendidikan')
                                 <span class="small fw-semibold text-dark">{{ $p->pendidikan_terakhir ?: '-' }}</span>
                                 <small class="text-muted d-block" style="font-size: 0.7rem;">{{ $p->nama_universitas ?: '-' }}</small>
+                            @elseif(isset($context) && $context === 'pns_definitif')
+                                @if(str_contains(strtolower($p->status_gelar ?? ''), 'tidak sesuai'))
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1" style="font-size: 0.7rem;">
+                                        <i class="fas fa-triangle-exclamation me-1"></i> Beda HRIS
+                                    </span>
+                                @else
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 0.7rem;">
+                                        <i class="fas fa-check-circle me-1"></i> Sesuai HRIS
+                                    </span>
+                                @endif
                             @else
                                 <span class="badge {{ $p->tipe_pegawai === 'pns' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} rounded-pill" style="font-size: 0.7rem;">
                                     {{ strtoupper($p->tipe_pegawai) }}

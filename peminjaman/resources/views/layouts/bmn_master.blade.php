@@ -422,8 +422,7 @@
 
     @php
         $currentUser = Auth::user();
-        $rawName = $currentUser ? $currentUser->name : 'Pengguna';
-        $cleanName = trim(preg_replace('/\s*\(.*?\)\s*/', '', $rawName));
+        $userName = $currentUser ? $currentUser->name : 'Pengguna';
         $userRole = $currentUser ? $currentUser->role : 'peminjam';
         $pendingCountBadge = \App\Models\RisalahPending::where('status', 'belum_validasi')->count();
         $revisiCountBadge = \App\Models\RisalahRevisi::where('status', 'revisi')->count();
@@ -448,32 +447,8 @@
                 </div>
             </a>
 
-            <!-- Right Actions: Role Switcher Demo, Logout -->
+            <!-- Right Actions: Logout -->
             <div class="ms-auto d-flex align-items-center gap-2">
-                <!-- Interactive Role Switcher Demo -->
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-primary dropdown-toggle text-capitalize px-2.5 py-1.5 rounded-pill" style="font-size: 0.82rem;" type="button" data-bs-toggle="dropdown">
-                        <i class="fa-solid fa-sliders me-1 text-warning"></i> Role: <strong>{{ $userRole }}</strong>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="font-size: 0.82rem;">
-                        <li class="dropdown-header text-uppercase fw-bold text-muted" style="font-size: 0.68rem;">Simulasi Hak Akses Aplikasi</li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('sso.switch-role', 'admin') }}">
-                                <i class="fa-solid fa-user-shield me-2 text-primary"></i> Admin / Seksi HI
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('sso.switch-role', 'pelelang') }}">
-                                <i class="fa-solid fa-gavel me-2 text-warning"></i> Pejabat Lelang
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('sso.switch-role', 'peminjam') }}">
-                                <i class="fa-solid fa-book-reader me-2 text-success"></i> Peminjam / Pegawai
-                            </a>
-                        </li>
-                    </ul>
-                </div>
 
                 <!-- Direct Logout Button -->
                 <form action="{{ route('logout') }}" method="POST" class="m-0">
@@ -497,11 +472,11 @@
             <!-- User Header Profile -->
             <div class="sidebar-header d-flex align-items-center gap-3">
                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
-                    {{ substr($cleanName, 0, 1) }}
+                    {{ strtoupper(substr($userName, 0, 1)) }}
                 </div>
                 <div class="d-flex flex-column" style="line-height: 1.25; min-width: 0; flex: 1;">
                     <span class="fw-bold text-body" style="word-break: break-word; overflow-wrap: break-word; white-space: normal;">
-                        {{ $cleanName }}
+                        {{ $userName }}
                     </span>
                     <small class="mt-1">
                         <span class="badge {{ $currentUser ? $currentUser->getRoleBadgeClass() : 'badge-role-peminjam' }} px-2 py-1 rounded-pill d-inline-flex align-items-center gap-1" style="font-size: 0.68rem;">

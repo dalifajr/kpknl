@@ -43,8 +43,8 @@
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div class="d-flex align-items-center gap-2">
                                 <div class="p-2.5 rounded-circle d-inline-flex align-items-center justify-content-center text-primary overflow-hidden" style="width: 44px; height: 44px; background-color: var(--md-sys-color-primary-container);">
-                                    @if($app->icon && !in_array($app->icon, ['box', 'desktop', 'window-maximize']))
-                                        <img src="{{ asset('storage/' . $app->icon) }}" alt="{{ $app->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    @if($app->icon && !in_array($app->icon, ['box', 'desktop', 'window-maximize', 'cube', 'cubes']))
+                                        <img src="{{ asset('storage/' . $app->icon) }}" alt="{{ $app->name }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-cube text-primary fs-5\'></i>';">
                                     @else
                                         <i class="fa-solid fa-{{ $app->icon ?: 'box' }} fs-5"></i>
                                     @endif

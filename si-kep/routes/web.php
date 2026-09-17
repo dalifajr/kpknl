@@ -44,7 +44,16 @@ Route::middleware('auth')->group(function () {
     // 7. Log Perubahan & Audit Sync (Superadmin & Maintenance)
     Route::get('/log-perubahan', [\App\Http\Controllers\ChangeLogController::class, 'index'])->name('change_log.index');
     Route::post('/log-perubahan/sync-pending', [\App\Http\Controllers\ChangeLogController::class, 'syncPending'])->name('change_log.sync_pending');
+    Route::post('/log-perubahan/{id}/rollback', [\App\Http\Controllers\ChangeLogController::class, 'rollback'])->name('change_log.rollback');
 
-    // 8. Wipe Data (Maintenance Only)
+    // 8. Wipe Data & Deteksi Izin Spreadsheet (Maintenance / Superadmin)
+    Route::post('/settings/check-spreadsheet-permission', [DashboardController::class, 'checkSpreadsheetPermission'])->name('settings.check_permission');
     Route::post('/settings/wipe-data', [DashboardController::class, 'wipeData'])->name('settings.wipe_data');
+
+    // 9. Informasi Sistem & Tentang Aplikasi
+    Route::get('/about', function () {
+        $totalPegawai = \App\Models\Pegawai::where('is_active', true)->count();
+        $lastSynced = \App\Models\AppSetting::get('last_synced_at');
+        return view('about.index', compact('totalPegawai', 'lastSynced'));
+    })->name('about');
 });

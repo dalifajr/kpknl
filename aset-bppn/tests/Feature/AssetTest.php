@@ -60,7 +60,7 @@ class AssetTest extends TestCase
             'kondisi_aset' => 'KOSONG'
         ]);
 
-        $response->assertRedirect('/assets');
+        $response->assertRedirect(route('assets.show', $asset->id));
         $this->assertDatabaseHas('assets', ['jenis_aset' => 'Tanah dan Bangunan', 'kondisi_aset' => 'KOSONG']);
     }
 

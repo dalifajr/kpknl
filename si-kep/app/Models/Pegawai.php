@@ -283,4 +283,47 @@ class Pegawai extends Model
     {
         return $this->lama_palembang_tahun >= 4;
     }
+
+    /**
+     * Total Lama Bertugas di Unit Eselon IV (dalam hitungan Bulan)
+     */
+    public function getLamaUeIvBulanAttribute(): int
+    {
+        if (!empty($this->lama_bertugas_ue_iv) && preg_match('/(\d+)\s*thn\s*(\d+)\s*bln/i', $this->lama_bertugas_ue_iv, $matches)) {
+            return ((int)$matches[1] * 12) + (int)$matches[2];
+        }
+
+        if (!empty($this->tmt_ue_iv) && $this->tmt_ue_iv !== '-') {
+            try {
+                $parsed = Carbon::hasFormat($this->tmt_ue_iv, 'd/m/Y')
+                    ? Carbon::createFromFormat('d/m/Y', $this->tmt_ue_iv)->startOfDay()
+                    : Carbon::parse($this->tmt_ue_iv)->startOfDay();
+                return max(0, (int)$parsed->diffInMonths(Carbon::now()));
+            } catch (\Exception $e) {
+                return 0;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Format teks lama bertugas UE IV (misal: "4 Thn 2 Bln")
+     */
+    public function getLamaUeIvFormattedAttribute(): string
+    {
+        if (!empty($this->lama_bertugas_ue_iv) && $this->lama_bertugas_ue_iv !== '-') {
+            return ucwords(trim($this->lama_bertugas_ue_iv));
+        }
+
+        $bulan = $this->lama_ue_iv_bulan;
+        if ($bulan <= 0) return '-';
+
+        $thn = floor($bulan / 12);
+        $bln = $bulan % 12;
+
+        if ($thn > 0 && $bln > 0) return "{$thn} Thn {$bln} Bln";
+        if ($thn > 0) return "{$thn} Thn";
+        return "{$bln} Bln";
+    }
 }

@@ -249,5 +249,188 @@ class KepegawaianViewsTest extends TestCase
         // Verify old avatar was deleted
         $this->assertFalse(Storage::disk('public')->exists($oldAvatarUrl));
     }
+
+    /**
+     * Test role user cannot trigger sync and does not see sync button
+     */
+    public function test_user_role_cannot_sync_and_sync_button_is_hidden(): void
+    {
+        $regularUser = User::factory()->create([
+            'role' => 'user',
+        ]);
+
+        $superadmin = User::factory()->create([
+            'role' => 'superadmin',
+        ]);
+
+        // Regular user visits dashboard -> sync button is NOT present
+        $responseUser = $this->actingAs($regularUser)->get(route('dashboard'));
+        $responseUser->assertStatus(200);
+        $responseUser->assertDontSee('id="btnSyncSpreadsheet"', false);
+
+        // Regular user posts to /sync -> forbidden HTTP 403
+        $syncResponse = $this->actingAs($regularUser)->postJson(route('sync'));
+        $syncResponse->assertStatus(403);
+        $syncResponse->assertJson(['success' => false]);
+
+        // Superadmin visits dashboard -> sync button IS present
+        $responseAdmin = $this->actingAs($superadmin)->get(route('dashboard'));
+        $responseAdmin->assertStatus(200);
+        $responseAdmin->assertSee('id="btnSyncSpreadsheet"', false);
+    }
+
+    /**
+     * Test wipe data endpoint functions properly for maintenance role without DB facade errors
+     */
+    public function test_maintenance_can_wipe_data(): void
+    {
+        $maintenance = User::factory()->create([
+            'role' => 'maintenance',
+        ]);
+
+        Pegawai::create([
+            'no_urut' => 1,
+            'nip' => '198801012010011009',
+            'nama' => 'Testing Pegawai Wipe',
+            'is_active' => true,
+        ]);
+        $this->assertEquals(1, Pegawai::count());
+
+        $response = $this->actingAs($maintenance)->postJson(route('settings.wipe_data'));
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertEquals(0, Pegawai::count());
+    }
+
+    /**
+     * Test spreadsheet raw view renders bootstrap-5 pagination
+     */
+    public function test_raw_spreadsheet_view_uses_bootstrap_pagination(): void
+    {
+        $superadmin = User::factory()->create([
+            'role' => 'superadmin',
+        ]);
+
+        for ($i = 1; $i <= 30; $i++) {
+            Pegawai::create([
+                'no_urut' => $i,
+                'nip' => '198801012010011' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'nama' => 'Pegawai ' . $i,
+                'is_active' => true,
+            ]);
+        }
+
+        $response = $this->actingAs($superadmin)->get(route('spreadsheet.raw'));
+        $response->assertStatus(200);
+        $response->assertSee('pagination', false);
+    }
+
+    /**
+     * Test unit kerja page renders cleanly when data is empty (no DataTables colspan error)
+     */
+    public function test_unit_kerja_page_renders_cleanly_when_data_is_empty(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'user',
+        ]);
+
+        // Clear all pegawai (simulating Wipe Data)
+        Pegawai::query()->delete();
+        $this->assertEquals(0, Pegawai::count());
+
+        $response = $this->actingAs($user)->get(route('unit_kerja.index'));
+        $response->assertStatus(200);
+        // Ensure no illegal colspan="7" inside tbody
+        $response->assertDontSee('colspan="7"', false);
+    }
+
+    /**
+     * Test diagram page renders Peringkat Masa Tugas Eselon IV panel without horizontal bar chart
+     */
+    public function test_diagram_page_renders_peringkat_masa_tugas_eselon_iv(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'user',
+        ]);
+
+        Pegawai::create([
+            'no_urut' => 1,
+            'nip' => '198501012010121001',
+            'nama' => 'Akhmad Testing Taupikur',
+            'nama_jabatan_raw' => 'Pelaksana Seksi PKN',
+            'tmt_ue_iv' => '15/7/2022',
+            'lama_bertugas_ue_iv' => '4 thn 2 bln',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('diagram.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Peringkat Masa Tugas Eselon IV', false);
+        $response->assertDontSee('chartTmtUeIv', false);
+        $response->assertSee('Akhmad Testing Taupikur', false);
+    }
+
+    /**
+     * Test authenticated user can access about page and sidebar has link
+     */
+    public function test_authenticated_user_can_access_about_page(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+
+        $response = $this->actingAs($user)->get('/about');
+        $response->assertStatus(200);
+        $response->assertSee('Tentang SI-KEP');
+        $response->assertSee('Tentang Aplikasi');
+        $response->assertSee('Pengembang Sistem');
+        $response->assertSee('Tim KP UIN Raden Fatah 2026 dan Utoro Yogi Wiratama A.Md.Pnl.');
+        $response->assertSee('logo-kpknl.png');
+        $response->assertDontSee('Sistem Informasi Resmi KPKNL Palembang');
+        $response->assertDontSee('Aparatur Terkelola');
+
+        // Check sidebar on dashboard has link to about
+        $dashResponse = $this->actingAs($user)->get('/');
+        $dashResponse->assertStatus(200);
+        $dashResponse->assertSee(route('about'));
+        $dashResponse->assertSee('Tentang Aplikasi');
+    }
+
+    /**
+     * Test dashboard renders accurate dynamic HRIS status for ASN Definitif
+     */
+    public function test_dashboard_renders_accurate_dynamic_hris_status_for_asn_definitif(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+
+        // Create 1 clear PNS and 1 mismatch PNS
+        Pegawai::create([
+            'no_urut' => 10,
+            'nip' => '199001012015011001',
+            'nama' => 'PNS Clear Test',
+            'tipe_pegawai' => 'pns',
+            'status_gelar' => 'Sudah Clear (sesuai dengan HRIS)',
+            'is_active' => true,
+        ]);
+        Pegawai::create([
+            'no_urut' => 11,
+            'nip' => '199001012015011002',
+            'nama' => 'PNS Mismatch Test',
+            'tipe_pegawai' => 'pns',
+            'status_gelar' => 'Data tidak sesuai di HRIS',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($user)->get('/');
+        $response->assertStatus(200);
+        $response->assertDontSee('100% Terverifikasi');
+        $response->assertSee('Clear');
+        $response->assertSee('Beda HRIS');
+
+        // Test filter modal drilldown pns_definitif
+        $modalResponse = $this->actingAs($user)->get('/pegawai/filter-modal?type=pns_definitif');
+        $modalResponse->assertStatus(200);
+        $modalResponse->assertSee('Sesuai HRIS');
+        $modalResponse->assertSee('Beda HRIS');
+    }
 }
 

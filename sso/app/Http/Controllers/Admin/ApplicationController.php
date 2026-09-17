@@ -26,9 +26,16 @@ class ApplicationController extends Controller
             $query->where('status', $status);
         }
 
+        $stats = [
+            'total' => Application::count(),
+            'active' => Application::where('status', 'active')->count(),
+            'inactive' => Application::where('status', 'inactive')->count(),
+            'total_users' => User::count(),
+        ];
+
         $applications = $query->latest()->paginate(9)->withQueryString();
 
-        return view('admin.applications.index', compact('applications'));
+        return view('admin.applications.index', compact('applications', 'stats'));
     }
 
     public function create()

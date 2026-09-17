@@ -75,7 +75,7 @@ class SsoController extends Controller
             ]);
 
             if (!$response->successful()) {
-                Log::warning('Gagal exchange token SSO SIMPATIK: ' . $response->body());
+                Log::warning('Gagal exchange token SSO SI-KEP: ' . $response->body());
                 return redirect()->route('login')->with('error', 'Gagal memverifikasi token ke server SSO KPKNL Palembang.');
             }
 
@@ -114,7 +114,7 @@ class SsoController extends Controller
                 ]
             );
 
-            // 4. Authenticate in SIMPATIK Application
+            // 4. Authenticate in SI-KEP Application
             Auth::login($localUser, true);
 
             return redirect()->intended(route('dashboard'))
@@ -136,6 +136,6 @@ class SsoController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('success', 'Anda telah berhasil keluar dari sistem SIMPATIK.');
+        return redirect()->route('login')->with('success', 'Anda telah berhasil keluar dari sistem SI-KEP.');
     }
 }

@@ -48,7 +48,136 @@ class GoogleSheetSyncService
     }
 
     /**
-     * Sync data from Google Spreadsheet
+     * Check spreadsheet access permissions (Read Only vs Read & Write) and format validity
+     */
+    public function checkPermissions(?string $sheetUrl = null, ?string $webhookUrl = null): array
+    {
+        $url = $sheetUrl ?: AppSetting::get('google_sheet_url', self::DEFAULT_SPREADSHEET_URL);
+        $csvUrl = $this->convertToCsvUrl($url);
+        $webhook = $webhookUrl !== null ? $webhookUrl : AppSetting::get('google_sheet_webhook_url', '');
+
+        $canRead = false;
+        $readStatus = 'unknown';
+        $readMessage = '';
+        $advice = null;
+
+        // 1. Test Read Access via CSV
+        try {
+            $response = Http::timeout(10)->retry(1, 300)->get($csvUrl);
+
+            if (!$response->successful()) {
+                $status = $response->status();
+                if ($status === 401 || $status === 403) {
+                    $readStatus = 'no_access';
+                    $readMessage = "Akses Ditolak (HTTP {$status}). File Google Spreadsheet bersifat privat atau dibatasi.";
+                    $advice = "Buka file di Google Spreadsheet > Klik 'Share' (Bagikan) di pojok kanan atas > Ubah General Access menjadi 'Anyone with the link' (Siapa saja yang memiliki tautan) > Pilih peran 'Viewer' atau 'Editor' > Simpan.";
+                } elseif ($status === 404) {
+                    $readStatus = 'not_found';
+                    $readMessage = "File spreadsheet tidak ditemukan (HTTP 404). Pastikan tautan atau ID Spreadsheet sudah benar.";
+                    $advice = "Periksa kembali tautan Google Spreadsheet Anda.";
+                } else {
+                    $readStatus = 'http_error';
+                    $readMessage = "Gagal mengakses spreadsheet dari Google (HTTP status: {$status}).";
+                    $advice = "Pastikan server terkoneksi dengan internet dan tautan Google Spreadsheet valid.";
+                }
+            } else {
+                $body = $response->body();
+                $contentType = $response->header('Content-Type') ?: '';
+
+                // Check if Google redirected to a HTML sign-in page
+                if (str_contains($contentType, 'text/html') && (str_contains($body, 'accounts.google.com') || str_contains($body, 'ServiceLogin') || str_contains($body, 'need permission'))) {
+                    $readStatus = 'no_access';
+                    $readMessage = "Akses Spreadsheet Ditolak. Google mengalihkan ke halaman login akun karena file ini dibatasi (bukan publik).";
+                    $advice = "Buka file di Google Spreadsheet > Klik 'Share' (Bagikan) > Ubah ke 'Anyone with the link' (Siapa saja yang memiliki tautan) > Selesai.";
+                } elseif (empty(trim($body))) {
+                    $readStatus = 'empty';
+                    $readMessage = "Konten spreadsheet kosong.";
+                    $advice = "Pastikan lembar kerja memiliki baris data kepegawaian.";
+                } else {
+                    // Check required headers
+                    $upper = strtoupper(substr($body, 0, 4096));
+                    if (!str_contains($upper, 'NAMA') || !str_contains($upper, 'NIP') || !str_contains($upper, 'JABATAN')) {
+                        $readStatus = 'invalid_format';
+                        $readMessage = "Format kolom spreadsheet tidak sesuai. Kolom 'NAMA', 'NIP', dan 'JABATAN' tidak ditemukan.";
+                        $advice = "Pastikan tautan menyertakan parameter gid yang mengarah ke lembar kerja 'Daftar Pegawai'.";
+                    } else {
+                        $canRead = true;
+                        $readStatus = 'authorized';
+                        $readMessage = "Izin baca valid. Berhasil mengunduh dan membaca struktur kolom master kepegawaian.";
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $readStatus = 'network_error';
+            $readMessage = "Koneksi ke Google Spreadsheet gagal: " . $e->getMessage();
+            $advice = "Periksa koneksi internet server dan pastikan domain docs.google.com tidak diblokir firewall.";
+        }
+
+        // 2. Test Write Access via Webhook
+        $canWrite = false;
+        $writeStatus = 'none';
+        $writeMessage = '';
+
+        if (empty(trim($webhook))) {
+            $writeStatus = 'not_configured';
+            $writeMessage = 'Webhook Google Apps Script belum diatur (Kanal Tulis belum aktif).';
+        } else {
+            try {
+                $probe = Http::timeout(8)->post($webhook, [
+                    'action' => 'check_permission',
+                    'ping' => true,
+                    'timestamp' => now()->toIso8601String(),
+                ]);
+
+                if ($probe->successful()) {
+                    $canWrite = true;
+                    $writeStatus = 'authorized';
+                    $writeMessage = 'Webhook Google Apps Script terhubung aktif dan siap menerima data pembaruan.';
+                } else {
+                    $writeStatus = 'unauthorized';
+                    $writeMessage = "Webhook Apps Script mengembalikan HTTP {$probe->status()} (Akses tulis gagal/dibatasi).";
+                }
+            } catch (\Exception $e) {
+                $writeStatus = 'connection_failed';
+                $writeMessage = "Gagal menghubungi webhook Apps Script: " . $e->getMessage();
+            }
+        }
+
+        // 3. Overall Permission Classification
+        if (!$canRead) {
+            $permission = $readStatus === 'invalid_format' ? 'invalid_format' : 'no_access';
+            $permissionLabel = $readStatus === 'invalid_format' ? 'Format Kolom Tidak Sesuai' : 'Akses Ditolak (Privat)';
+            $summary = $readMessage;
+        } elseif ($canRead && $canWrite) {
+            $permission = 'read_and_write';
+            $permissionLabel = 'Read & Write (Akses Penuh)';
+            $summary = 'Spreadsheet dapat dibaca publik dan webhook siap menerima pembaruan data secara dua arah.';
+        } else {
+            $permission = 'read_only';
+            $permissionLabel = 'Read Only (Hanya Baca)';
+            $summary = 'Spreadsheet dapat diimpor ke SI-KEP, namun perubahan data dari aplikasi web hanya akan disimpan di database lokal karena webhook tulis belum diatur atau tidak merespons.';
+            if (empty($advice)) {
+                $advice = "Jika Anda ingin perubahan dari SI-KEP otomatis tertulis balik ke spreadsheet, atur URL Webhook Google Apps Script di formulir Pengaturan.";
+            }
+        }
+
+        return [
+            'success' => $canRead,
+            'permission' => $permission,
+            'permission_label' => $permissionLabel,
+            'can_read' => $canRead,
+            'can_write' => $canWrite,
+            'read_status' => $readStatus,
+            'read_message' => $readMessage,
+            'write_status' => $writeStatus,
+            'write_message' => $writeMessage,
+            'message' => $summary,
+            'advice' => $advice,
+        ];
+    }
+
+    /**
+     * Sync data from Google Spreadsheet with Smart Upsert (Safe Preservation of Local Data)
      */
     public function sync(?string $sheetUrl = null): array
     {
@@ -61,10 +190,20 @@ class GoogleSheetSyncService
             $response = Http::timeout(30)->retry(2, 500)->get($csvUrl);
 
             if (!$response->successful()) {
-                throw new Exception("Gagal mengunduh spreadsheet dari Google (HTTP status: {$response->status()}). Pastikan link dapat diakses publik.");
+                $st = $response->status();
+                if ($st === 401 || $st === 403) {
+                    throw new Exception("Akses Ditolak (HTTP {$st}). Pastikan spreadsheet memiliki izin 'Anyone with the link can view'.");
+                }
+                throw new Exception("Gagal mengunduh spreadsheet dari Google (HTTP status: {$st}). Pastikan link dapat diakses publik.");
             }
 
             $csvContent = $response->body();
+            $contentType = $response->header('Content-Type') ?: '';
+
+            if (str_contains($contentType, 'text/html') && (str_contains($csvContent, 'accounts.google.com') || str_contains($csvContent, 'ServiceLogin') || str_contains($csvContent, 'need permission'))) {
+                throw new Exception("Akses Spreadsheet Ditolak. File bersifat privat dan memerlukan izin login Google. Ubah pengaturan sharing ke 'Anyone with the link'.");
+            }
+
             if (empty(trim($csvContent))) {
                 throw new Exception("Konten spreadsheet kosong.");
             }
@@ -110,9 +249,10 @@ class GoogleSheetSyncService
             $pnsCount = 0;
             $ppnpnCount = 0;
             $importedCount = 0;
-
-            // Clear old records
-            Pegawai::query()->delete();
+            $createdCount = 0;
+            $updatedCount = 0;
+            $importedNips = [];
+            $importedNiks = [];
 
             for ($i = $dataStartIndex; $i < count($rows); $i++) {
                 // Rule: Row 41 and below or Gorontalo data must NOT be included
@@ -185,7 +325,7 @@ class GoogleSheetSyncService
 
                 $noUrut = intval(trim($this->getVal($row, $colMap, ['NO', 'NO.']))) ?: ($importedCount + 1);
 
-                $pegawai = Pegawai::create([
+                $pegawaiData = [
                     'no_urut' => $noUrut,
                     'nip' => !empty($nip) ? $nip : null,
                     'nik' => !empty($nik) ? $nik : null,
@@ -229,7 +369,28 @@ class GoogleSheetSyncService
                     'validasi_pangkat' => $this->parseBool($this->getVal($row, $colMap, ['VALIDASI DATA PANGKAT TERAKHIR'])),
                     'validasi_pendidikan' => $this->parseBool($this->getVal($row, $colMap, ['VALIDASI DATA PENDIDIKAN TERAKHIR'])),
                     'is_active' => true,
-                ]);
+                ];
+
+                // Smart Upsert: Find existing pegawai by NIP or NIK to preserve avatar and local IDs
+                $existing = null;
+                if (!empty($nip)) {
+                    $existing = Pegawai::where('nip', $nip)->first();
+                    $importedNips[] = $nip;
+                } elseif (!empty($nik)) {
+                    $existing = Pegawai::where('nik', $nik)->first();
+                    $importedNiks[] = $nik;
+                }
+
+                if ($existing) {
+                    // Update attributes while keeping existing avatar_url intact!
+                    $existing->fill($pegawaiData);
+                    $existing->save();
+                    $pegawai = $existing;
+                    $updatedCount++;
+                } else {
+                    $pegawai = Pegawai::create($pegawaiData);
+                    $createdCount++;
+                }
 
                 // If Kepala Kantor, set as head of Pimpinan unit
                 if (str_contains(strtolower($jabatanRaw), 'kepala kpknl')) {
@@ -239,6 +400,25 @@ class GoogleSheetSyncService
                 $importedCount++;
             }
 
+            // Deactivate any records no longer in spreadsheet instead of deleting them
+            $deactivateQuery = Pegawai::where('is_active', true);
+            $hasFilter = false;
+            $cleanNips = array_filter($importedNips);
+            $cleanNiks = array_filter($importedNiks);
+            if (!empty($cleanNips)) {
+                $deactivateQuery->whereNotIn('nip', $cleanNips);
+                $hasFilter = true;
+            }
+            if (!empty($cleanNiks)) {
+                $deactivateQuery->where(function($q) use ($cleanNiks) {
+                    $q->whereNull('nik')->orWhereNotIn('nik', $cleanNiks);
+                });
+                $hasFilter = true;
+            }
+            if ($hasFilter) {
+                $deactivateQuery->update(['is_active' => false]);
+            }
+
             // Save Sync Audit Log
             $syncLog = SyncLog::create([
                 'source_url' => $url,
@@ -246,7 +426,7 @@ class GoogleSheetSyncService
                 'total_pns' => $pnsCount,
                 'total_ppnpn' => $ppnpnCount,
                 'status' => 'success',
-                'message' => "Berhasil menyinkronkan {$importedCount} data personil ({$pnsCount} ASN dan {$ppnpnCount} PPNPN).",
+                'message' => "Berhasil menyinkronkan {$importedCount} data personil ({$createdCount} baru, {$updatedCount} diperbarui: {$pnsCount} ASN dan {$ppnpnCount} PPNPN).",
                 'synced_at' => Carbon::now(),
             ]);
 
@@ -264,8 +444,10 @@ class GoogleSheetSyncService
 
             return [
                 'success' => true,
-                'message' => "Sinkronisasi berhasil! {$importedCount} data pegawai ({$pnsCount} PNS, {$ppnpnCount} PPNPN) berhasil diperbarui{$pushInfo}.",
+                'message' => "Sinkronisasi berhasil! {$importedCount} data pegawai diproses ({$createdCount} baru, {$updatedCount} diperbarui: {$pnsCount} PNS, {$ppnpnCount} PPNPN){$pushInfo}.",
                 'total' => $importedCount,
+                'created' => $createdCount,
+                'updated' => $updatedCount,
                 'pns' => $pnsCount,
                 'ppnpn' => $ppnpnCount,
                 'pending_pushed' => $pendingPushResult,

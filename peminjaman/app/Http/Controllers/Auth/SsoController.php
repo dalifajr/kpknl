@@ -42,8 +42,14 @@ class SsoController extends Controller
      */
     public function redirect(Request $request)
     {
-        if (Auth::check()) {
+        if (Auth::check() && !$request->has('force') && !$request->has('reauth')) {
             return redirect()->route('dashboard');
+        }
+
+        if ($request->has('force') || $request->has('reauth')) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
 
         $ssoBaseUrl = $this->getSsoBaseUrl($request);
@@ -165,32 +171,53 @@ class SsoController extends Controller
                 }
             }
 
-            if (!$isAssigned) {
-                return redirect()->away($ssoBaseUrl . '/dashboard')->with('error', "Akses Ditolak: Anda belum di-assign ke aplikasi Peminjaman Risalah Lelang.");
+            // 3. Map application role per KPKNL business rules:
+            // - Pegawai / User Biasa = peminjam (Peminjam Berkas)
+            // - Admin (Pejabat Lelang) = pelelang (Pejabat Lelang)
+            // - Superadmin & Maintenance = admin (Administrator Arsip)
+            $roles = $userPayload['roles'] ?? [];
+            $primaryRole = $userPayload['primary_role'] ?? ($roles[0] ?? 'user');
+            $isSuperadmin = !empty($userPayload['is_superadmin']) || in_array('superadmin', $roles);
+            $isMaintenance = !empty($userPayload['is_maintenance']) || in_array('maintenance', $roles) || ($userPayload['username'] ?? '') === 'maintenance';
+            $isAdmin = !empty($userPayload['is_admin']) || in_array('admin', $roles) || $primaryRole === 'admin';
+
+            if ($isSuperadmin || $isMaintenance) {
+                $role = 'admin'; // Administrator Arsip
+            } elseif ($isAdmin || ($assignedRole ?? null) === 'pelelang' || ($assignedRole ?? null) === 'pejabat_lelang' || ($userPayload['app_role'] ?? null) === 'pelelang') {
+                $role = 'pelelang'; // Pejabat Lelang
+            } else {
+                $role = 'peminjam'; // Peminjam Berkas (Pegawai / User Biasa)
             }
 
-            // 3. Map application role: admin, pelelang, peminjam
-            $role = $assignedRole ?? ($userPayload['app_role'] ?? null);
-            if (!in_array($role, ['admin', 'pelelang', 'peminjam'])) {
-                if ($isSuperadmin || $isMaintenance || (!empty($userPayload['is_admin']) && $userPayload['is_admin'])) {
-                    $role = 'admin';
-                } else {
-                    $role = 'peminjam';
-                }
+            // 4. Update or create local user strictly synced with SSO profile
+            $user = null;
+            if ($ssoUserId) {
+                $user = User::where('sso_id', $ssoUserId)->first();
+            }
+            if (!$user && !empty($email)) {
+                $user = User::where('email', $email)->first();
             }
 
-            // 4. Update or create local user
-            $user = User::updateOrCreate(
-                ['email' => $email],
-                [
+            if ($user) {
+                $user->update([
+                    'name' => $name,
+                    'username' => $userPayload['username'] ?? $user->username,
+                    'email' => $email,
+                    'role' => $role,
+                    'sso_id' => $ssoUserId,
+                    'avatar_url' => $userPayload['avatar_url'] ?? $user->avatar_url,
+                ]);
+            } else {
+                $user = User::create([
                     'name' => $name,
                     'username' => $userPayload['username'] ?? Str::slug($name),
+                    'email' => $email,
                     'role' => $role,
                     'sso_id' => $ssoUserId,
                     'avatar_url' => $userPayload['avatar_url'] ?? null,
                     'password' => bcrypt(Str::random(32)),
-                ]
-            );
+                ]);
+            }
 
             Auth::login($user, true);
 

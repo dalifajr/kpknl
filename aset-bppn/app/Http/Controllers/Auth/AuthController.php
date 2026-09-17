@@ -52,7 +52,7 @@ class AuthController extends Controller
 
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('Aset BPPN SSO Error: ' . $e->getMessage());
-            return redirect('/')->withErrors(['error' => 'Gagal terhubung ke server SSO: ' . $e->getMessage()]);
+            return redirect()->route('login')->with('sso_error', 'Gagal login melalui SSO: ' . $e->getMessage());
         }
     }
 

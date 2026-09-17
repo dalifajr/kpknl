@@ -143,6 +143,22 @@
                         <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.68rem;">Normal</span>
                     @endif
                 </div>
+
+                <!-- 5. Masa Bertugas di Seksi (TMT UE IV / Rolling Internal) -->
+                <div class="p-2 px-3 rounded-3 border d-flex justify-content-between align-items-center bg-white shadow-xs">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle p-2 bg-info-subtle text-info d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <i class="fas fa-arrows-split-up-and-left" style="font-size: 0.8rem;"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Lama di Seksi (UE IV)</div>
+                            <div class="fw-bold text-dark small">{{ $pegawai->lama_bertugas_ue_iv && $pegawai->lama_bertugas_ue_iv !== '-' ? $pegawai->lama_bertugas_ue_iv : '-' }}</div>
+                        </div>
+                    </div>
+                    <span class="badge bg-light text-muted border small" style="font-size: 0.68rem;" title="TMT Seksi UE IV">
+                        TMT: {{ $pegawai->tmt_ue_iv && $pegawai->tmt_ue_iv !== '-' ? $pegawai->tmt_ue_iv : '-' }}
+                    </span>
+                </div>
             </div>
 
             <!-- Footnote Info (Poin 11) -->
@@ -197,7 +213,6 @@
                                 </div>
                                 <div class="fw-bold text-dark fs-6">{{ $pegawai->nama_jabatan_raw }}</div>
                                 <div class="mt-1">
-                                    <span class="badge bg-primary-subtle text-primary text-uppercase">{{ $pegawai->jabatan?->nama_jabatan ?: 'Fungsional Umum' }}</span>
                                     @if($pegawai->job_grade)
                                         <span class="badge bg-secondary-subtle text-secondary">Grade {{ $pegawai->job_grade }}</span>
                                     @endif
@@ -222,6 +237,20 @@
                                 <div class="small text-muted mt-1">
                                     Status Kepegawaian: 
                                     <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fas fa-check me-1"></i> {{ strtoupper($pegawai->tipe_pegawai) }} Aktif</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-3 p-3 h-100 bg-white border-start border-3 border-info">
+                                <div class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.68rem; letter-spacing: 0.05em;">
+                                    <i class="fas fa-arrows-split-up-and-left text-info me-1"></i> Penugasan Seksi &amp; Rolling Internal (UE IV)
+                                </div>
+                                <div class="fw-bold text-dark fs-6">{{ $pegawai->unitKerja?->nama_unit ?: 'KPKNL Palembang' }}</div>
+                                <div class="small text-muted mt-1">
+                                    Lama Bertugas: <strong class="text-primary">{{ $pegawai->lama_bertugas_ue_iv && $pegawai->lama_bertugas_ue_iv !== '-' ? $pegawai->lama_bertugas_ue_iv : '-' }}</strong>
+                                </div>
+                                <div class="small text-muted">
+                                    TMT Seksi (UE IV): <span class="fw-semibold text-dark">{{ $pegawai->tmt_ue_iv && $pegawai->tmt_ue_iv !== '-' ? $pegawai->tmt_ue_iv : '-' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -412,7 +441,7 @@
 
 <div class="modal-footer border-top px-4 py-3 bg-white d-flex justify-content-between align-items-center">
     <div class="small text-muted">
-        <i class="fas fa-database text-primary me-1"></i> Database SIMPATIK Kepegawaian KPKNL Palembang
+        <i class="fas fa-database text-primary me-1"></i> Database SI-KEP KPKNL Palembang
     </div>
     <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup Profil</button>
 </div>

@@ -237,6 +237,194 @@
             </div>
         </div>
     </div>
+<!-- Grid Diagram 5: Peringkat Masa Tugas Eselon IV -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle p-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                        <i class="fas fa-award text-warning fs-6"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold text-dark">
+                            Peringkat Masa Tugas Eselon IV
+                        </h6>
+                        <small class="text-muted" style="font-size: 0.72rem;">Rekam Jejak Masa Penugasan Terlama Personil di Unit Eselon IV (Seksi / Subbagian)</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1.5">
+                        <i class="fas fa-users me-1"></i> {{ $topUeIv->count() }} Personil Eselon IV
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                @if($topPersonilUeIv)
+                    <!-- Top Highlight & Metrik Statistik Row -->
+                    <div class="row g-4 mb-4">
+                        <!-- Highlight Terlama Card -->
+                        <div class="col-lg-6">
+                            <div class="p-3.5 rounded-3 bg-primary-subtle border border-primary-subtle text-dark h-100 position-relative overflow-hidden">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1" style="font-size: 0.75rem;">
+                                        <i class="fas fa-crown me-1 text-warning-emphasis"></i> Masa Tugas Terlama di Seksi
+                                    </span>
+                                    <span class="badge bg-white text-primary border font-monospace px-2.5 py-1">
+                                        {{ $topPersonilUeIv->lama_ue_iv_bulan }} Bulan
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="avatar-initial shadow-sm" style="width: 50px; height: 50px; font-size: 1.1rem; background: linear-gradient(135deg, #0c306b, #1e40af);">
+                                        {{ strtoupper(substr($topPersonilUeIv->nama, 0, 2)) }}
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold text-primary mb-1 cursor-pointer hover-underline" onclick="showPegawaiDetail({{ $topPersonilUeIv->id }})" title="Klik untuk melihat profil lengkap">
+                                            {{ $topPersonilUeIv->display_name }}
+                                        </h6>
+                                        <div class="small text-muted font-monospace">{{ $topPersonilUeIv->nip ?: '-' }}</div>
+                                        <div class="small fw-semibold text-dark mt-0.5">
+                                            <i class="fas fa-building-user text-secondary me-1"></i> {{ $topPersonilUeIv->unitKerja?->nama_unit ?: 'KPKNL Palembang' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-2 pt-2 border-top border-primary-subtle">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block" style="font-size: 0.72rem;">TMT Seksi (UE IV):</small>
+                                        <span class="fw-semibold small text-dark">{{ $topPersonilUeIv->tmt_ue_iv ?: '-' }}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block" style="font-size: 0.72rem;">Total Masa Penugasan:</small>
+                                        <span class="fw-bold text-danger-emphasis small">{{ $topPersonilUeIv->lama_ue_iv_formatted }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KPI Statistik UE IV -->
+                        <div class="col-lg-6">
+                            <div class="row g-3 h-100">
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3 bg-light border h-100 d-flex flex-column justify-content-center text-center">
+                                        <div class="small text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">
+                                            <i class="fas fa-clock text-primary me-1"></i> RATA-RATA UE IV
+                                        </div>
+                                        <div class="fw-bold fs-4 text-primary">{{ $avgUeIvFormatted }}</div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Durasi rata-rata aparatur di seksi</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3 bg-light border h-100 d-flex flex-column justify-content-center text-center">
+                                        <div class="small text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">
+                                            <i class="fas fa-users-gear text-info me-1"></i> TOTAL TERDATA
+                                        </div>
+                                        <div class="fw-bold fs-4 text-dark">{{ $totalWithUeIv }} Aparatur</div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Memiliki data TMT Eselon IV</small>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-3 rounded-3 bg-light border">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fas fa-circle-info text-primary"></i>
+                                            <div class="small text-muted" style="font-size: 0.75rem; line-height: 1.4;">
+                                                Data TMT UE IV (Unit Eselon IV) digunakan pimpinan untuk mengevaluasi rotasi berkala, penyegaran suasana kerja, dan penataan formasi kompetensi personil pada seksi terkait di KPKNL Palembang.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Peringkat Masa Tugas Eselon IV -->
+                    <div class="border rounded-3 overflow-hidden bg-white shadow-xs">
+                        <div class="bg-light px-3 py-2.5 border-bottom d-flex align-items-center justify-content-between">
+                            <span class="small fw-bold text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">
+                                <i class="fas fa-list-ol me-1 text-primary"></i> Daftar Urutan Masa Tugas Personil (Terlama ke Terpendek)
+                            </span>
+                            <span class="small text-muted" style="font-size: 0.72rem;">Klik baris untuk melihat profil personil</span>
+                        </div>
+                        <div class="table-responsive" style="max-height: 420px;">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light sticky-top" style="z-index: 1;">
+                                    <tr>
+                                        <th class="ps-3 text-center" style="width: 50px;">Peringkat</th>
+                                        <th>Nama Pegawai &amp; NIP</th>
+                                        <th>Unit Kerja / Seksi</th>
+                                        <th>TMT Eselon IV</th>
+                                        <th>Masa Tugas (Bulan)</th>
+                                        <th>Lama Penugasan</th>
+                                        <th class="text-end pe-3" style="width: 100px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($topUeIv as $idx => $p)
+                                        <tr class="cursor-pointer transition-all" onclick="showPegawaiDetail({{ $p->id }})" title="Klik untuk membuka profil {{ $p->nama }}">
+                                            <td class="ps-3 text-center">
+                                                @if($idx === 0)
+                                                    <span class="badge bg-warning text-dark fw-bold rounded-circle p-2" style="width: 28px; height: 28px; line-height: 12px;" title="Peringkat 1">1</span>
+                                                @elseif($idx === 1)
+                                                    <span class="badge bg-secondary-subtle text-dark fw-bold rounded-circle p-2 border" style="width: 28px; height: 28px; line-height: 12px;" title="Peringkat 2">2</span>
+                                                @elseif($idx === 2)
+                                                    <span class="badge bg-warning-subtle text-warning-emphasis fw-bold rounded-circle p-2 border border-warning-subtle" style="width: 28px; height: 28px; line-height: 12px;" title="Peringkat 3">3</span>
+                                                @else
+                                                    <span class="text-muted fw-semibold small">#{{ $idx + 1 }}</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2.5">
+                                                    @if($p->avatar_url)
+                                                        <img src="{{ asset('storage/' . $p->avatar_url) }}" alt="{{ $p->nama }}" class="rounded-circle border" style="width: 34px; height: 34px; object-fit: cover;">
+                                                    @else
+                                                        <div class="avatar-initial shadow-xs" style="width: 34px; height: 34px; font-size: 0.75rem;">
+                                                            {{ strtoupper(substr($p->nama, 0, 2)) }}
+                                                        </div>
+                                                    @endif
+                                                    <div>
+                                                        <div class="fw-bold text-dark hover-underline">{{ $p->display_name }}</div>
+                                                        <div class="small text-muted font-monospace">{{ $p->nip ?: '-' }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border px-2.5 py-1 fw-medium" style="font-size: 0.75rem;">
+                                                    {{ $p->unitKerja?->nama_unit ?: 'KPKNL Palembang' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="font-monospace small text-muted">{{ $p->tmt_ue_iv ?: '-' }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2.5 py-1">
+                                                    {{ $p->lama_ue_iv_bulan }} Bulan
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold {{ $idx === 0 ? 'text-danger-emphasis' : 'text-primary' }} small">
+                                                    {{ $p->lama_ue_iv_formatted }}
+                                                </span>
+                                            </td>
+                                            <td class="text-end pe-3">
+                                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1" style="font-size: 0.7rem;" onclick="event.stopPropagation(); showPegawaiDetail({{ $p->id }})">
+                                                    <i class="fas fa-eye me-1"></i> Detail
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-inbox fs-2 mb-2 d-block opacity-50"></i>
+                        <h6>Belum Ada Data Penugasan Eselon IV</h6>
+                        <p class="small text-muted mb-0">Personil dengan tanggal TMT Eselon IV akan otomatis tercatat dan diurutkan di sini.</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection

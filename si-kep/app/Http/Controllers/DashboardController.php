@@ -12,6 +12,7 @@ use App\Services\GoogleSheetSyncService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -20,6 +21,19 @@ class DashboardController extends Controller
         $totalPegawai = Pegawai::where('is_active', true)->count();
         $totalPns = Pegawai::where('is_active', true)->where('tipe_pegawai', 'pns')->count();
         $totalPpnpn = Pegawai::where('is_active', true)->where('tipe_pegawai', 'ppnpn')->count();
+
+        // Status Akurasi Data & Gelar HRIS ASN Definitif
+        $pnsClearHris = Pegawai::where('is_active', true)
+            ->where('tipe_pegawai', 'pns')
+            ->where(function ($q) {
+                $q->where('status_gelar', 'like', '%Clear%')
+                  ->orWhere('status_gelar', 'like', '%sesuai%');
+            })->count();
+
+        $pnsMismatchHris = Pegawai::where('is_active', true)
+            ->where('tipe_pegawai', 'pns')
+            ->where('status_gelar', 'like', '%tidak sesuai%')
+            ->count();
 
         // KGB Alerts: 2 tahun dari TMT KGB terakhir, alert jika overdue (<0) atau jatuh tempo dalam 90 hari
         $now = Carbon::now()->startOfDay();
@@ -93,6 +107,8 @@ class DashboardController extends Controller
             'boomer',
             'totalLaki',
             'totalPerempuan',
+            'pnsClearHris',
+            'pnsMismatchHris',
             'unitStats',
             'lastSync',
             'sheetUrl'
@@ -104,6 +120,15 @@ class DashboardController extends Controller
      */
     public function sync(Request $request, GoogleSheetSyncService $syncService)
     {
+        $user = auth()->user();
+        if ($user && $user->role === 'user') {
+            $msg = 'Akses ditolak. Sinkronisasi hanya dapat dijalankan oleh Admin atau Tim Kepegawaian.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->back()->with('error', $msg);
+        }
+
         $url = $request->input('sheet_url');
         $result = $syncService->sync($url);
 
@@ -151,6 +176,19 @@ class DashboardController extends Controller
     }
 
     /**
+     * Check spreadsheet permissions and connection status (Maintenance / Superadmin)
+     */
+    public function checkSpreadsheetPermission(Request $request, GoogleSheetSyncService $syncService)
+    {
+        $sheetUrl = $request->input('sheet_url');
+        $webhookUrl = $request->input('webhook_url');
+
+        $result = $syncService->checkPermissions($sheetUrl, $webhookUrl);
+
+        return response()->json($result);
+    }
+
+    /**
      * Wipe all Pegawai and synchronization data (Maintenance only)
      */
     public function wipeData(Request $request)
@@ -186,7 +224,7 @@ class DashboardController extends Controller
 
             DB::commit();
 
-            if ($request->ajax()) {
+            if ($request->ajax() || $request->expectsJson()) {
                 return response()->json([
                     'success' => true,
                     'message' => "Wipe Data Berhasil! Seluruh {$totalPegawai} data pegawai dan log telah dibersihkan.",

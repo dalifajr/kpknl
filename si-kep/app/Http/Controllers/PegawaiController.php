@@ -116,6 +116,7 @@ class PegawaiController extends Controller
                 break;
 
             case 'pns_definitif':
+                $context = 'pns_definitif';
                 $query->where('tipe_pegawai', 'pns');
                 $title = 'Aparatur Sipil Negara (ASN) Definitif';
                 break;

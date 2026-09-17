@@ -231,7 +231,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($unit->pegawai as $p)
+                                @foreach($unit->pegawai as $p)
                                     @php $kgb = $p->kgb_status; @endphp
                                     <tr onclick="showPegawaiDetail({{ $p->id }})" role="button" title="Klik untuk melihat profil">
                                         <td class="text-center fw-bold text-muted ps-3">{{ $loop->iteration }}</td>
@@ -266,14 +266,7 @@
                                             </button>
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center py-4 text-muted">
-                                            <i class="fas fa-inbox fs-3 mb-2 d-block opacity-50"></i>
-                                            Belum ada personil definitif yang terdaftar pada unit ini.
-                                        </td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -300,6 +293,8 @@
                         lengthMenu: "Tampilkan _MENU_ data",
                         info: "Menampilkan _START_ s.d. _END_ dari _TOTAL_ pegawai",
                         infoEmpty: "Tidak ada data personil",
+                        emptyTable: "<div class='py-4 text-muted'><i class='fas fa-inbox fs-3 mb-2 d-block opacity-50'></i>Belum ada personil definitif yang terdaftar pada unit ini.</div>",
+                        zeroRecords: "<div class='py-4 text-muted'><i class='fas fa-magnifying-glass fs-3 mb-2 d-block opacity-50'></i>Tidak ada data personil yang cocok dengan pencarian.</div>",
                         paginate: {
                             previous: "<i class='fas fa-chevron-left'></i>",
                             next: "<i class='fas fa-chevron-right'></i>"

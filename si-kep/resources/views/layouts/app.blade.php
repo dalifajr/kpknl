@@ -94,10 +94,12 @@
                     <span class="fw-bold text-dark" id="headerLastSyncText">{{ $lastSyncDisplay }}</span>
                 </div>
 
-                <!-- Live Google Sheets Sync Button -->
-                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2 rounded-pill px-3 shadow-sm" id="btnSyncSpreadsheet">
-                    <i class="fas fa-arrows-rotate" id="syncIcon"></i> <span id="syncText">Sinkronisasi</span>
-                </button>
+                @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance', 'administrator']))
+                    <!-- Live Google Sheets Sync Button -->
+                    <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2 rounded-pill px-3 shadow-sm" id="btnSyncSpreadsheet">
+                        <i class="fas fa-arrows-rotate" id="syncIcon"></i> <span id="syncText">Sinkronisasi</span>
+                    </button>
+                @endif
 
                 @auth
                     <!-- User Account Dropdown -->
@@ -200,6 +202,11 @@
                             </a>
                         @endif
                     @endauth
+
+                    <div class="menu-header mt-3">Informasi Sistem</div>
+                    <a href="{{ route('about') }}" class="menu-item {{ request()->routeIs('about') ? 'active' : '' }}">
+                        <i class="fas fa-circle-info"></i> <span>Tentang Aplikasi</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -256,7 +263,7 @@
                         &copy; {{ date('Y') }} <strong>KPKNL Palembang</strong> &bull; DJKN Kementerian Keuangan RI
                     </div>
                     <div>
-                        SI-KEP SIMPATIK v2.5 &bull; Terintegrasi Google Spreadsheet &amp; SSO
+                        SI-KEP v2.5 &bull; Terintegrasi Google Spreadsheet &amp; SSO
                     </div>
                 </footer>
             </div>
@@ -462,6 +469,23 @@
 
                         <hr class="my-3 text-muted opacity-25">
 
+                        <!-- Permission Detection Widget -->
+                        <div class="mb-3 p-3 rounded-3 border bg-light">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div>
+                                    <div class="fw-bold text-dark small"><i class="fas fa-shield-halved text-primary me-1"></i> Deteksi Izin File Spreadsheet</div>
+                                    <div class="text-muted" style="font-size: 0.72rem;">Memeriksa apakah izin file berupa Read Only atau Read &amp; Write</div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold shadow-sm d-flex align-items-center gap-1" id="btnCheckPermission">
+                                    <i class="fas fa-stethoscope" id="iconCheckPermission"></i>
+                                    <span id="textCheckPermission">Uji Izin</span>
+                                </button>
+                            </div>
+                            <div id="permissionCheckResult" class="d-none mt-2 pt-2 border-top">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
                         <label class="form-label fw-bold small text-muted text-uppercase">Tautan Google Spreadsheet (Publik)</label>
                         <div class="input-group mb-2">
                             <span class="input-group-text bg-light"><i class="fas fa-link text-muted"></i></span>
@@ -503,6 +527,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Additional Modals from Child Views (outside container-fluid to prevent backdrop stacking trap) -->
+    @stack('modals')
 
     <!-- Core Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -737,6 +764,13 @@
 
         // Wipe Data Trigger with Double Confirmation SweetAlert
         $('#btnWipeDataTrigger').on('click', function() {
+            // Hide settings modal first to release Bootstrap 5 focus trap so SweetAlert input can be clicked & typed into
+            const settingsModalEl = document.getElementById('settingsModal');
+            const settingsModalInstance = bootstrap.Modal.getInstance(settingsModalEl);
+            if (settingsModalInstance) {
+                settingsModalInstance.hide();
+            }
+
             Swal.fire({
                 title: 'PERINGATAN: WIPE DATA!',
                 text: 'Tindakan ini akan MENGHAPUS SEMUA DATA PEGAWAI di database lokal! Ketik "WIPE" untuk melanjutkan:',
@@ -749,6 +783,12 @@
                 confirmButtonText: '<i class="fas fa-trash-can me-1"></i> Ya, Hapus Semua Data!',
                 cancelButtonText: 'Batal',
                 reverseButtons: true,
+                didOpen: () => {
+                    setTimeout(() => {
+                        const swalInput = Swal.getInput();
+                        if (swalInput) swalInput.focus();
+                    }, 200);
+                },
                 preConfirm: (val) => {
                     if (val !== 'WIPE') {
                         Swal.showValidationMessage('Teks konfirmasi salah. Harap ketik WIPE secara tepat.');
@@ -772,9 +812,16 @@
                         } else {
                             Swal.fire('Gagal!', res.message, 'error');
                         }
-                    }).fail(function() {
-                        Swal.fire('Error!', 'Terjadi kesalahan saat memproses Wipe Data.', 'error');
+                    }).fail(function(xhr) {
+                        const errMsg = xhr.responseJSON?.message || 'Terjadi kesalahan saat memproses Wipe Data.';
+                        Swal.fire('Error!', errMsg, 'error');
                     });
+                } else {
+                    // Reopen settings modal if user cancelled or dismissed
+                    if (settingsModalEl) {
+                        const modal = bootstrap.Modal.getOrCreateInstance(settingsModalEl);
+                        modal.show();
+                    }
                 }
             });
         });
@@ -807,7 +854,7 @@
 
             Swal.fire({
                 title: 'Sinkronisasi Spreadsheet?',
-                text: 'Aplikasi akan membaca ulang data dari Google Spreadsheet dan memperbarui basis data lokal.',
+                text: 'Aplikasi akan membaca ulang data dari Google Spreadsheet dan memperbarui basis data lokal dengan metode Smart Upsert.',
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#0c306b',
@@ -822,7 +869,7 @@
 
                     Swal.fire({
                         title: 'Sedang Menyinkronkan...',
-                        text: 'Mengunduh data pegawai dari Google Spreadsheet...',
+                        text: 'Membaca data pegawai dari Google Spreadsheet...',
                         allowOutsideClick: false,
                         didOpen: () => {
                             Swal.showLoading();
@@ -835,7 +882,7 @@
                                 title: 'Sinkronisasi Berhasil!',
                                 text: response.message || 'Data kepegawaian berhasil diperbarui.',
                                 icon: 'success',
-                                timer: 1800,
+                                timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
                                 window.location.reload();
@@ -843,17 +890,18 @@
                         } else {
                             Swal.fire({
                                 title: 'Gagal Sinkronisasi',
-                                text: response.message || 'Terjadi kesalahan saat memproses data.',
+                                html: `<div class="text-danger fw-semibold mb-2">${response.message || 'Terjadi kesalahan saat memproses data.'}</div>
+                                       <div class="text-muted small">Silakan periksa izin akses di Pengaturan Spreadsheet (pastikan Anyone with the link can view).</div>`,
                                 icon: 'error'
                             });
                             btn.prop('disabled', false);
                             icon.removeClass('spin');
                             text.text('Sinkronisasi');
                         }
-                    }).fail(function() {
+                    }).fail(function(xhr) {
                         Swal.fire({
-                            title: 'Kesalahan Jaringan',
-                            text: 'Tidak dapat terhubung ke server atau Google Spreadsheet.',
+                            title: 'Kendala Sinkronisasi',
+                            html: `<div class="text-danger mb-2">${xhr.responseJSON?.message || 'Tidak dapat terhubung ke server atau Google Spreadsheet.'}</div>`,
                             icon: 'error'
                         });
                         btn.prop('disabled', false);
@@ -861,6 +909,65 @@
                         text.text('Sinkronisasi');
                     });
                 }
+            });
+        });
+
+        // Check Spreadsheet Permission Button Handler
+        $('#btnCheckPermission').on('click', function() {
+            const btn = $(this);
+            const icon = $('#iconCheckPermission');
+            const text = $('#textCheckPermission');
+            const resultBox = $('#permissionCheckResult');
+            const sheetUrl = $('#inputSheetUrl').val();
+            const webhookUrl = $('#inputWebhookUrl').val();
+
+            btn.prop('disabled', true);
+            icon.removeClass('fa-stethoscope').addClass('fa-spinner fa-spin');
+            text.text('Memeriksa...');
+            resultBox.removeClass('d-none').html('<div class="text-muted small py-2"><i class="fas fa-circle-notch fa-spin me-1 text-primary"></i> Sedang mendeteksi izin berkas Google Spreadsheet...</div>');
+
+            $.post("{{ route('settings.check_permission') }}", {
+                sheet_url: sheetUrl,
+                webhook_url: webhookUrl
+            }, function(res) {
+                let badgeClass = 'bg-danger-subtle text-danger border-danger-subtle';
+                let iconClass = 'fa-circle-xmark';
+
+                if (res.permission === 'read_and_write') {
+                    badgeClass = 'bg-success-subtle text-success border-success-subtle';
+                    iconClass = 'fa-circle-check';
+                } else if (res.permission === 'read_only') {
+                    badgeClass = 'bg-warning-subtle text-warning border-warning-subtle';
+                    iconClass = 'fa-triangle-exclamation';
+                }
+
+                let adviceHtml = '';
+                if (res.advice) {
+                    adviceHtml = `<div class="p-2 mt-2 rounded-2 bg-light border text-secondary small" style="font-size: 0.72rem;">
+                        <strong><i class="fas fa-circle-info text-info me-1"></i> Saran Tindakan:</strong> ${res.advice}
+                    </div>`;
+                }
+
+                resultBox.html(`
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="badge ${badgeClass} border rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
+                            <i class="fas ${iconClass} me-1"></i> ${res.permission_label}
+                        </span>
+                        <small class="text-muted font-monospace" style="font-size: 0.68rem;">Baca: ${res.can_read ? 'YA' : 'TIDAK'} &bull; Tulis: ${res.can_write ? 'YA' : 'TIDAK'}</small>
+                    </div>
+                    <div class="small text-dark mt-1" style="font-size: 0.75rem;">${res.message}</div>
+                    ${adviceHtml}
+                `);
+            }).fail(function(xhr) {
+                resultBox.html(`
+                    <div class="alert alert-danger py-2 px-3 small mb-0 mt-1" style="font-size: 0.75rem;">
+                        <i class="fas fa-triangle-exclamation me-1"></i> Gagal memeriksa perizinan spreadsheet: ${xhr.responseJSON?.message || 'Koneksi terputus'}.
+                    </div>
+                `);
+            }).always(function() {
+                btn.prop('disabled', false);
+                icon.removeClass('fa-spinner fa-spin').addClass('fa-stethoscope');
+                text.text('Uji Izin');
             });
         });
 

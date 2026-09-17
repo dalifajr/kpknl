@@ -1,14 +1,10 @@
-RENCANA PERBAIKAN SI-KEP DIDALAMNYA;
+RENCANA PERBAIKAN APLIKASI DIDALAMNYA;
 
-1. update foto profil masih tidak bisa dengan error "validasi gagal, path must not be empty"
+1. buang kata-kata "SIMPATIK" pada seluruh bagian si-kep dan ganti dengan SI-KEP.
 
-2. pindahkan tombol tambah pegawai dari dashborad ke menu kepegawaian.
+2. perbaiki layout halaman http://localhost/sso/public/admin/applications
 
-3. ubah nama menu dashboard eksekutif menjadi dashboard saja. ganti juga Dashboard Eksekutif Kepegawaian
-Sistem Informasi Manajemen Profil & Analitika Terpadu Kepegawaian (SIMPATIK) KPKNL Palembang menjadi SI-KEP
-
-4. hapus card body > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(2) Distribusi Formasi Personil per Seksi & Subbagian dari dashboard
-
+3. ganti style aplikasi sso. ubahlah styling layout, css, dan lain-lain untuk memperbagus tampilan. gunakan referensi sso pada folder referensi dengan kamu kustomisasi sesuai kebutuhan sso. 
 
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.
