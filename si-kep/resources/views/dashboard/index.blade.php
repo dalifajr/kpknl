@@ -1,18 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Eksekutif Kepegawaian — SI-KEP KPKNL Palembang')
-@section('hero-title', 'Dashboard Eksekutif Kepegawaian')
-@section('hero-subtitle', 'Sistem Informasi Manajemen Profil & Analitika Terpadu Kepegawaian (SIMPATIK) KPKNL Palembang')
-
-@section('header-actions')
-    @auth
-        @if(in_array(auth()->user()->role, ['superadmin', 'maintenance', 'administrator']))
-            <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm fw-semibold text-primary" onclick="openPegawaiFormModal()">
-                <i class="fas fa-user-plus me-1"></i> Tambah Pegawai
-            </button>
-        @endif
-    @endauth
-@endsection
+@section('title', 'Dashboard — SI-KEP KPKNL Palembang')
+@section('hero-title', 'SI-KEP')
+@section('hero-subtitle', '')
 
 @section('content')
 
@@ -300,80 +290,6 @@
                     Direktori Pegawai <i class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Formasi Personil Unit Kerja dengan Ikon Visual Tematik (Poin 5) -->
-<div class="card shadow-sm border-0">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h6 class="mb-0 fw-bold text-dark">
-            <i class="fas fa-sitemap text-primary me-2"></i>Distribusi Formasi Personil per Seksi &amp; Subbagian
-        </h6>
-        <a href="{{ route('unit_kerja.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-            Lihat Formasi Lengkap <i class="fas fa-arrow-right ms-1"></i>
-        </a>
-    </div>
-    <div class="card-body p-4">
-        <div class="row g-3">
-            @foreach($unitStats as $unit)
-                @php
-                    $uName = strtolower($unit->nama_unit);
-                    $icon = 'fa-building';
-                    $iconColor = 'text-primary';
-                    $iconBg = 'bg-primary-subtle';
-
-                    if (str_contains($uName, 'umum')) {
-                        $icon = 'fa-folder-tree';
-                        $iconColor = 'text-primary';
-                        $iconBg = 'bg-primary-subtle';
-                    } elseif (str_contains($uName, 'kekayaan') || str_contains($uName, 'pkn')) {
-                        $icon = 'fa-vault';
-                        $iconColor = 'text-warning';
-                        $iconBg = 'bg-warning-subtle';
-                    } elseif (str_contains($uName, 'piutang')) {
-                        $icon = 'fa-file-invoice-dollar';
-                        $iconColor = 'text-danger';
-                        $iconBg = 'bg-danger-subtle';
-                    } elseif (str_contains($uName, 'hukum') || str_contains($uName, 'informasi')) {
-                        $icon = 'fa-scale-balanced';
-                        $iconColor = 'text-info';
-                        $iconBg = 'bg-info-subtle';
-                    } elseif (str_contains($uName, 'kepatuhan') || str_contains($uName, 'internal')) {
-                        $icon = 'fa-shield-halved';
-                        $iconColor = 'text-success';
-                        $iconBg = 'bg-success-subtle';
-                    } elseif (str_contains($uName, 'lelang') || str_contains($uName, 'penilai') || str_contains($uName, 'fungsional')) {
-                        $icon = 'fa-gavel';
-                        $iconColor = 'text-primary';
-                        $iconBg = 'bg-primary-subtle';
-                    } elseif (str_contains($uName, 'pimpinan') || str_contains($uName, 'kepala')) {
-                        $icon = 'fa-crown';
-                        $iconColor = 'text-primary';
-                        $iconBg = 'bg-primary-subtle';
-                    }
-                @endphp
-                <div class="col-md-6 col-lg-3">
-                    <div class="p-3 rounded-4 border bg-body-tertiary h-100 transition-all card-clickable shadow-xs"
-                         onclick="showAggregateModal('unit_kerja', '{{ $unit->id }}', 'Personil {{ $unit->nama_unit }}')"
-                         title="Klik untuk melihat personil {{ $unit->nama_unit }}">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle p-2 {{ $iconBg }} {{ $iconColor }} d-flex align-items-center justify-content-center shadow-xs" style="width: 32px; height: 32px;">
-                                    <i class="fas {{ $icon }}" style="font-size: 0.85rem;"></i>
-                                </div>
-                                <span class="badge bg-light text-secondary border px-2 py-1" style="font-size: 0.7rem;">{{ $unit->singkatan ?: 'SEKSI' }}</span>
-                            </div>
-                            <span class="fw-bold text-dark fs-5">{{ $unit->total_pns }} <span class="small text-muted fs-6">ASN</span></span>
-                        </div>
-                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">{{ $unit->nama_unit }}</h6>
-                        <div class="text-muted small d-flex justify-content-between align-items-center" style="font-size: 0.75rem;">
-                            <span>KPKNL Palembang</span>
-                            <span class="text-primary fw-semibold"><i class="fas fa-arrow-right" style="font-size: 0.65rem;"></i> Detail</span>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
         </div>
     </div>
 </div>

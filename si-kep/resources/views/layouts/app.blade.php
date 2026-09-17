@@ -160,7 +160,7 @@
                     <div class="menu-header">Menu Utama</div>
                     
                     <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                        <i class="fas fa-gauge-high"></i> <span>Dashboard Eksekutif</span>
+                        <i class="fas fa-gauge-high"></i> <span>Dashboard</span>
                     </a>
 
                     <a href="{{ route('pegawai.index') }}" class="menu-item {{ request()->routeIs('pegawai.*') ? 'active' : '' }}">
@@ -213,10 +213,12 @@
                 <!-- Page Title & Header Bar -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 text-white">
                     <div>
-                        <h4 class="fw-bold mb-1">@yield('hero-title', 'SIMPATIK Kepegawaian')</h4>
-                        <p class="mb-0 text-white-50 small">
-                            @yield('hero-subtitle', 'Sistem Informasi Manajemen Profil & Analitika Terpadu Kepegawaian KPKNL Palembang')
-                        </p>
+                        <h4 class="fw-bold mb-1">@yield('hero-title', 'SI-KEP')</h4>
+                        @if(trim($__env->yieldContent('hero-subtitle')))
+                            <p class="mb-0 text-white-50 small">
+                                @yield('hero-subtitle')
+                            </p>
+                        @endif
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
@@ -715,11 +717,20 @@
                 },
                 error: function(xhr) {
                     submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Data Pegawai');
-                    let errMsg = 'Gagal menyimpan data pegawai.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errMsg = xhr.responseJSON.message;
+                    let title = xhr.status === 422 ? 'Validasi Gagal' : 'Gagal Menyimpan';
+                    let errMsg = 'Terjadi kesalahan saat menyimpan data pegawai.';
+                    if (xhr.responseJSON) {
+                        if (xhr.responseJSON.errors) {
+                            errMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                        } else if (xhr.responseJSON.message) {
+                            errMsg = xhr.responseJSON.message;
+                        }
                     }
-                    Swal.fire('Validasi Gagal', errMsg, 'error');
+                    Swal.fire({
+                        title: title,
+                        html: errMsg,
+                        icon: 'error'
+                    });
                 }
             });
         });

@@ -353,10 +353,12 @@ class PegawaiController extends Controller
             $pegawai->nama_universitas = trim($request->nama_universitas);
             $pegawai->tahun_lulus = $request->filled('tahun_lulus') ? (int) $request->tahun_lulus : null;
 
-            // Handle Avatar Upload
+            // Handle Avatar Upload safely without getRealPath() issues on Windows/Laragon
             if ($request->hasFile('avatar')) {
-                $avatarPath = $request->file('avatar')->store('avatars', 'public');
-                $pegawai->avatar_url = $avatarPath;
+                $avatarPath = $this->handleAvatarUpload($request->file('avatar'));
+                if ($avatarPath) {
+                    $pegawai->avatar_url = $avatarPath;
+                }
             }
 
             // Hitung No Urut Terakhir
@@ -470,13 +472,15 @@ class PegawaiController extends Controller
             $pegawai->nama_universitas = trim($request->nama_universitas);
             $pegawai->tahun_lulus = $request->filled('tahun_lulus') ? (int) $request->tahun_lulus : $pegawai->tahun_lulus;
 
-            // Handle Avatar Upload
+            // Handle Avatar Upload safely without getRealPath() issues on Windows/Laragon
             if ($request->hasFile('avatar')) {
-                if ($pegawai->avatar_url && Storage::disk('public')->exists($pegawai->avatar_url)) {
-                    Storage::disk('public')->delete($pegawai->avatar_url);
+                $avatarPath = $this->handleAvatarUpload($request->file('avatar'), $pegawai->id);
+                if ($avatarPath) {
+                    if (!empty($pegawai->avatar_url) && Storage::disk('public')->exists($pegawai->avatar_url)) {
+                        Storage::disk('public')->delete($pegawai->avatar_url);
+                    }
+                    $pegawai->avatar_url = $avatarPath;
                 }
-                $avatarPath = $request->file('avatar')->store('avatars', 'public');
-                $pegawai->avatar_url = $avatarPath;
             }
 
             $pegawai->save();
@@ -527,5 +531,36 @@ class PegawaiController extends Controller
                 'message' => 'Gagal memperbarui pegawai: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Safely store uploaded avatar file preventing Windows/Laragon getRealPath empty string bug.
+     */
+    private function handleAvatarUpload($file, ?int $pegawaiId = null): ?string
+    {
+        if (!$file || !$file->isValid()) {
+            return null;
+        }
+
+        $extension = $file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'jpg');
+        $filename = 'avatar_' . ($pegawaiId ?: uniqid()) . '_' . time() . '.' . $extension;
+
+        // Direct binary content write prevents FilesystemAdapter::putFileAs fopen('', 'r') on Windows
+        $pathname = $file->getPathname();
+        if ($pathname && file_exists($pathname)) {
+            $contents = @file_get_contents($pathname);
+            if ($contents !== false) {
+                Storage::disk('public')->put('avatars/' . $filename, $contents);
+                return 'avatars/' . $filename;
+            }
+        }
+
+        // Fallback to native move
+        $targetDir = Storage::disk('public')->path('avatars');
+        if (!is_dir($targetDir)) {
+            @mkdir($targetDir, 0755, true);
+        }
+        $file->move($targetDir, $filename);
+        return 'avatars/' . $filename;
     }
 }

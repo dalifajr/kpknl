@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Pegawai;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class KepegawaianViewsTest extends TestCase
@@ -26,7 +28,9 @@ class KepegawaianViewsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('SI-KEP');
-        $response->assertSee('Dashboard Eksekutif');
+        $response->assertSee('Dashboard');
+        $response->assertDontSee('Distribusi Formasi Personil per Seksi & Subbagian');
+        $response->assertDontSee('onclick="openPegawaiFormModal()"', false);
         $response->assertSee('Total Personil');
         $response->assertSee('admin-app.css');
         $response->assertSee('Outfit');
@@ -34,13 +38,14 @@ class KepegawaianViewsTest extends TestCase
 
     public function test_authenticated_user_can_access_pegawai_directory(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'superadmin']);
 
         $response = $this->actingAs($user)->get('/pegawai');
 
         $response->assertStatus(200);
         $response->assertSee('Direktori Data Kepegawaian');
         $response->assertSee('Daftar Personil Definitif KPKNL Palembang');
+        $response->assertSee('Tambah Pegawai');
     }
 
     public function test_authenticated_user_can_access_jabatan_page(): void
@@ -185,16 +190,20 @@ class KepegawaianViewsTest extends TestCase
 
     public function test_pegawai_create_and_update_with_changelog(): void
     {
+        Storage::fake('public');
         $superadmin = User::factory()->create(['role' => 'superadmin']);
 
-        // 1. Create Pegawai
-        $storeResponse = $this->actingAs($superadmin)->postJson(route('pegawai.store'), [
+        $initialAvatar = UploadedFile::fake()->image('initial_avatar.jpg', 120, 120);
+
+        // 1. Create Pegawai with Avatar
+        $storeResponse = $this->actingAs($superadmin)->post(route('pegawai.store'), [
             'nama' => 'Budi Santoso Testing',
             'nip' => '198801012010011001',
             'nama_jabatan_raw' => 'Pengolah Data dan Informasi',
             'tipe_pegawai' => 'pns',
             'job_grade' => 8,
             'jenis_kelamin' => 'L',
+            'avatar' => $initialAvatar,
         ]);
 
         $storeResponse->assertStatus(200);
@@ -202,6 +211,9 @@ class KepegawaianViewsTest extends TestCase
 
         $createdPegawai = Pegawai::where('nip', '198801012010011001')->first();
         $this->assertNotNull($createdPegawai);
+        $this->assertNotNull($createdPegawai->avatar_url);
+        $this->assertTrue(Storage::disk('public')->exists($createdPegawai->avatar_url));
+        $oldAvatarUrl = $createdPegawai->avatar_url;
 
         // Verify ChangeLog record created
         $this->assertDatabaseHas('change_logs', [
@@ -209,14 +221,17 @@ class KepegawaianViewsTest extends TestCase
             'action' => 'create',
         ]);
 
-        // 2. Update Pegawai
-        $updateResponse = $this->actingAs($superadmin)->postJson(route('pegawai.update', ['id' => $createdPegawai->id]), [
+        // 2. Update Pegawai with New Avatar (replaces old)
+        $fakeAvatar = UploadedFile::fake()->image('updated_profil.jpg', 200, 200);
+
+        $updateResponse = $this->actingAs($superadmin)->post(route('pegawai.update', ['id' => $createdPegawai->id]), [
             'nama' => 'Budi Santoso Testing Updated',
             'nip' => '198801012010011001',
             'nama_jabatan_raw' => 'Pelelang Ahli Pertama',
             'tipe_pegawai' => 'pns',
             'job_grade' => 9,
             'jenis_kelamin' => 'L',
+            'avatar' => $fakeAvatar,
         ]);
 
         $updateResponse->assertStatus(200);
@@ -227,6 +242,12 @@ class KepegawaianViewsTest extends TestCase
             'pegawai_id' => $createdPegawai->id,
             'action' => 'update',
         ]);
+
+        $createdPegawai->refresh();
+        $this->assertNotNull($createdPegawai->avatar_url);
+        $this->assertTrue(Storage::disk('public')->exists($createdPegawai->avatar_url));
+        // Verify old avatar was deleted
+        $this->assertFalse(Storage::disk('public')->exists($oldAvatarUrl));
     }
 }
 

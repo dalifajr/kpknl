@@ -4,6 +4,16 @@
 @section('hero-title', 'Direktori Data Kepegawaian')
 @section('hero-subtitle', 'Pangkalan data personil resmi ASN KPKNL Palembang terintegrasi langsung dengan Google Spreadsheet.')
 
+@section('header-actions')
+    @auth
+        @if(in_array(auth()->user()->role, ['superadmin', 'maintenance', 'administrator']))
+            <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm fw-semibold text-primary" onclick="openPegawaiFormModal()">
+                <i class="fas fa-user-plus me-1"></i> Tambah Pegawai
+            </button>
+        @endif
+    @endauth
+@endsection
+
 @section('content')
 
 <!-- Header Filter & Search Box (From referensi_desain/desain2.html) -->
