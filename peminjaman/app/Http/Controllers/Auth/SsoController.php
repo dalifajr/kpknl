@@ -16,6 +16,28 @@ use PDO;
 class SsoController extends Controller
 {
     /**
+     * Resolve SSO base URL adapting dynamically to current request host if client accesses via LAN IP.
+     */
+    protected function getSsoBaseUrl(Request $request): string
+    {
+        $baseUrl = env('SSO_BASE_URL', 'http://localhost/sso/public');
+        $currentHost = $request->getHost();
+
+        if ($currentHost && !in_array(strtolower($currentHost), ['localhost', '127.0.0.1'])) {
+            $parsed = parse_url($baseUrl);
+            $targetHost = $parsed['host'] ?? 'localhost';
+            if (in_array(strtolower($targetHost), ['localhost', '127.0.0.1'])) {
+                $scheme = $request->getScheme();
+                $port = $request->getPort() && !in_array($request->getPort(), [80, 443]) ? ':' . $request->getPort() : '';
+                $path = $parsed['path'] ?? '/sso/public';
+                return "{$scheme}://{$currentHost}{$port}{$path}";
+            }
+        }
+
+        return $baseUrl;
+    }
+
+    /**
      * Redirect unauthenticated user directly to SSO KPKNL Palembang
      */
     public function redirect(Request $request)
@@ -24,7 +46,7 @@ class SsoController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $ssoBaseUrl = env('SSO_BASE_URL', 'http://localhost/sso/public');
+        $ssoBaseUrl = $this->getSsoBaseUrl($request);
         $clientId = env('SSO_CLIENT_ID', 'client_peminjaman_lelang');
         $redirectUri = env('SSO_REDIRECT_URI', url('/auth/sso/callback'));
         $state = Str::random(40);
@@ -54,7 +76,7 @@ class SsoController extends Controller
         }
 
         try {
-            $ssoBaseUrl = env('SSO_BASE_URL', 'http://localhost/sso/public');
+            $ssoBaseUrl = $this->getSsoBaseUrl($request);
             $clientId = env('SSO_CLIENT_ID', 'client_peminjaman_lelang');
             $clientSecret = env('SSO_CLIENT_SECRET', 'secret_peminjaman_kpknl_2026');
             $redirectUri = env('SSO_REDIRECT_URI', url('/auth/sso/callback'));
@@ -93,14 +115,34 @@ class SsoController extends Controller
             $email = $userPayload['email'] ?? ($userPayload['username'] ? $userPayload['username'].'@kpknl.go.id' : 'user@kpknl.go.id');
             $name = $userPayload['name'] ?? 'Pengguna SSO';
             $isSuperadmin = !empty($userPayload['is_superadmin']) && $userPayload['is_superadmin'] === true;
+            $isMaintenance = (!empty($userPayload['is_maintenance']) && $userPayload['is_maintenance'] === true)
+                || (!empty($userPayload['primary_role']) && $userPayload['primary_role'] === 'maintenance')
+                || (isset($userPayload['roles']) && in_array('maintenance', (array)$userPayload['roles']))
+                || (($userPayload['username'] ?? '') === 'maintenance');
 
             // 2. Check application assignment in SSO DB
-            $isAssigned = $isSuperadmin;
+            $isAssigned = $isSuperadmin || $isMaintenance;
             $assignedRole = null;
 
             if ($ssoUserId) {
                 try {
                     $pdo = new PDO("mysql:host=127.0.0.1;dbname=sso_kpknl_palembang", "root", "");
+                    
+                    // If not yet flagged as assigned, check user_role table in SSO DB
+                    if (!$isAssigned) {
+                        $stmtRole = $pdo->prepare("
+                            SELECT r.name FROM roles r 
+                            JOIN user_role ur ON ur.role_id = r.id 
+                            WHERE ur.user_id = :user_id AND r.name IN ('superadmin', 'maintenance')
+                            LIMIT 1
+                        ");
+                        $stmtRole->execute(['user_id' => $ssoUserId]);
+                        if ($stmtRole->fetch()) {
+                            $isAssigned = true;
+                            $isMaintenance = true;
+                        }
+                    }
+
                     $stmt = $pdo->prepare("
                         SELECT ua.role FROM user_application ua 
                         JOIN applications a ON ua.application_id = a.id 
@@ -128,9 +170,9 @@ class SsoController extends Controller
             }
 
             // 3. Map application role: admin, pelelang, peminjam
-            $role = $assignedRole ?? ($userPayload['app_role'] ?? 'peminjam');
+            $role = $assignedRole ?? ($userPayload['app_role'] ?? null);
             if (!in_array($role, ['admin', 'pelelang', 'peminjam'])) {
-                if ($isSuperadmin || (!empty($userPayload['is_admin']) && $userPayload['is_admin'])) {
+                if ($isSuperadmin || $isMaintenance || (!empty($userPayload['is_admin']) && $userPayload['is_admin'])) {
                     $role = 'admin';
                 } else {
                     $role = 'peminjam';
@@ -229,7 +271,7 @@ class SsoController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        $ssoDashboardUrl = env('SSO_BASE_URL', 'http://localhost/sso-kpknl-palembang/public') . '/dashboard';
+        $ssoDashboardUrl = $this->getSsoBaseUrl($request) . '/dashboard';
         return redirect($ssoDashboardUrl);
     }
 }

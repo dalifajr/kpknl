@@ -87,4 +87,26 @@ class KepegawaianViewsTest extends TestCase
             $this->assertTrue(true);
         }
     }
+
+    public function test_spreadsheet_raw_access_control(): void
+    {
+        // 1. Unauthorized regular user / viewer gets 403
+        $viewer = User::factory()->create(['role' => 'viewer']);
+        $this->actingAs($viewer)->get('/spreadsheet-raw')->assertStatus(403);
+
+        // 2. Superadmin gets 200
+        $superadmin = User::factory()->create(['role' => 'superadmin']);
+        $this->actingAs($superadmin)->get('/spreadsheet-raw')
+            ->assertStatus(200)
+            ->assertSee('Data Mentah Google Spreadsheet');
+
+        // 3. Admin gets 200
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($admin)->get('/spreadsheet-raw')->assertStatus(200);
+
+        // 4. Maintenance gets 200
+        $maintenance = User::factory()->create(['role' => 'maintenance']);
+        $this->actingAs($maintenance)->get('/spreadsheet-raw')->assertStatus(200);
+    }
 }
+

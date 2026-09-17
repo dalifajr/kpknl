@@ -33,4 +33,7 @@ Route::middleware('auth')->group(function () {
 
     // 5. Diagram & Analitika
     Route::get('/diagram', [DiagramController::class, 'index'])->name('diagram.index');
+
+    // 6. Data Mentah Spreadsheet (Khusus Superadmin, Admin, Maintenance)
+    Route::get('/spreadsheet-raw', [DashboardController::class, 'spreadsheetRaw'])->name('spreadsheet.raw');
 });

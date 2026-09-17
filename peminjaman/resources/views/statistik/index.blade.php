@@ -4,14 +4,7 @@
 @section('page_title', 'Statistik & Tren Grafik Risalah Lelang')
 @section('page_subtitle', 'Analisis komparasi bulanan, tahunan, statistik peminjam, dan produktivitas pejabat lelang — KPKNL Palembang')
 
-@section('page_actions')
-    <a href="{{ route('dashboard') }}" class="btn btn-light btn-sm d-flex align-items-center gap-2 text-primary fw-semibold shadow-sm">
-        <i class="fas fa-chart-pie"></i> Monitoring Operasional
-    </a>
-    <a href="{{ route('katalog.index') }}" class="btn btn-warning btn-sm d-flex align-items-center gap-2 fw-semibold text-dark shadow-sm">
-        <i class="fas fa-boxes-stacked"></i> Jelajah Katalog
-    </a>
-@endsection
+
 
 @section('content')
 

@@ -134,6 +134,47 @@ class DashboardController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Tautan Google Spreadsheet berhasil disimpan.');
+        return redirect()->back()->with('success', 'Tautan Google Spreadsheet berhasil diperbarui.');
+    }
+
+    /**
+     * View Data Mentah Spreadsheet (Khusus Superadmin, Admin, Maintenance)
+     */
+    public function spreadsheetRaw(Request $request)
+    {
+        $user = auth()->user();
+        $allowedRoles = ['superadmin', 'admin', 'maintenance'];
+
+        if (!$user || !in_array($user->role, $allowedRoles)) {
+            abort(403, 'Akses Terbatas: Halaman Data Mentah Spreadsheet hanya dapat diakses oleh Superadmin, Admin, dan Maintenance.');
+        }
+
+        $query = Pegawai::with(['unitKerja', 'jabatan', 'pangkatGolongan'])->orderBy('no_urut');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nip', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%")
+                  ->orWhere('nama_jabatan_raw', 'like', "%{$search}%")
+                  ->orWhere('pangkat_golongan_raw', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('tipe')) {
+            $query->where('tipe_pegawai', $request->input('tipe'));
+        }
+
+        if ($request->filled('unit_id')) {
+            $query->where('unit_kerja_id', $request->input('unit_id'));
+        }
+
+        $pegawais = $query->get();
+        $unitKerjas = UnitKerja::orderBy('urutan')->get();
+        $sheetUrl = AppSetting::get('google_sheet_url', GoogleSheetSyncService::DEFAULT_SPREADSHEET_URL);
+        $lastSync = SyncLog::latest('synced_at')->first();
+
+        return view('spreadsheet.raw', compact('pegawais', 'unitKerjas', 'sheetUrl', 'lastSync'));
     }
 }

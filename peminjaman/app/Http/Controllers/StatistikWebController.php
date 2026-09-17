@@ -55,8 +55,12 @@ class StatistikWebController extends Controller
         $yearlyPelelangan = [];
         $yearlyPeminjaman = [];
 
+        $isSqlite = DB::getDriverName() === 'sqlite';
+        $yearRisalahExpr = $isSqlite ? "cast(strftime('%Y', tgl_risalah) as integer) as y, count(*) as total" : 'YEAR(tgl_risalah) as y, count(*) as total';
+        $yearPinjamExpr = $isSqlite ? "cast(strftime('%Y', tgl_peminjaman) as integer) as y, count(*) as total" : 'YEAR(tgl_peminjaman) as y, count(*) as total';
+
         $minutaByYear = DB::table('risalah_minuta')
-            ->selectRaw('YEAR(tgl_risalah) as y, count(*) as total')
+            ->selectRaw($yearRisalahExpr)
             ->whereNotNull('tgl_risalah')
             ->where('tgl_risalah', '!=', '0000-00-00')
             ->groupBy('y')
@@ -64,7 +68,7 @@ class StatistikWebController extends Controller
             ->toArray();
 
         $tapByYear = DB::table('risalah_tap')
-            ->selectRaw('YEAR(tgl_risalah) as y, count(*) as total')
+            ->selectRaw($yearRisalahExpr)
             ->whereNotNull('tgl_risalah')
             ->where('tgl_risalah', '!=', '0000-00-00')
             ->groupBy('y')
@@ -72,7 +76,7 @@ class StatistikWebController extends Controller
             ->toArray();
 
         $batalByYear = DB::table('risalah_batal')
-            ->selectRaw('YEAR(tgl_risalah) as y, count(*) as total')
+            ->selectRaw($yearRisalahExpr)
             ->whereNotNull('tgl_risalah')
             ->where('tgl_risalah', '!=', '0000-00-00')
             ->groupBy('y')
@@ -80,7 +84,7 @@ class StatistikWebController extends Controller
             ->toArray();
 
         $pinjamByYear = DB::table('peminjaman')
-            ->selectRaw('YEAR(tgl_peminjaman) as y, count(*) as total')
+            ->selectRaw($yearPinjamExpr)
             ->whereNotNull('tgl_peminjaman')
             ->groupBy('y')
             ->pluck('total', 'y')
@@ -99,29 +103,32 @@ class StatistikWebController extends Controller
             9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
         ];
 
+        $monthRisalahExpr = $isSqlite ? "cast(strftime('%m', tgl_risalah) as integer) as m, count(*) as total" : 'MONTH(tgl_risalah) as m, count(*) as total';
+        $monthPinjamExpr = $isSqlite ? "cast(strftime('%m', tgl_peminjaman) as integer) as m, count(*) as total" : 'MONTH(tgl_peminjaman) as m, count(*) as total';
+
         $monthlyMinuta = DB::table('risalah_minuta')
-            ->selectRaw('MONTH(tgl_risalah) as m, count(*) as total')
+            ->selectRaw($monthRisalahExpr)
             ->whereYear('tgl_risalah', $year)
             ->groupBy('m')
             ->pluck('total', 'm')
             ->toArray();
 
         $monthlyTap = DB::table('risalah_tap')
-            ->selectRaw('MONTH(tgl_risalah) as m, count(*) as total')
+            ->selectRaw($monthRisalahExpr)
             ->whereYear('tgl_risalah', $year)
             ->groupBy('m')
             ->pluck('total', 'm')
             ->toArray();
 
         $monthlyBatal = DB::table('risalah_batal')
-            ->selectRaw('MONTH(tgl_risalah) as m, count(*) as total')
+            ->selectRaw($monthRisalahExpr)
             ->whereYear('tgl_risalah', $year)
             ->groupBy('m')
             ->pluck('total', 'm')
             ->toArray();
 
         $monthlyPinjam = DB::table('peminjaman')
-            ->selectRaw('MONTH(tgl_peminjaman) as m, count(*) as total')
+            ->selectRaw($monthPinjamExpr)
             ->whereYear('tgl_peminjaman', $year)
             ->groupBy('m')
             ->pluck('total', 'm')

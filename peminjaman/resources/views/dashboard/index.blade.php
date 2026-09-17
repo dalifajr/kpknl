@@ -4,17 +4,7 @@
 @section('page_title', 'Monitoring Risalah Lelang')
 @section('page_subtitle', 'Monitoring ketersediaan fisik, perputaran, dan tata kelola arsip Risalah Lelang — KPKNL Palembang')
 
-@section('page_actions')
-    <a href="{{ route('statistik.index') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-2 fw-semibold shadow-sm">
-        <i class="fas fa-chart-column"></i> Statistik & Tren
-    </a>
-    <a href="{{ route('katalog.index') }}" class="btn btn-warning btn-sm d-flex align-items-center gap-2 fw-semibold text-dark shadow-sm">
-        <i class="fas fa-boxes-stacked"></i> Jelajah Katalog
-    </a>
-    <a href="{{ route('dashboard') }}" class="btn btn-light btn-sm d-flex align-items-center gap-2 text-primary fw-semibold shadow-sm">
-        <i class="fas fa-arrows-rotate"></i> Segarkan Data
-    </a>
-@endsection
+
 
 @section('content')
 

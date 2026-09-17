@@ -613,9 +613,11 @@
                             @yield('page_subtitle', 'Sistem Informasi Peminjaman dan Validasi Dokumen Risalah Lelang — KPKNL Palembang')
                         </p>
                     </div>
-                    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-                        @yield('page_actions')
-                    </div>
+                    @hasSection('page_actions')
+                        <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+                            @yield('page_actions')
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Alert Notifications -->

@@ -59,10 +59,18 @@
 
             <!-- Right Actions & Quick Buttons -->
             <div class="ms-auto d-flex align-items-center gap-2">
-                <!-- Settings Button -->
-                <button type="button" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-2 rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                    <i class="fas fa-sliders"></i> <span class="d-none d-md-inline">Pengaturan Sheets</span>
-                </button>
+                @php
+                    $lastSyncTimestamp = \App\Models\AppSetting::get('last_synced_at');
+                    $lastSyncDisplay = $lastSyncTimestamp ? \Carbon\Carbon::parse($lastSyncTimestamp)->locale('id')->diffForHumans() : 'Belum pernah';
+                    $lastSyncFullDate = $lastSyncTimestamp ? \Carbon\Carbon::parse($lastSyncTimestamp)->locale('id')->translatedFormat('d F Y, H:i') : 'Belum ada data sinkronisasi';
+                @endphp
+
+                <!-- Last Sync Status Info -->
+                <div class="d-none d-sm-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-light border text-secondary" style="font-size: 0.78rem;" title="Terakhir disinkronkan: {{ $lastSyncFullDate }}" id="headerLastSyncInfo">
+                    <i class="fas fa-clock-rotate-left text-primary"></i>
+                    <span class="d-none d-md-inline text-muted">Sinkron:</span>
+                    <span class="fw-bold text-dark" id="headerLastSyncText">{{ $lastSyncDisplay }}</span>
+                </div>
 
                 <!-- Live Google Sheets Sync Button -->
                 <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2 rounded-pill px-3 shadow-sm" id="btnSyncSpreadsheet">
@@ -151,12 +159,16 @@
 
                     <div class="menu-header mt-3">Pangkalan Data</div>
 
-                    <a href="javascript:void(0)" class="menu-item" onclick="$('#btnSyncSpreadsheet').click()">
-                        <i class="fas fa-arrows-rotate"></i> <span>Sinkronisasi Data</span>
-                    </a>
+                    @auth
+                        @if(in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance']))
+                            <a href="{{ route('spreadsheet.raw') }}" class="menu-item {{ request()->routeIs('spreadsheet.raw') ? 'active' : '' }}">
+                                <i class="fas fa-table-cells"></i> <span>Spreadsheet Mentah</span>
+                            </a>
+                        @endif
+                    @endauth
 
                     <a href="javascript:void(0)" class="menu-item" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                        <i class="fas fa-sliders"></i> <span>Pengaturan Sheets</span>
+                        <i class="fas fa-sliders"></i> <span>Pengaturan</span>
                     </a>
 
                     <div class="menu-header mt-3">Sistem</div>
@@ -256,6 +268,19 @@
                 <form action="{{ route('settings.sheet_url') }}" method="POST" id="formSettingsSheet">
                     @csrf
                     <div class="modal-body p-4 bg-white">
+                        <!-- Quick Instant Sync Button -->
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded-3 border">
+                            <div>
+                                <div class="fw-bold text-dark small"><i class="fas fa-arrows-rotate text-primary me-1"></i> Sinkronisasi Data</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Perbarui data dari lembar kerja Google Sheets</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold shadow-sm" onclick="$('#settingsModal').modal('hide'); setTimeout(() => $('#btnSyncSpreadsheet').click(), 350);">
+                                Sinkron Sekarang
+                            </button>
+                        </div>
+
+                        <hr class="my-3 text-muted opacity-25">
+
                         <label class="form-label fw-bold small text-muted text-uppercase">Tautan Google Spreadsheet (Publik)</label>
                         <div class="input-group mb-2">
                             <span class="input-group-text bg-light"><i class="fas fa-link text-muted"></i></span>

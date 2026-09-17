@@ -55,9 +55,10 @@ class UserInfoController extends Controller
                 'status' => $user->status,
                 'roles' => $roles,
                 'primary_role' => $primaryRole,
-                'app_role' => $appRole ?? ($user->isSuperadmin() ? 'admin' : ($user->isAdmin() ? 'admin' : 'peminjam')),
+                'app_role' => $appRole ?? ($user->isSuperadmin() || $user->isMaintenance() ? 'admin' : ($user->isAdmin() ? 'admin' : 'peminjam')),
                 'is_superadmin' => $user->isSuperadmin(),
                 'is_admin' => $user->isAdmin(),
+                'is_maintenance' => $user->isMaintenance(),
                 'avatar_url' => asset($user->avatar ?: 'images/default-avatar.png'),
             ],
         ]);

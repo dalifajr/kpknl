@@ -20,38 +20,46 @@
     <!-- Highlight Cards Bar (From referensi_desain) -->
     <div class="row g-3 mb-4">
         <div class="col-sm-6 col-md-3">
-            <div class="p-3 rounded-3 bg-light border text-center h-100">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Pangkat / Gol.</div>
-                <div class="fw-bold text-primary fs-6 mt-1">{{ $pegawai->pangkatGolongan?->golongan_ruang ?: '-' }}</div>
-                <div class="text-muted" style="font-size: 0.72rem;">{{ $pegawai->pangkatGolongan?->nama_pangkat }}</div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="p-3 rounded-3 bg-light border text-center h-100">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Kelas Jabatan</div>
-                <div class="fw-bold text-success fs-6 mt-1">Grade {{ $pegawai->job_grade ?: '-' }}</div>
-                <div class="text-muted" style="font-size: 0.72rem;">Remunerasi DJKN</div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="p-3 rounded-3 bg-light border text-center h-100">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Unit Penempatan</div>
-                <div class="fw-bold text-dark fs-6 mt-1 text-truncate" title="{{ $pegawai->unitKerja?->nama_unit }}">
-                    {{ $pegawai->unitKerja?->singkatan ?: ($pegawai->unitKerja?->nama_unit ?: 'KPKNL Palembang') }}
+            <div class="card shadow-sm border-0 h-100 border-start border-4 border-primary">
+                <div class="card-body p-3">
+                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.04em;">Pangkat / Gol.</small>
+                    <div class="fw-bold text-primary fs-5 mt-1">{{ $pegawai->pangkatGolongan?->golongan_ruang ?: '-' }}</div>
+                    <div class="text-muted text-truncate" style="font-size: 0.72rem;" title="{{ $pegawai->pangkatGolongan?->nama_pangkat }}">{{ $pegawai->pangkatGolongan?->nama_pangkat ?: 'PNS' }}</div>
                 </div>
-                <div class="text-muted" style="font-size: 0.72rem;">Palembang</div>
             </div>
         </div>
         <div class="col-sm-6 col-md-3">
-            <div class="p-3 rounded-3 bg-light border text-center h-100">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Status KGB</div>
-                @php $kgbInfo = $pegawai->kgb_status; @endphp
-                <div class="mt-1">
-                    <span class="badge bg-{{ $kgbInfo['badge'] }} px-2 py-1" style="font-size: 0.72rem;">
-                        {{ $kgbInfo['label'] }}
-                    </span>
+            <div class="card shadow-sm border-0 h-100 border-start border-4 border-success">
+                <div class="card-body p-3">
+                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.04em;">Kelas Jabatan</small>
+                    <div class="fw-bold text-success fs-5 mt-1">Grade {{ $pegawai->job_grade ?: '-' }}</div>
+                    <div class="text-muted" style="font-size: 0.72rem;">Remunerasi DJKN</div>
                 </div>
-                <div class="text-muted" style="font-size: 0.7rem;">{{ $pegawai->tmt_kgb ? $pegawai->tmt_kgb->format('d/m/Y') : '-' }}</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="card shadow-sm border-0 h-100 border-start border-4 border-info">
+                <div class="card-body p-3">
+                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.04em;">Unit Penempatan</small>
+                    <div class="fw-bold text-dark fs-5 mt-1 text-truncate" title="{{ $pegawai->unitKerja?->nama_unit }}">
+                        {{ $pegawai->unitKerja?->singkatan ?: ($pegawai->unitKerja?->nama_unit ?: 'KPKNL Palembang') }}
+                    </div>
+                    <div class="text-muted" style="font-size: 0.72rem;">Palembang</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            @php $kgbInfo = $pegawai->kgb_status; @endphp
+            <div class="card shadow-sm border-0 h-100 border-start border-4 border-{{ $kgbInfo['badge'] }}">
+                <div class="card-body p-3">
+                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.04em;">Status KGB</small>
+                    <div class="mt-1">
+                        <span class="badge bg-{{ $kgbInfo['badge'] }} px-2 py-1" style="font-size: 0.72rem;">
+                            {{ $kgbInfo['label'] }}
+                        </span>
+                    </div>
+                    <div class="text-muted mt-1" style="font-size: 0.7rem;">{{ $pegawai->tmt_kgb ? $pegawai->tmt_kgb->format('d/m/Y') : '-' }}</div>
+                </div>
             </div>
         </div>
     </div>

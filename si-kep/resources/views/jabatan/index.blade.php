@@ -6,80 +6,97 @@
 
 @section('content')
 
-<!-- KPI Jabatan Row (From referensi_desain/desain2.html) -->
-<div class="row g-3 mb-4">
-    <div class="col-sm-6 col-lg-3">
-        <div class="card shadow-sm border-0 h-100 border-start border-4 border-primary">
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Pejabat Struktural</small>
-                    <i class="fas fa-user-tie text-primary opacity-50"></i>
-                </div>
-                <h3 class="fw-bold text-dark mb-0">{{ $struktural->count() }}</h3>
-                <small class="text-muted" style="font-size: 0.72rem;">Eselon III.a &amp; IV.a</small>
+<!-- Main Job Grading & KPI Row (Diagram Donat & 4 Kartu Menurun) -->
+<div class="row g-4 mb-4">
+    <!-- Left Column: Doughnut Chart Distribusi Kelas Jabatan -->
+    <div class="col-lg-7 col-xl-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-dark">
+                    <i class="fas fa-chart-pie text-primary me-2"></i>Distribusi Kelas Jabatan (Job Grading Kemenkeu)
+                </h6>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    Remunerasi DJKN
+                </span>
             </div>
-        </div>
-    </div>
-
-    <div class="col-sm-6 col-lg-3">
-        <div class="card shadow-sm border-0 h-100 border-start border-4 border-info">
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Fungsional Tertentu</small>
-                    <i class="fas fa-gavel text-info opacity-50"></i>
-                </div>
-                <h3 class="fw-bold text-info mb-0">{{ $fungsional->count() }}</h3>
-                <small class="text-muted" style="font-size: 0.72rem;">Pelelang &amp; Penilai</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-6 col-lg-3">
-        <div class="card shadow-sm border-0 h-100 border-start border-4 border-success">
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Staf Pelaksana</small>
-                    <i class="fas fa-users-gear text-success opacity-50"></i>
-                </div>
-                <h3 class="fw-bold text-success mb-0">{{ $pelaksana->count() }}</h3>
-                <small class="text-muted" style="font-size: 0.72rem;">Pengolah Data &amp; Teknis</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-6 col-lg-3">
-        <div class="card shadow-sm border-0 h-100 border-start border-4 border-warning">
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Sebaran Grading</small>
-                    <i class="fas fa-layer-group text-warning opacity-50"></i>
-                </div>
-                <h3 class="fw-bold text-warning mb-0">{{ $grades->count() }}</h3>
-                <small class="text-muted" style="font-size: 0.72rem;">Grade 7 s.d. Grade 18</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Sebaran Job Grading (From referensi_desain) -->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h6 class="mb-0 fw-bold text-dark">
-            <i class="fas fa-chart-simple text-primary me-2"></i>Distribusi Kelas Jabatan (Job Grading Kemenkeu)
-        </h6>
-        <span class="badge bg-light text-secondary border">Tingkat Remunerasi</span>
-    </div>
-    <div class="card-body p-4">
-        <div class="row g-3">
-            @foreach($grades as $g)
-                <div class="col-6 col-md-3 col-xl-2">
-                    <div class="p-3 rounded-4 border bg-body-tertiary text-center h-100">
-                        <span class="badge bg-primary-subtle text-primary mb-1" style="font-size: 0.72rem;">Kelas Jabatan</span>
-                        <div class="fw-bold fs-4 text-primary">Grade {{ $g->job_grade }}</div>
-                        <div class="text-muted small fw-semibold">{{ $g->total }} Pegawai</div>
+            <div class="card-body p-4 d-flex flex-column justify-content-center">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-7 text-center">
+                        <div style="position: relative; height: 260px; max-width: 290px; margin: 0 auto;">
+                            <canvas id="chartGradingDoughnut"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.05em;">
+                            Rincian Sebaran Grade
+                        </div>
+                        <div class="d-flex flex-column gap-2" style="max-height: 250px; overflow-y: auto; padding-right: 4px;">
+                            @foreach($grades as $g)
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded-3 bg-light border">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-primary text-white rounded-pill px-2 py-1" style="font-size: 0.68rem;">Grade {{ $g->job_grade }}</span>
+                                        <span class="small fw-semibold text-dark">Kelas {{ $g->job_grade }}</span>
+                                    </div>
+                                    <span class="badge bg-body text-secondary border fw-bold">{{ $g->total }} Org</span>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
-            @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: 4 Cards Stacked Vertically (Disusun Menurun) -->
+    <div class="col-lg-5 col-xl-4">
+        <div class="d-flex flex-column gap-3 h-100 justify-content-between">
+            <!-- 1. Pejabat Struktural -->
+            <div class="card shadow-sm border-0 mb-0 border-start border-4 border-primary">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Pejabat Struktural</small>
+                        <i class="fas fa-user-tie text-primary opacity-50"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-0">{{ $struktural->count() }}</h3>
+                    <small class="text-muted" style="font-size: 0.72rem;">Eselon III.a &amp; IV.a</small>
+                </div>
+            </div>
+
+            <!-- 2. Fungsional Tertentu -->
+            <div class="card shadow-sm border-0 mb-0 border-start border-4 border-info">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Fungsional Tertentu</small>
+                        <i class="fas fa-gavel text-info opacity-50"></i>
+                    </div>
+                    <h3 class="fw-bold text-info mb-0">{{ $fungsional->count() }}</h3>
+                    <small class="text-muted" style="font-size: 0.72rem;">Pelelang &amp; Penilai</small>
+                </div>
+            </div>
+
+            <!-- 3. Staf Pelaksana -->
+            <div class="card shadow-sm border-0 mb-0 border-start border-4 border-success">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Staf Pelaksana</small>
+                        <i class="fas fa-users-gear text-success opacity-50"></i>
+                    </div>
+                    <h3 class="fw-bold text-success mb-0">{{ $pelaksana->count() }}</h3>
+                    <small class="text-muted" style="font-size: 0.72rem;">Pengolah Data &amp; Teknis</small>
+                </div>
+            </div>
+
+            <!-- 4. Sebaran Grading -->
+            <div class="card shadow-sm border-0 mb-0 border-start border-4 border-warning">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Sebaran Grading</small>
+                        <i class="fas fa-layer-group text-warning opacity-50"></i>
+                    </div>
+                    <h3 class="fw-bold text-warning mb-0">{{ $grades->count() }} Tingkat</h3>
+                    <small class="text-muted" style="font-size: 0.72rem;">Grade 7 s.d. Grade 18</small>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -273,3 +290,55 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('chartGradingDoughnut');
+        if (!ctx) return;
+
+        const gradeLabels = {!! json_encode($grades->map(fn($g) => 'Grade ' . $g->job_grade)) !!};
+        const gradeData = {!! json_encode($grades->pluck('total')) !!};
+
+        const colors = [
+            '#0c306b', '#1e40af', '#2563eb', '#3b82f6', '#60a5fa',
+            '#059669', '#10b981', '#34d399', '#d97706', '#f59e0b',
+            '#ef4444', '#8b5cf6', '#a855f7', '#6366f1'
+        ];
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: gradeLabels,
+                datasets: [{
+                    data: gradeData,
+                    backgroundColor: colors.slice(0, gradeLabels.length),
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const val = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                return ` ${context.label}: ${val} Pegawai (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '68%'
+            }
+        });
+    });
+</script>
+@endpush
