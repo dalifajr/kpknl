@@ -32,6 +32,10 @@ class KepegawaianViewsTest extends TestCase
         $response->assertDontSee('Distribusi Formasi Personil per Seksi & Subbagian');
         $response->assertDontSee('onclick="openPegawaiFormModal()"', false);
         $response->assertSee('Total Personil');
+        $response->assertSee('Pegawai Eselon IV');
+        $response->assertDontSee('Seksi / Subbag');
+        $response->assertSee('Masa Penugasan Pegawai di Unit Eselon IV');
+        $response->assertSee('tableUeIvDashboard');
         $response->assertSee('admin-app.css');
         $response->assertSee('Outfit');
     }
@@ -151,6 +155,11 @@ class KepegawaianViewsTest extends TestCase
         // 3. KGB Alert filter
         $response = $this->actingAs($user)->get('/pegawai/filter-modal?type=kgb_alert');
         $response->assertStatus(200);
+
+        // 4. Eselon IV tenure ranking filter
+        $response = $this->actingAs($user)->get('/pegawai/filter-modal?type=ue_iv');
+        $response->assertStatus(200);
+        $response->assertSee('Daftar Pegawai Unit Eselon IV');
     }
 
     public function test_pegawai_pp17_2020_pensiun_calculation(): void

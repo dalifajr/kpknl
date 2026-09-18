@@ -55,10 +55,16 @@ class SsoController extends Controller
     {
         $code = $request->input('code');
         $state = $request->input('state');
+        $savedState = session('sso_state');
 
         if (!$code) {
             return redirect()->route('login')->with('error', 'Otorisasi SSO dibatalkan atau tidak menerima kode.');
         }
+
+        if ($savedState && (!$state || !hash_equals((string) $savedState, (string) $state))) {
+            return redirect()->route('login')->with('error', 'Validasi token keamanan sesi (OAuth state) gagal. Silakan ulangi.');
+        }
+        session()->forget('sso_state');
 
         try {
             $ssoBaseUrl = env('SSO_BASE_URL', 'http://localhost/sso/public');
@@ -151,7 +157,12 @@ class SsoController extends Controller
                 ]
             );
 
-            Auth::login($user, true);
+            session([
+                'sso_access_token' => $accessToken,
+                'sso_user_id' => $ssoUserId,
+            ]);
+
+            Auth::login($user, false);
 
             return redirect()->to(rtrim(url('/'), '/') . '/')->with('success', "Selamat datang, {$user->name}! Berhasil masuk via SSO KPKNL Palembang sebagai [{$user->getRoleLabel()}].");
 

@@ -1,6 +1,6 @@
 RENCANA PERBAIKAN APLIKASI SSO DIDALAMNYA;
 
-1. saya ingin kamu melakukan analisa sistem keamanan aplikasi sso, dan aplikasi yang terintegerasi didalamnya. karena ini aplikasi untuk instansi, maka keamanan data adalah yang terpenting. silakan kamu coba analisa celah, kekurangan dari sisi keamanan, dan berikan saran perbaikan yang diperlukan. dan bahkan kamu bisa coba lakukan pentest ke aplikasi saya ini di localhost untuk memastikan aplikasi saya ini aman saat saya deploy.
+1. pada halaman dashboard, card SEKSI / SUBBAG pada aplikasi SI-KEP diganti saja dengan card untuk memunculkan pegawai yang berada di unit eselon iv, diurutkan dari paling lama masa tugasnya ke paling baru.
 
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.

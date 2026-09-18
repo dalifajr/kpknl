@@ -76,10 +76,16 @@ class SsoController extends Controller
     {
         $code = $request->input('code');
         $state = $request->input('state');
+        $savedState = session('sso_state');
 
         if (!$code) {
             return redirect()->route('sso.redirect')->with('error', 'Otorisasi SSO dibatalkan atau tidak menerima kode.');
         }
+
+        if ($savedState && (!$state || !hash_equals((string) $savedState, (string) $state))) {
+            return redirect()->route('sso.redirect')->with('error', 'Validasi token keamanan sesi (OAuth state) gagal. Silakan coba kembali.');
+        }
+        session()->forget('sso_state');
 
         try {
             $ssoBaseUrl = $this->getSsoBaseUrl($request);
@@ -219,7 +225,13 @@ class SsoController extends Controller
                 ]);
             }
 
-            Auth::login($user, true);
+            // Persist SSO token in session for Single Sign-Out tracking
+            session([
+                'sso_access_token' => $accessToken,
+                'sso_user_id' => $ssoUserId,
+            ]);
+
+            Auth::login($user, false);
 
             return redirect()->route('dashboard')->with('success', "Selamat datang, {$user->name}! Berhasil masuk via SSO sebagai [{$user->getRoleLabel()}].");
 

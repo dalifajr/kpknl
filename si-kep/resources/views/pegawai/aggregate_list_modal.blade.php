@@ -95,6 +95,13 @@
                             @elseif(isset($context) && $context === 'pendidikan')
                                 <span class="small fw-semibold text-dark">{{ $p->pendidikan_terakhir ?: '-' }}</span>
                                 <small class="text-muted d-block" style="font-size: 0.7rem;">{{ $p->nama_universitas ?: '-' }}</small>
+                            @elseif(isset($context) && $context === 'ue_iv')
+                                <div>
+                                    <span class="badge {{ $p->lama_ue_iv_bulan >= 48 ? 'bg-danger text-white' : ($p->lama_ue_iv_bulan >= 24 ? 'bg-warning text-dark' : 'bg-success text-white') }} fw-bold px-2 py-1" style="font-size: 0.72rem;">
+                                        <i class="fas fa-business-time me-1"></i> {{ $p->lama_ue_iv_formatted }}
+                                    </span>
+                                    <small class="text-muted d-block mt-0.5" style="font-size: 0.68rem;">TMT: {{ $p->effective_tmt_ue_iv }}</small>
+                                </div>
                             @elseif(isset($context) && $context === 'pns_definitif')
                                 @if(str_contains(strtolower($p->status_gelar ?? ''), 'tidak sesuai'))
                                     <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1" style="font-size: 0.7rem;">

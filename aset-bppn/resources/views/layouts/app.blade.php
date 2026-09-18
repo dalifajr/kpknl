@@ -476,6 +476,22 @@
         </script>
     @endif
 
+    @auth
+    <script>
+        // Single Sign-Out Real-time Sync: Check session when returning to this tab
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                fetch('{{ route("dashboard") }}', { method: 'HEAD', credentials: 'same-origin', cache: 'no-store' })
+                    .then(function(res) {
+                        if (res.redirected || res.status === 401) {
+                            window.location.reload();
+                        }
+                    }).catch(function() {});
+            }
+        });
+    </script>
+    @endauth
+
     @stack('scripts')
 </body>
 </html>

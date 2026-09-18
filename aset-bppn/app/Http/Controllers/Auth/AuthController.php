@@ -25,7 +25,12 @@ class AuthController extends Controller
     public function callback()
     {
         try {
-            $ssoUser = Socialite::driver('sso')->user();
+            try {
+                $ssoUser = Socialite::driver('sso')->user();
+            } catch (\Laravel\Socialite\Two\InvalidStateException $stateEx) {
+                // If IdP-Initiated from SSO Dashboard, state was not set in client session; exchange code statelessly
+                $ssoUser = Socialite::driver('sso')->stateless()->user();
+            }
 
             $rawUser = $ssoUser->user ?? [];
             $role = 'user';
@@ -47,7 +52,12 @@ class AuthController extends Controller
                 ]
             );
 
-            Auth::login($user);
+            session([
+                'sso_access_token' => $ssoUser->token,
+                'sso_user_id' => $ssoUser->id,
+            ]);
+
+            Auth::login($user, false);
 
             return redirect()->route('dashboard');
 

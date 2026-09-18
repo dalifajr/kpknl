@@ -55,4 +55,20 @@ class SingleSignOutTest extends TestCase
         $response->assertSessionHas('warning', 'Sesi SSO Anda telah berakhir atau Anda telah logout dari Portal SSO.');
         $this->assertGuest();
     }
+
+    public function test_authenticated_user_without_sso_token_is_immediately_logged_out(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'user',
+            'sso_user_id' => 1,
+        ]);
+
+        // Request with auth but NO sso_access_token in session
+        $response = $this->actingAs($user)
+            ->withSession(['_enforce_sso_check' => true])
+            ->get('/');
+
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
 }

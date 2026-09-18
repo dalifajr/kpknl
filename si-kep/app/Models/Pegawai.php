@@ -300,11 +300,41 @@ class Pegawai extends Model
                     : Carbon::parse($this->tmt_ue_iv)->startOfDay();
                 return max(0, (int)$parsed->diffInMonths(Carbon::now()));
             } catch (\Exception $e) {
-                return 0;
+                // fallback below
             }
         }
 
+        // Jika tidak ada tmt_ue_iv tetapi ada tmt_eselon (misal Kepala Seksi / Kasubbag Eselon IV)
+        if ($this->tmt_eselon) {
+            return max(0, (int)$this->tmt_eselon->diffInMonths(Carbon::now()));
+        }
+
+        // Atau jika memiliki tmt_palembang dan berada di unit non-pimpinan (Seksi/Subbagian Eselon IV)
+        if ($this->tmt_palembang && $this->unit_kerja_id != 8) {
+            return max(0, (int)$this->tmt_palembang->diffInMonths(Carbon::now()));
+        }
+
         return 0;
+    }
+
+    /**
+     * TMT Efektif di Unit Eselon IV (TMT UE IV / TMT Eselon / TMT Palembang)
+     */
+    public function getEffectiveTmtUeIvAttribute(): string
+    {
+        if (!empty($this->tmt_ue_iv) && $this->tmt_ue_iv !== '-') {
+            return $this->tmt_ue_iv;
+        }
+
+        if ($this->tmt_eselon) {
+            return $this->tmt_eselon->format('d/m/Y');
+        }
+
+        if ($this->tmt_palembang) {
+            return $this->tmt_palembang->format('d/m/Y');
+        }
+
+        return '-';
     }
 
     /**

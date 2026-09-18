@@ -87,6 +87,22 @@ class DashboardController extends Controller
             $q->where('tipe_pegawai', 'ppnpn')->where('is_active', true);
         }])->orderBy('urutan')->get();
 
+        // Pegawai Unit Eselon IV (Seksi & Subbagian) diurutkan dari masa tugas terlama ke terbaru
+        $ueIvPegawaiList = Pegawai::where('is_active', true)
+            ->where(function ($q) {
+                $q->where('unit_kerja_id', '!=', 8)
+                  ->orWhereNull('unit_kerja_id');
+            })
+            ->with(['unitKerja', 'pangkatGolongan'])
+            ->get()
+            ->sortByDesc(function ($p) {
+                return $p->lama_ue_iv_bulan;
+            })
+            ->values();
+
+        $totalUeIv = $ueIvPegawaiList->count();
+        $topPersonilUeIv = $ueIvPegawaiList->first();
+
         // Last sync info
         $lastSync = SyncLog::latest('synced_at')->first();
         $sheetUrl = AppSetting::get('google_sheet_url', GoogleSheetSyncService::DEFAULT_SPREADSHEET_URL);
@@ -110,6 +126,9 @@ class DashboardController extends Controller
             'pnsClearHris',
             'pnsMismatchHris',
             'unitStats',
+            'totalUeIv',
+            'topPersonilUeIv',
+            'ueIvPegawaiList',
             'lastSync',
             'sheetUrl'
         ));

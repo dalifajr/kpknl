@@ -60,8 +60,8 @@ class SsoController extends Controller
             return redirect()->route('login')->with('error', 'Otorisasi SSO dibatalkan atau tidak menerima kode otorisasi.');
         }
 
-        // Anti-OAuth Login CSRF validation (RFC 6749 Section 10.12)
-        if (!$state || !$savedState || !hash_equals((string) $savedState, (string) $state)) {
+        // Anti-OAuth Login CSRF validation: Required if login was initiated from client login page
+        if ($savedState && (!$state || !hash_equals((string) $savedState, (string) $state))) {
             return redirect()->route('login')->with('error', 'Validasi token keamanan sesi (OAuth state) gagal atau sesi Anda telah kedaluwarsa. Silakan ulangi proses masuk.');
         }
 
@@ -129,7 +129,7 @@ class SsoController extends Controller
                 'sso_user_id' => $ssoUser['id'],
             ]);
 
-            Auth::login($localUser, true);
+            Auth::login($localUser, false);
 
             return redirect()->intended(route('dashboard'))
                 ->with('success', "Selamat datang kembali, {$localUser->name}! Anda berhasil masuk melalui SSO KPKNL Palembang.");

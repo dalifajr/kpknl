@@ -11,10 +11,15 @@ class SingleSignOutTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
+    protected function createTestUser(array $attributes = []): User
     {
-        parent::setUp();
-        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance::class);
+        return User::create(array_merge([
+            'name' => 'User Aset BPPN',
+            'email' => 'user.' . uniqid() . '@kpknl.go.id',
+            'role' => 'user',
+            'sso_id' => 1,
+            'password' => bcrypt('password'),
+        ], $attributes));
     }
 
     public function test_authenticated_user_with_valid_sso_token_can_access_dashboard(): void
@@ -23,13 +28,9 @@ class SingleSignOutTest extends TestCase
             '*/api/sso/verify-session' => Http::response(['valid' => true, 'user_id' => 1], 200),
         ]);
 
-        $user = User::factory()->create([
-            'role' => 'user',
-            'sso_id' => 1,
-        ]);
+        $user = $this->createTestUser();
 
         $response = $this->actingAs($user)
-
             ->withSession(['sso_access_token' => 'valid_token_123'])
             ->get('/dashboard');
 
@@ -43,35 +44,27 @@ class SingleSignOutTest extends TestCase
             '*/api/sso/verify-session' => Http::response(['valid' => false, 'error' => 'session_terminated'], 401),
         ]);
 
-        $user = User::factory()->create([
-            'role' => 'user',
-            'sso_id' => 1,
-        ]);
+        $user = $this->createTestUser();
 
         $response = $this->actingAs($user)
-
             ->withSession([
                 'sso_access_token' => 'revoked_token_123',
-                'sso_last_checked_at' => null,
             ])
             ->get('/dashboard');
 
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('login'));
         $this->assertGuest();
     }
 
     public function test_authenticated_user_without_sso_token_is_immediately_logged_out(): void
     {
-        $user = User::factory()->create([
-            'role' => 'user',
-            'sso_id' => 1,
-        ]);
+        $user = $this->createTestUser();
 
         $response = $this->actingAs($user)
             ->withSession(['_enforce_sso_check' => true])
             ->get('/dashboard');
 
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('login'));
         $this->assertGuest();
     }
 }

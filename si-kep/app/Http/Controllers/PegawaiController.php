@@ -258,6 +258,27 @@ class PegawaiController extends Controller
                     $title = 'Masa Penugasan Palembang: Kurang dari 2 Tahun';
                 }
                 break;
+
+            case 'ue_iv':
+                $context = 'ue_iv';
+                if (!$request->filled('title')) {
+                    $title = 'Daftar Pegawai Unit Eselon IV (Urutan Masa Tugas Terlama ke Terbaru)';
+                }
+                if ($value) {
+                    $query->where('unit_kerja_id', $value);
+                } else {
+                    $query->where(function ($q) {
+                        $q->where('unit_kerja_id', '!=', 8)
+                          ->orWhereNull('unit_kerja_id');
+                    });
+                }
+                $pegawais = $query->get()
+                    ->sortByDesc(function ($p) {
+                        return $p->lama_ue_iv_bulan;
+                    })
+                    ->values();
+
+                return view('pegawai.aggregate_list_modal', compact('pegawais', 'title', 'context'));
         }
 
         $pegawais = $query->orderBy('no_urut')->get();

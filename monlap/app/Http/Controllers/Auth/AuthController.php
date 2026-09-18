@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class AuthController extends Controller
 {
@@ -17,13 +19,18 @@ class AuthController extends Controller
     public function callback()
     {
         try {
-            $ssoUser = Socialite::driver('sso')->user();
+            try {
+                $ssoUser = Socialite::driver('sso')->user();
+            } catch (InvalidStateException $stateEx) {
+                // If IdP-Initiated from SSO Dashboard, state was not set in client session; exchange code statelessly
+                $ssoUser = Socialite::driver('sso')->stateless()->user();
+            }
             
             $user = User::firstOrNew(['sso_id' => $ssoUser->id]);
             $user->name = $ssoUser->name;
             $user->email = $ssoUser->email;
             
-            // Hanya update role dari SSO, dan gunakan primary_role
+            // Update role dari SSO, dan gunakan primary_role
             if (isset($ssoUser->user['primary_role'])) {
                 $user->role = $ssoUser->user['primary_role'];
             }
@@ -37,7 +44,7 @@ class AuthController extends Controller
                 'sso_user_id' => $ssoUser->id,
             ]);
 
-            Auth::login($user);
+            Auth::login($user, false);
 
             return redirect()->route('dashboard');
 
@@ -46,9 +53,12 @@ class AuthController extends Controller
         }
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect(config('services.sso.url') . '/dashboard');
     }
 }

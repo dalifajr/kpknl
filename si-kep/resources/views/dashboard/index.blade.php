@@ -95,18 +95,23 @@
         </div>
     </div>
 
-    <!-- Formasi Unit -->
+    <!-- Pegawai Unit Eselon IV (Masa Tugas Terlama ke Terbaru) -->
     <div class="col-sm-6 col-xl-2">
-        <div class="card shadow-sm border-0 h-100 border-start border-4 border-success card-clickable transition-all"
-             onclick="showAggregateModal('total_pegawai', '', 'Distribusi Formasi Seluruh Unit Kerja')"
-             title="Klik untuk melihat seluruh formasi">
+        <div class="card shadow-sm border-0 h-100 border-start border-4 border-success card-clickable transition-all" style="border-left-color: #059669 !important;"
+             onclick="showAggregateModal('ue_iv', '', 'Daftar Pegawai Unit Eselon IV (Urutan Masa Tugas Terlama ke Terbaru)')"
+             title="Klik untuk melihat daftar pegawai unit Eselon IV urut masa tugas">
             <div class="card-body p-3">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Seksi / Subbag</small>
-                    <i class="fas fa-building-columns text-success opacity-50"></i>
+                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Pegawai Eselon IV</small>
+                    <i class="fas fa-business-time opacity-50" style="color: #059669;"></i>
                 </div>
-                <h3 class="fw-bold text-success mb-0">{{ $unitStats->count() }}</h3>
-                <small class="text-muted" style="font-size: 0.72rem;">Unit Kerja Aktif &bull; <span class="text-success fw-semibold">Lihat <i class="fas fa-chevron-right" style="font-size: 0.6rem;"></i></span></small>
+                <h3 class="fw-bold mb-0" style="color: #059669;">{{ $totalUeIv }}</h3>
+                <small class="text-muted" style="font-size: 0.72rem;">
+                    @if($topPersonilUeIv)
+                        Terlama: <span class="fw-semibold text-dark">{{ $topPersonilUeIv->lama_ue_iv_formatted }}</span> &bull;
+                    @endif
+                    <span class="fw-semibold" style="color: #059669;">Lihat <i class="fas fa-chevron-right" style="font-size: 0.6rem;"></i></span>
+                </small>
             </div>
         </div>
     </div>
@@ -301,6 +306,92 @@
     </div>
 </div>
 
+<!-- Card Tabel: Daftar Pegawai Unit Eselon IV (Urutan Masa Tugas Terlama ke Terbaru) -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h6 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-business-time text-success me-2"></i>Masa Penugasan Pegawai di Unit Eselon IV (Seksi &amp; Subbagian)
+                    </h6>
+                    <small class="text-muted" style="font-size: 0.75rem;">Diurutkan secara berjenjang dari aparatur dengan masa tugas terlama ke paling baru untuk evaluasi rotasi &amp; penyegaran kerja</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">{{ $totalUeIv }} Aparatur Eselon IV</span>
+                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="showAggregateModal('ue_iv', '', 'Daftar Pegawai Unit Eselon IV (Urutan Masa Tugas Terlama ke Terbaru)')">
+                        Buka Modal <i class="fas fa-up-right-from-square ms-1"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                @if($ueIvPegawaiList->isEmpty())
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-circle-check fs-2 text-success mb-2"></i>
+                        <p class="mb-0">Tidak ada data personil pada unit Eselon IV.</p>
+                    </div>
+                @else
+                    <div class="table-responsive p-3 w-100">
+                        <table class="table table-hover mb-0 align-middle w-100" id="tableUeIvDashboard" style="width: 100% !important;">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-2" style="width: 60px;">Urutan</th>
+                                    <th>Nama Pegawai &amp; NIP</th>
+                                    <th>Unit Kerja / Seksi</th>
+                                    <th>Jabatan</th>
+                                    <th>TMT Unit / Seksi</th>
+                                    <th class="text-end pe-2">Masa Penugasan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($ueIvPegawaiList as $idx => $p)
+                                    <tr onclick="showPegawaiDetail({{ $p->id }})" role="button" title="Klik untuk melihat profil lengkap">
+                                        <td class="ps-2">
+                                            @if($idx === 0)
+                                                <span class="badge bg-warning text-dark fw-bold rounded-pill px-2.5 py-1" title="Masa Tugas Terlama">#1</span>
+                                            @elseif($idx === 1)
+                                                <span class="badge bg-secondary-subtle text-dark fw-bold rounded-pill px-2.5 py-1 border">#2</span>
+                                            @elseif($idx === 2)
+                                                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold rounded-pill px-2.5 py-1 border border-warning-subtle">#3</span>
+                                            @else
+                                                <span class="text-muted fw-semibold ps-2" style="font-size: 0.8rem;">#{{ $idx + 1 }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ $p->display_name }}</div>
+                                            <div class="small text-muted font-monospace">{{ $p->nip ?: '-' }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-secondary border">{{ $p->unitKerja?->singkatan ?: '-' }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="small text-dark fw-semibold">{{ $p->nama_jabatan_raw }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="small text-muted">{{ $p->effective_tmt_ue_iv }}</div>
+                                        </td>
+                                        <td class="text-end pe-2">
+                                            <span class="badge {{ $p->lama_ue_iv_bulan >= 48 ? 'bg-danger text-white' : ($p->lama_ue_iv_bulan >= 24 ? 'bg-warning text-dark' : 'bg-success text-white') }} fw-bold px-2 py-1" style="font-size: 0.75rem;">
+                                                {{ $p->lama_ue_iv_formatted }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+            <div class="card-footer bg-white border-top py-2 px-3 d-flex justify-content-between align-items-center">
+                <small class="text-muted"><i class="fas fa-info-circle me-1"></i> Data diperbarui otomatis dari rekam jejak TMT penugasan unit Eselon IV</small>
+                <a href="{{ route('pegawai.index') }}" class="btn btn-sm btn-link text-success p-0 text-decoration-none small fw-semibold">
+                    Direktori Pegawai Lengkap <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -430,6 +521,28 @@
                 info: true,
                 language: {
                     info: "<small class='text-muted'>Menampilkan _START_-_END_ dari _TOTAL_ pegawai</small>",
+                    infoEmpty: "<small class='text-muted'>0 data</small>",
+                    paginate: {
+                        previous: "<i class='fas fa-chevron-left'></i>",
+                        next: "<i class='fas fa-chevron-right'></i>"
+                    }
+                }
+            });
+        }
+
+        // DataTables Paginasi Maks. 10 data untuk Unit Eselon IV
+        if ($('#tableUeIvDashboard').length && !$.fn.DataTable.isDataTable('#tableUeIvDashboard')) {
+            $('#tableUeIvDashboard').DataTable({
+                pageLength: 10,
+                lengthChange: false,
+                searching: true,
+                autoWidth: false,
+                responsive: true,
+                info: true,
+                language: {
+                    search: "Cari:",
+                    searchPlaceholder: "Filter pegawai...",
+                    info: "<small class='text-muted'>Menampilkan _START_-_END_ dari _TOTAL_ aparatur</small>",
                     infoEmpty: "<small class='text-muted'>0 data</small>",
                     paginate: {
                         previous: "<i class='fas fa-chevron-left'></i>",

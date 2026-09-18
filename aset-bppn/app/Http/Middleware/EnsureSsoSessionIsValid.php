@@ -50,11 +50,11 @@ class EnsureSsoSessionIsValid
             return response()->json([
                 'error' => 'session_terminated',
                 'message' => $message,
-                'redirect' => '/',
+                'redirect' => route('login'),
             ], 401);
         }
 
-        return redirect('/')->withErrors(['error' => $message]);
+        return redirect()->route('login')->with('warning', $message);
     }
 
     /**
