@@ -123,7 +123,11 @@ class GoogleSheetSyncService
             $writeMessage = 'Webhook Google Apps Script belum diatur (Kanal Tulis belum aktif).';
         } else {
             try {
-                $probe = Http::timeout(8)->post($webhook, [
+                $probe = Http::withOptions([
+                    'timeout' => 25,
+                    'connect_timeout' => 15,
+                    'http_errors' => false,
+                ])->post($webhook, [
                     'action' => 'check_permission',
                     'ping' => true,
                     'timestamp' => now()->toIso8601String(),
@@ -746,15 +750,65 @@ class GoogleSheetSyncService
         }
 
         try {
-            $response = Http::timeout(15)->post($webhookUrl, [
+            $payload = $log->payload_after ?? [];
+
+            // Map database keys to Spreadsheet column headers
+            $rowData = [
+                'NAMA' => $payload['nama'] ?? $log->nama_pegawai,
+                'NIP' => $payload['nip'] ?? $log->nip,
+                'NAMA DI DATA POKOK HRIS' => $payload['nama_lengkap_gelar'] ?? null,
+                'JABATAN' => $payload['nama_jabatan_raw'] ?? null,
+                'PER.JABATAN' => $payload['per_jabatan'] ?? null,
+                'NIK' => $payload['nik'] ?? null,
+                'TMT NIP' => $payload['tmt_nip'] ?? null,
+                'TEMPAT LAHIR' => $payload['tempat_lahir'] ?? null,
+                'TGL LAHIR' => $payload['tanggal_lahir'] ?? null,
+                'PANGKAT / GOLONGAN' => $payload['pangkat_golongan_raw'] ?? null,
+                'TMT GOLONGAN' => $payload['tmt_golongan'] ?? null,
+                'GRADING' => $payload['job_grade'] ?? null,
+                'TMT GRADING' => $payload['tmt_grading'] ?? null,
+                'TMT ESELON' => $payload['tmt_eselon'] ?? null,
+                'TMT PALEMBANG' => $payload['tmt_palembang'] ?? null,
+                'TMT KGB' => $payload['tmt_kgb'] ?? null,
+                'JENIS KELAMIN' => $payload['jenis_kelamin'] ?? null,
+                'PENDIDIKAN (HRIS)' => $payload['pendidikan_terakhir'] ?? null,
+                'FAKULTAS' => $payload['fakultas'] ?? null,
+                'JURUSAN' => $payload['jurusan'] ?? null,
+                'TAHUN LULUS' => $payload['tahun_lulus'] ?? null,
+                'NAMA UNIVERSITAS' => $payload['nama_universitas'] ?? null,
+                'TMT UE IV' => $payload['tmt_ue_iv'] ?? null,
+                'LAMA BERTUGAS DI UE IV' => $payload['lama_bertugas_ue_iv'] ?? null,
+                'Status Pendidikan dan Pencantuman Gelar Akademik' => $payload['status_gelar'] ?? null,
+            ];
+
+            $response = Http::withOptions([
+                'timeout' => 30,
+                'connect_timeout' => 15,
+                'http_errors' => false,
+            ])->post($webhookUrl, [
                 'action' => $log->action,
                 'nip' => $log->nip,
                 'nama' => $log->nama_pegawai,
-                'data' => $log->payload_after,
+                'data' => $payload,
+                'row_data' => $rowData,
                 'timestamp' => now()->toIso8601String(),
             ]);
 
             if ($response->successful()) {
+                $json = $response->json();
+                if (is_array($json) && isset($json['status']) && $json['status'] === 'error') {
+                    $errMsg = $json['message'] ?? 'Webhook Google Apps Script mengembalikan status error.';
+                    $log->update([
+                        'sync_status' => 'pending',
+                        'sync_error' => $errMsg,
+                    ]);
+                    return [
+                        'success' => false,
+                        'message' => "Gagal sinkron ke spreadsheet: {$errMsg}",
+                        'pending' => true,
+                    ];
+                }
+
                 $log->update([
                     'sync_status' => 'synced',
                     'sync_error' => null,

@@ -888,10 +888,14 @@
                                 window.location.reload();
                             });
                         } else {
+                            let helpHtml = '';
+                            const msg = response.message || '';
+                            if (msg.includes('401') || msg.includes('403') || msg.toLowerCase().includes('privat') || msg.toLowerCase().includes('izin')) {
+                                helpHtml = `<div class="text-muted small mt-2">Silakan periksa izin akses di Pengaturan Spreadsheet (pastikan Anyone with the link can view).</div>`;
+                            }
                             Swal.fire({
                                 title: 'Gagal Sinkronisasi',
-                                html: `<div class="text-danger fw-semibold mb-2">${response.message || 'Terjadi kesalahan saat memproses data.'}</div>
-                                       <div class="text-muted small">Silakan periksa izin akses di Pengaturan Spreadsheet (pastikan Anyone with the link can view).</div>`,
+                                html: `<div class="text-danger fw-semibold mb-2">${msg || 'Terjadi kesalahan saat memproses data.'}</div>${helpHtml}`,
                                 icon: 'error'
                             });
                             btn.prop('disabled', false);
