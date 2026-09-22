@@ -1,17 +1,6 @@
  PERBAIKAN APLIKASI SI-KEP;
 
-1. Gagal Sinkronisasi
-Gagal melakukan sinkronisasi: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sikep_kpknl_palembang.change_logs' doesn't exist (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: sikep_kpknl_palembang, SQL: select * from `change_logs` where `sync_status` = pending)
-Silakan periksa izin akses di Pengaturan Spreadsheet (pastikan Anyone with the link can view).
-
-padahal saya sudah memasang link api webhook dari GAS dan, memeriksa status read and write spreadsheet dan sudah full access.
-
-2. Illuminate\Database\QueryException - Internal Server Error
-
-SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sikep_kpknl_palembang.change_logs' doesn't exist (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: sikep_kpknl_palembang, SQL: select count(*) as `aggregate` from `change_logs`)
-
-
-3. Kemudian saat saya melakukan perubahan baik itu edit, create, data pegawai dari SI-KEP, data tersebut tidak ter-write pada spreadsheet walau saya sudah mensinkronkan dari tombol si-kep.
+1. Kemudian saat saya melakukan perubahan baik itu edit, create, data pegawai dari SI-KEP, data tersebut tidak ter-write pada spreadsheet. data yang dirubah pada awalnya tampil pada aplikasi si-kep. namun karena data tida ter-write pada spreadsheet, saat saya klik sinkronisasi, data kembali ke kondisi awal sebelum diedit karena mengikuti data pada spreadsheet yang tidak terwrite.
 
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.

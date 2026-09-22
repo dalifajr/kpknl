@@ -41,7 +41,8 @@ class GoogleSheetSyncService
         }
 
         if ($sheetId) {
-            return "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv&gid={$gid}";
+            $cb = time();
+            return "https://docs.google.com/spreadsheets/d/{$sheetId}/export?format=csv&gid={$gid}&cb={$cb}";
         }
 
         return $url;
@@ -187,9 +188,17 @@ class GoogleSheetSyncService
     {
         $startTime = microtime(true);
         $url = $sheetUrl ?: AppSetting::get('google_sheet_url', self::DEFAULT_SPREADSHEET_URL);
-        $csvUrl = $this->convertToCsvUrl($url);
 
         try {
+            // Push pending local changes to spreadsheet FIRST
+            $pendingPushResult = $this->pushPendingChanges();
+            $pushInfo = '';
+            if ($pendingPushResult['total'] > 0) {
+                $pushInfo = " ({$pendingPushResult['synced']} perubahan lokal disinkronkan ke spreadsheet)";
+            }
+
+            $csvUrl = $this->convertToCsvUrl($url);
+
             // Fetch CSV content with retry and timeout
             $response = Http::timeout(30)->retry(2, 500)->get($csvUrl);
 
@@ -438,13 +447,6 @@ class GoogleSheetSyncService
             AppSetting::set('google_sheet_url', $url, 'Tautan Google Spreadsheet aktif');
 
             DB::commit();
-
-            // Push pending local changes to spreadsheet
-            $pendingPushResult = $this->pushPendingChanges();
-            $pushInfo = '';
-            if ($pendingPushResult['total'] > 0) {
-                $pushInfo = " ({$pendingPushResult['synced']} perubahan lokal disinkronkan ke spreadsheet)";
-            }
 
             return [
                 'success' => true,
