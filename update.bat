@@ -177,7 +177,7 @@ call :PROCESS_APP "Dashboard Pengelolaan BMN"
 call :PROCESS_APP "aset-bppn"
 call :PROCESS_APP "monlap"
 call :PROCESS_APP "peminjaman"
-
+call :PROCESS_APP "si-kep"
 REM -------------------------------------------------------------------------------
 REM 5. Sinkronisasi Metadata dan Riwayat Log pada Portal SSO
 REM -------------------------------------------------------------------------------
