@@ -1,6 +1,20 @@
 RENCANA PERBAIKAN APLIKASI SSO DIDALAMNYA;
 
-1. pada halaman dashboard, card SEKSI / SUBBAG pada aplikasi SI-KEP diganti saja dengan card untuk memunculkan pegawai yang berada di unit eselon iv, diurutkan dari paling lama masa tugasnya ke paling baru.
+1.   ── ✉  GANTI EMAIL ──────────────────────────────────────────
+  Masukkan detail akun untuk login dan mengganti email.
+  Username/Email: yogaanggraen725
+  Password: k4XP^Y4g@@a8g49M
+  2FA Secret Key: DKGYRZUA32IYFVUX
+
+  ✔ Login berhasil.
+
+  ── ✉  GANTI EMAIL ──────────────────────────────────────────
+  Username    yogaanggraen725
+  None
+  Masukkan Email Baru (kosongkan untuk batal):
+
+
+program change email belum dapat menampilkan email sebelumnya. pada contoh diatas, hanya ditampilkan none. lakukan perbaikan agar pada tampilan program change email dapat menampilkan email sebelumnya.
 
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.
