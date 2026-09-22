@@ -1,20 +1,17 @@
-RENCANA PERBAIKAN APLIKASI SSO DIDALAMNYA;
+ PERBAIKAN APLIKASI SI-KEP;
 
-1.   ── ✉  GANTI EMAIL ──────────────────────────────────────────
-  Masukkan detail akun untuk login dan mengganti email.
-  Username/Email: yogaanggraen725
-  Password: k4XP^Y4g@@a8g49M
-  2FA Secret Key: DKGYRZUA32IYFVUX
+1. Gagal Sinkronisasi
+Gagal melakukan sinkronisasi: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sikep_kpknl_palembang.change_logs' doesn't exist (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: sikep_kpknl_palembang, SQL: select * from `change_logs` where `sync_status` = pending)
+Silakan periksa izin akses di Pengaturan Spreadsheet (pastikan Anyone with the link can view).
 
-  ✔ Login berhasil.
+padahal saya sudah memasang link api webhook dari GAS dan, memeriksa status read and write spreadsheet dan sudah full access.
 
-  ── ✉  GANTI EMAIL ──────────────────────────────────────────
-  Username    yogaanggraen725
-  None
-  Masukkan Email Baru (kosongkan untuk batal):
+2. Illuminate\Database\QueryException - Internal Server Error
+
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sikep_kpknl_palembang.change_logs' doesn't exist (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: sikep_kpknl_palembang, SQL: select count(*) as `aggregate` from `change_logs`)
 
 
-program change email belum dapat menampilkan email sebelumnya. pada contoh diatas, hanya ditampilkan none. lakukan perbaikan agar pada tampilan program change email dapat menampilkan email sebelumnya.
+3. Kemudian saat saya melakukan perubahan baik itu edit, create, data pegawai dari SI-KEP, data tersebut tidak ter-write pada spreadsheet walau saya sudah mensinkronkan dari tombol si-kep.
 
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.
