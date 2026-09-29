@@ -46,7 +46,12 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === self::ROLE_ADMIN || $this->role === 'superadmin';
+        return in_array($this->role, [self::ROLE_ADMIN, 'superadmin', 'maintenance'], true) || session('sso_role') === 'maintenance';
+    }
+
+    public function isMaintenance(): bool
+    {
+        return $this->role === 'maintenance' || session('sso_role') === 'maintenance' || $this->username === 'maintenance';
     }
 
     public function isPelelang(): bool
@@ -62,6 +67,7 @@ class User extends Authenticatable
     public function getRoleLabel(): string
     {
         return match ($this->role) {
+            'maintenance' => 'Tim Maintenance',
             'admin', 'superadmin' => 'Administrator Arsip',
             'pelelang' => 'Pejabat Lelang',
             default => 'Peminjam Berkas',
@@ -71,6 +77,7 @@ class User extends Authenticatable
     public function getRoleBadgeClass(): string
     {
         return match ($this->role) {
+            'maintenance' => 'badge-role-admin',
             'admin', 'superadmin' => 'badge-role-admin',
             'pelelang' => 'badge-role-pelelang',
             default => 'badge-role-peminjam',

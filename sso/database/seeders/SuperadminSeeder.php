@@ -14,10 +14,10 @@ class SuperadminSeeder extends Seeder
         $superadminRole = Role::where('name', 'superadmin')->first();
 
         $user = User::updateOrCreate(
-            ['username' => 'mardanus'],
+            ['username' => 'kepala_kantor'],
             [
-                'name' => 'Mardanus',
-                'email' => 'mardanus@kpknl.go.id',
+                'name' => 'Kepala Kantor',
+                'email' => 'kepala_kantor@kpknl.go.id',
                 'password' => Hash::make('admin123'),
                 'status' => 'active',
             ]

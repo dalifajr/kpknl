@@ -728,6 +728,11 @@
         </a>
 
         <div class="ms-auto d-flex align-items-center gap-2">
+            <!-- Role Help Guide Modal Button -->
+            <button type="button" class="btn btn-tonal rounded-circle d-flex align-items-center justify-content-center p-0" onclick="document.getElementById('modalSsoRoleHelp').showModal()" aria-haspopup="dialog" style="width: 36px; height: 36px;" title="Panduan Peran &amp; Ekosistem SSO">
+                <i class="fa-solid fa-circle-question fs-6 text-primary"></i>
+            </button>
+
             <!-- Dark Mode Toggle Button -->
             <button type="button" class="btn btn-tonal rounded-circle d-flex align-items-center justify-content-center p-0" id="darkModeToggle" style="width: 36px; height: 36px;" title="Ganti Mode Gelap / Terang">
                 <i class="fa-solid fa-moon fs-7" id="darkModeIcon"></i>
@@ -1063,6 +1068,9 @@
             }
         });
     </script>
+
+    @include('components.role-help')
+
     @yield('scripts')
     @stack('scripts')
 </body>

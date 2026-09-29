@@ -33,14 +33,8 @@ class AuthController extends Controller
             }
 
             $rawUser = $ssoUser->user ?? [];
-            $role = 'user';
-            if (!empty($rawUser['is_superadmin']) || ($rawUser['primary_role'] ?? null) === 'superadmin') {
-                $role = 'superadmin';
-            } elseif (!empty($rawUser['is_admin']) || ($rawUser['primary_role'] ?? null) === 'admin') {
-                $role = 'admin';
-            } elseif (!empty($rawUser['primary_role'])) {
-                $role = $rawUser['primary_role'];
-            }
+            $role = \App\Support\SsoRole::resolve($rawUser);
+            $role = in_array($role, ['maintenance', 'superadmin', 'admin'], true) ? $role : 'user';
 
             $user = User::updateOrCreate(
                 ['email' => $ssoUser->email],

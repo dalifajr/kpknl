@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(in_array(auth()->user()->role, ['admin', 'superadmin', 'maintenance']))
             <div style="flex: 1; min-width: 200px;">
                 <div class="md-input-container" style="margin-bottom: 0;">
                     <select name="pic_id" class="md-input">

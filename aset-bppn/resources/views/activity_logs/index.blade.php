@@ -203,7 +203,7 @@
                                                     <i class="material-icons" style="font-size: 16px;">visibility</i> Detail
                                                 </a>
 
-                                                @if($isTrashed && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                                @if($isTrashed && in_array(auth()->user()->role, ['admin', 'superadmin', 'maintenance']))
                                                     <button type="button" onclick="confirmRestoreAsset({{ $subjectId }}, '{{ $assetCode }}')" class="btn-small green darken-2 waves-effect waves-light tooltipped" data-position="top" data-tooltip="Kembalikan / Restore Aset" style="border-radius: 4px; padding: 0 8px; height: 30px; line-height: 30px; font-size: 12px; display: inline-flex; align-items: center; gap: 2px;">
                                                         <i class="material-icons" style="font-size: 16px;">restore_from_trash</i> Undo
                                                     </button>

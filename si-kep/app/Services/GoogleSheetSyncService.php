@@ -754,25 +754,45 @@ class GoogleSheetSyncService
         try {
             $payload = $log->payload_after ?? [];
 
+            // Fallback derivation for derived columns from foreign keys
+            $pangkatRaw = $payload['pangkat_golongan_raw'] ?? null;
+            if (empty($pangkatRaw) && !empty($payload['pangkat_golongan_id'])) {
+                $pg = \App\Models\PangkatGolongan::find($payload['pangkat_golongan_id']);
+                if ($pg) {
+                    $pangkatRaw = $pg->nama_pangkat . ' / ' . str_replace('/', '.', $pg->golongan_ruang);
+                }
+            }
+
+            $perJabatan = $payload['per_jabatan'] ?? null;
+            if (empty($perJabatan) && !empty($payload['unit_kerja_id'])) {
+                $uk = \App\Models\UnitKerja::find($payload['unit_kerja_id']);
+                if ($uk) {
+                    $perJabatan = $uk->nama_unit;
+                }
+            }
+
+            $gender = !empty($payload['jenis_kelamin']) ? strtoupper(trim($payload['jenis_kelamin'])) : null;
+            $statusGelar = $payload['status_gelar'] ?? null;
+
             // Map database keys to Spreadsheet column headers
             $rowData = [
                 'NAMA' => $payload['nama'] ?? $log->nama_pegawai,
                 'NIP' => $payload['nip'] ?? $log->nip,
                 'NAMA DI DATA POKOK HRIS' => $payload['nama_lengkap_gelar'] ?? null,
                 'JABATAN' => $payload['nama_jabatan_raw'] ?? null,
-                'PER.JABATAN' => $payload['per_jabatan'] ?? null,
+                'PER.JABATAN' => $perJabatan,
                 'NIK' => $payload['nik'] ?? null,
                 'TMT NIP' => $payload['tmt_nip'] ?? null,
                 'TEMPAT LAHIR' => $payload['tempat_lahir'] ?? null,
                 'TGL LAHIR' => $payload['tanggal_lahir'] ?? null,
-                'PANGKAT / GOLONGAN' => $payload['pangkat_golongan_raw'] ?? null,
+                'PANGKAT / GOLONGAN' => $pangkatRaw,
                 'TMT GOLONGAN' => $payload['tmt_golongan'] ?? null,
                 'GRADING' => $payload['job_grade'] ?? null,
                 'TMT GRADING' => $payload['tmt_grading'] ?? null,
                 'TMT ESELON' => $payload['tmt_eselon'] ?? null,
                 'TMT PALEMBANG' => $payload['tmt_palembang'] ?? null,
                 'TMT KGB' => $payload['tmt_kgb'] ?? null,
-                'JENIS KELAMIN' => $payload['jenis_kelamin'] ?? null,
+                'JENIS KELAMIN' => $gender,
                 'PENDIDIKAN (HRIS)' => $payload['pendidikan_terakhir'] ?? null,
                 'FAKULTAS' => $payload['fakultas'] ?? null,
                 'JURUSAN' => $payload['jurusan'] ?? null,
@@ -780,7 +800,8 @@ class GoogleSheetSyncService
                 'NAMA UNIVERSITAS' => $payload['nama_universitas'] ?? null,
                 'TMT UE IV' => $payload['tmt_ue_iv'] ?? null,
                 'LAMA BERTUGAS DI UE IV' => $payload['lama_bertugas_ue_iv'] ?? null,
-                'Status Pendidikan dan Pencantuman Gelar Akademik' => $payload['status_gelar'] ?? null,
+                'Status Pendidikan dan Pencantuman Gelar Akademik' => $statusGelar,
+                'STATUS PENDIDIKAN DAN PENCANTUMAN GELAR AKADEMIK' => $statusGelar,
             ];
 
             $response = Http::withOptions([
@@ -790,6 +811,7 @@ class GoogleSheetSyncService
             ])->post($webhookUrl, [
                 'action' => $log->action,
                 'nip' => $log->nip,
+                'original_nip' => $log->payload_before['nip'] ?? $log->nip,
                 'nama' => $log->nama_pegawai,
                 'data' => $payload,
                 'row_data' => $rowData,
@@ -798,8 +820,10 @@ class GoogleSheetSyncService
 
             if ($response->successful()) {
                 $json = $response->json();
-                if (is_array($json) && isset($json['status']) && $json['status'] === 'error') {
-                    $errMsg = $json['message'] ?? 'Webhook Google Apps Script mengembalikan status error.';
+                if (!is_array($json) || !in_array($json['status'] ?? null, ['success', 'ok'], true)) {
+                    $errMsg = is_array($json)
+                        ? ($json['message'] ?? 'Webhook tidak memberikan konfirmasi sinkronisasi yang valid.')
+                        : 'Respons webhook bukan JSON. Periksa URL deployment dan izin Apps Script.';
                     $log->update([
                         'sync_status' => 'pending',
                         'sync_error' => $errMsg,

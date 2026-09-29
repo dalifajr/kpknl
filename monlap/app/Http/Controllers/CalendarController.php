@@ -107,7 +107,7 @@ class CalendarController extends Controller
         }
         $agendas = $agendasQuery->get();
 
-        $canManageAgenda = in_array(Auth::user()->role, ['admin', 'superadmin']);
+        $canManageAgenda = in_array(Auth::user()->role, ['admin', 'superadmin', 'maintenance']);
 
         foreach ($agendas as $agenda) {
             $isHoliday = (bool) $agenda->is_holiday;

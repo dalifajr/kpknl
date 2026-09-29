@@ -117,7 +117,7 @@
         </div>
         @endif
 
-        @if(auth()->user()->role === 'superadmin')
+        @if(in_array(auth()->user()->role, ['superadmin', 'maintenance'], true))
         <div style="margin-top: 16px; text-align: right;">
             <button type="button" class="btn btn-flat ripple-surface" style="color: #F44336; background: #FFEBEE;" onclick="showMDModal('Hapus Tugas Permanen', 'Yakin ingin menghapus penugasan tugas ini dari daftar tugas PIC? (Aksi ini juga menghapus laporan yang bersangkutan)', () => submitDeleteDraft('{{ route('user-tasks.destroy', $assignment->id) }}'), true)">
                 <i class="material-icons" style="font-size: 18px; margin-right: 4px;">delete_forever</i> Hapus Tugas

@@ -110,7 +110,12 @@ class SsoController extends Controller
 
             // 3. Find or Create Local User
             $email = $ssoUser['email'] ?? ($ssoUser['username'] . '@kpknl.go.id');
-            $role = $ssoUser['primary_role'] ?? ($ssoUser['is_superadmin'] ? 'superadmin' : 'user');
+            $role = \App\Support\SsoRole::resolve($ssoUser);
+            $role = match ($role) {
+                'maintenance', 'superadmin', 'administrator' => $role,
+                'admin' => 'administrator',
+                default => 'user',
+            };
 
             $localUser = User::updateOrCreate(
                 ['sso_user_id' => $ssoUser['id']],

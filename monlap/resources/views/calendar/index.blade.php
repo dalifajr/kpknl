@@ -10,7 +10,7 @@
             <h2 class="card-title" style="margin: 0 0 4px 0; font-weight: 500; font-size: 22px; color: var(--text-primary);">Kalender Penugasan & Agenda</h2>
             <p style="color: var(--text-secondary); margin-bottom: 0; font-size: 14px;">Pantau tenggat waktu laporan, agenda kantor, dan hari libur kerja.</p>
         </div>
-        @if(in_array(Auth::user()->role, ['admin', 'superadmin']))
+        @if(in_array(Auth::user()->role, ['admin', 'superadmin', 'maintenance']))
         <div>
             <button type="button" class="btn btn-primary" onclick="openAddAgendaModal()" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 6px; font-weight: 500;">
                 <i class="material-icons" style="font-size: 20px;">add</i> Tambah Agenda
@@ -643,7 +643,7 @@ function showDateDetails(dateStr) {
                 else if (props.status === 'revision') { badgeClass = 'badge-revision'; statusText = 'Revisi'; }
 
                 let url = "{{ url('user-tasks') }}/" + props.assignment_id;
-                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'superadmin')
+                @if(in_array(Auth::user()->role, ['admin', 'superadmin', 'maintenance'], true))
                     url = "{{ url('reviews') }}/" + props.assignment_id;
                 @endif
 
@@ -654,7 +654,7 @@ function showDateDetails(dateStr) {
                             ${event.title}
                         </div>
                         
-                        @if(Auth::user()->role === 'admin' || Auth::user()->role === 'superadmin')
+                        @if(in_array(Auth::user()->role, ['admin', 'superadmin', 'maintenance'], true))
                         ${props.pic ? `
                         <div style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
                             <i class="material-icons" style="font-size: 16px;">person</i> ${props.pic}

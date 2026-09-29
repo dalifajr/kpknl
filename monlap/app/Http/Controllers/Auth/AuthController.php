@@ -30,10 +30,9 @@ class AuthController extends Controller
             $user->name = $ssoUser->name;
             $user->email = $ssoUser->email;
             
-            // Update role dari SSO, dan gunakan primary_role
-            if (isset($ssoUser->user['primary_role'])) {
-                $user->role = $ssoUser->user['primary_role'];
-            }
+            $role = \App\Support\SsoRole::resolve($ssoUser->user ?? []);
+            $user->role = in_array($role, ['maintenance', 'superadmin', 'admin'], true) ? $role : 'user';
+            $user->username = $ssoUser->user['username'] ?? $user->username;
             
             $user->save();
 

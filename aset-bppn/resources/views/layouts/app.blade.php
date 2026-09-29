@@ -208,7 +208,7 @@
         <li class="{{ request()->routeIs('assets.import.*') ? 'active' : '' }}"><a href="{{ route('assets.import.index') }}" class="waves-effect"><i class="material-icons">cloud_upload</i><span>Impor Aset</span></a></li>
         
         @auth
-        @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+        @if(in_array(auth()->user()->role, ['admin', 'superadmin', 'maintenance']))
         <li class="{{ request()->routeIs('activity-logs.*') ? 'active' : '' }}"><a href="{{ route('activity-logs.index') }}" class="waves-effect"><i class="material-icons">history</i><span>Log Aktifitas</span></a></li>
         @endif
         <li class="hide-on-large-only"><div class="divider"></div></li>

@@ -25,7 +25,7 @@
                 </div>
             </div>
             
-            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(in_array(auth()->user()->role, ['admin', 'superadmin', 'maintenance']))
             <div>
                 <div class="md-input-container" style="margin-bottom: 0;">
                     <select name="pic_id" class="md-input" onchange="this.form.submit()">
@@ -45,7 +45,7 @@
 
 <div class="d-flex" style="gap: 16px; margin-top: 16px;">
     <!-- User PIC Summary (4 cards) -->
-    <div style="flex: {{ (auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin') ? '1' : '100%' }}; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+    <div style="flex: {{ (in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance'], true)) ? '1' : '100%' }}; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
         
         <div class="card" style="margin: 0;">
             <h3 class="card-title" style="font-size: 16px;">Todo-List Saya</h3>
@@ -77,7 +77,7 @@
 
     </div>
     
-    @if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin')
+    @if(in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance'], true))
     <!-- Admin Summary -->
     <div class="card" style="flex: 1;">
         <h3 class="card-title">Menunggu Verifikasi</h3>
@@ -88,7 +88,7 @@
     @endif
 </div>
 
-@if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin')
+@if(in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance'], true))
 <!-- Admin Statistics -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;">
     <div class="card" style="margin: 0;">
@@ -109,7 +109,7 @@
 @endsection
 
 @push('scripts')
-@if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin')
+@if(in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance'], true))
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {

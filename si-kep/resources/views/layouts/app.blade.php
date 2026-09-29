@@ -94,6 +94,11 @@
                     <span class="fw-bold text-dark" id="headerLastSyncText">{{ $lastSyncDisplay }}</span>
                 </div>
 
+                <!-- Role Help Guide Button -->
+                <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5 rounded-pill px-3" onclick="document.getElementById('modalRoleHelp').showModal()" aria-haspopup="dialog" title="Panduan Peran & Fitur Kepegawaian">
+                    <i class="fas fa-circle-question text-primary"></i> <span class="d-none d-md-inline">Panduan</span>
+                </button>
+
                 @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance', 'administrator']))
                     <!-- Live Google Sheets Sync Button -->
                     <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2 rounded-pill px-3 shadow-sm" id="btnSyncSpreadsheet">
@@ -530,6 +535,8 @@
 
     <!-- Additional Modals from Child Views (outside container-fluid to prevent backdrop stacking trap) -->
     @stack('modals')
+
+    @include('components.role-help')
 
     <!-- Core Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

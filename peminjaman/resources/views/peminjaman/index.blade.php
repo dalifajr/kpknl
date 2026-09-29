@@ -103,7 +103,7 @@
                             </td>
                             <td style="text-align: right;">
                                 <!-- STAGE 1: Proses Peminjaman -> Admin Approve -->
-                                @if($loan->status === \App\Models\Peminjaman::STATUS_PROSES && Auth::user()->role === 'admin')
+                                @if($loan->status === \App\Models\Peminjaman::STATUS_PROSES && Auth::user()->isAdmin())
                                     <form action="{{ route('peminjaman.approve', $loan->id) }}" method="POST" class="d-inline" onsubmit="return confirmAction(event, 'Setujui Permohonan Pinjam?', 'Berkas fisik akan disiapkan untuk diambil oleh peminjam.')">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-primary py-1 px-2.5" style="font-size: 0.75rem;">
@@ -133,7 +133,7 @@
                                 @endif
 
                                 <!-- STAGE 4: Proses Pengembalian -> Admin verifies physical return -->
-                                @if($loan->status === \App\Models\Peminjaman::STATUS_PROSES_PENGEMBALIAN && Auth::user()->role === 'admin')
+                                @if($loan->status === \App\Models\Peminjaman::STATUS_PROSES_PENGEMBALIAN && Auth::user()->isAdmin())
                                     <form action="{{ route('peminjaman.verify-return', $loan->id) }}" method="POST" class="d-inline" onsubmit="return confirmAction(event, 'Verifikasi Fisik Pengembalian?', 'Berkas fisik akan dikembalikan ke lemari arsip dan status risalah dalam katalog akan pulih menjadi Tersedia.')">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-success py-1 px-2.5" style="font-size: 0.75rem;">

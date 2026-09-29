@@ -424,6 +424,7 @@
         $currentUser = Auth::user();
         $userName = $currentUser ? $currentUser->name : 'Pengguna';
         $userRole = $currentUser ? $currentUser->role : 'peminjam';
+        $ssoMaintenance = session('sso_role') === 'maintenance' && $currentUser?->isAdmin();
         $pendingCountBadge = \App\Models\RisalahPending::where('status', 'belum_validasi')->count();
         $revisiCountBadge = \App\Models\RisalahRevisi::where('status', 'revisi')->count();
     @endphp
@@ -447,8 +448,13 @@
                 </div>
             </a>
 
-            <!-- Right Actions: Logout -->
+            <!-- Right Actions: Help & Logout -->
             <div class="ms-auto d-flex align-items-center gap-2">
+                <!-- Role-Based Help Button -->
+                <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5 rounded-pill px-3 shadow-sm" onclick="document.getElementById('modalHelpRole').showModal()" aria-haspopup="dialog" aria-controls="modalHelpRole" title="Panduan Peran & Fitur" style="font-size: 0.82rem;">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span class="d-none d-sm-inline">Panduan</span>
+                </button>
 
                 <!-- Direct Logout Button -->
                 <form action="{{ route('logout') }}" method="POST" class="m-0">
@@ -487,7 +493,7 @@
                             @else
                                 <i class="fa-solid fa-book-reader"></i>
                             @endif
-                            {{ $currentUser ? $currentUser->getRoleLabel() : 'Guest' }}
+                            {{ $ssoMaintenance ? 'Maintenance · Administrator Arsip' : ($currentUser ? $currentUser->getRoleLabel() : 'Guest') }}
                         </span>
                     </small>
                 </div>
@@ -525,8 +531,8 @@
 
                     <div class="menu-header mt-3">Manajemen Risalah</div>
 
-                    <!-- 4. Validasi Risalah (Admin Seksi HI) -->
-                    @if($userRole === 'admin')
+                    <!-- 4. Validasi Risalah (Admin Seksi HI & Maintenance) -->
+                    @if($currentUser && $currentUser->isAdmin())
                         <a href="{{ route('validasi.index') }}" class="menu-item {{ request()->routeIs('validasi.*') ? 'active' : '' }}">
                             <i class="fas fa-file-circle-check"></i>
                             <span class="flex-grow-1">Validasi Risalah</span>
@@ -536,16 +542,16 @@
                         </a>
                     @endif
 
-                    <!-- 5. Pendaftaran Risalah Baru (Pelelang & Admin) -->
-                    @if($userRole === 'pelelang' || $userRole === 'admin')
+                    <!-- 5. Pendaftaran Risalah Baru (Pelelang, Admin & Maintenance) -->
+                    @if($currentUser && ($currentUser->isPelelang() || $currentUser->isAdmin()))
                         <a href="{{ route('pendaftaran.index') }}" class="menu-item {{ request()->routeIs('pendaftaran.*') ? 'active' : '' }}">
                             <i class="fas fa-file-circle-plus"></i>
                             <span>Pendaftaran Baru</span>
                         </a>
                     @endif
 
-                    <!-- 6. Revisi Risalah (Pelelang & Admin) -->
-                    @if($userRole === 'pelelang' || $userRole === 'admin')
+                    <!-- 6. Revisi Risalah (Pelelang, Admin & Maintenance) -->
+                    @if($currentUser && ($currentUser->isPelelang() || $currentUser->isAdmin()))
                         <a href="{{ route('revisi.index') }}" class="menu-item {{ request()->routeIs('revisi.*') ? 'active' : '' }}">
                             <i class="fas fa-file-pen"></i>
                             <span class="flex-grow-1">Revisi Risalah</span>
@@ -588,11 +594,10 @@
                             @yield('page_subtitle', 'Sistem Informasi Peminjaman dan Validasi Dokumen Risalah Lelang — KPKNL Palembang')
                         </p>
                     </div>
-                    @hasSection('page_actions')
-                        <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-                            @yield('page_actions')
-                        </div>
-                    @endif
+                    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+                        <button type="button" class="btn btn-light rounded-pill" onclick="document.getElementById('modalHelpRole').showModal()" aria-haspopup="dialog">Panduan</button>
+                        @yield('page_actions')
+                    </div>
                 </div>
 
                 <!-- Alert Notifications -->
@@ -681,5 +686,6 @@
     </script>
 
     @stack('scripts')
+    @include('components.role-help')
 </body>
 </html>

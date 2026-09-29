@@ -89,7 +89,7 @@
                 </button>
             </div>
             @else
-                @if(auth()->user()->role === 'superadmin')
+                @if(in_array(auth()->user()->role, ['superadmin', 'maintenance'], true))
                 <div style="margin-bottom: 16px;">
                     <button type="button" class="btn btn-flat ripple-surface" style="width: 100%; border: 1px solid #F44336; color: #F44336;" onclick="showMDModal('Batalkan ACC', 'Yakin ingin membatalkan ACC laporan ini?', () => submitAjax(this, 'batal_acc'), true)">
                         Batalkan ACC (Khusus Superadmin)
@@ -105,7 +105,7 @@
             <div style="display: flex; gap: 8px;">
                 <a href="{{ route('reviews.index') }}" class="btn btn-flat ripple-surface" style="flex: 1; text-align: center; border: 1px solid var(--divider);">Kembali ke Daftar</a>
                 
-                @if(auth()->user()->role === 'superadmin' && $assignment->status !== 'acc')
+                @if(in_array(auth()->user()->role, ['superadmin', 'maintenance'], true) && $assignment->status !== 'acc')
                     <button type="button" class="btn btn-flat ripple-surface" style="background: #F44336; color: white;" onclick="showMDModal('Batalkan Pengisian', 'Yakin ingin mengosongkan data laporan ini dan mengembalikan statusnya ke pending?', () => submitAjax(this, 'cancel_submission'), true)">
                         <i class="material-icons" style="font-size: 16px;">remove_circle_outline</i> Batalkan Pengisian
                     </button>
@@ -121,7 +121,7 @@
     
     <div style="margin-bottom: 24px;">
         @forelse($assignment->comments as $comment)
-            <div style="margin-bottom: 16px; padding: 16px; background: #F5F5F5; border-radius: 4px; border-left: 4px solid {{ in_array($comment->user->role, ['superadmin', 'admin']) ? 'var(--primary)' : '#9E9E9E' }};">
+            <div style="margin-bottom: 16px; padding: 16px; background: #F5F5F5; border-radius: 4px; border-left: 4px solid {{ in_array($comment->user->role, ['superadmin', 'admin', 'maintenance']) ? 'var(--primary)' : '#9E9E9E' }};">
                 <div class="d-flex justify-between" style="margin-bottom: 8px;">
                     <strong style="font-size: 14px;">{{ $comment->user->name }} <span style="font-weight: normal; color: var(--text-secondary); font-size: 12px;">({{ $comment->user->role }})</span></strong>
                     <span style="color: var(--text-secondary); font-size: 12px;">{{ $comment->created_at->format('d M Y H:i') }}</span>

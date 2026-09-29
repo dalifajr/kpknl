@@ -47,7 +47,7 @@ class DashboardController extends Controller
         $picStats = [];
         $users = [];
         
-        if (in_array($user->role, ['superadmin', 'admin'])) {
+        if (in_array($user->role, ['superadmin', 'admin', 'maintenance'])) {
             $query = TaskAssignment::where('status', 'submitted');
             $waitingReviews = $applyFilters($query)->count();
 

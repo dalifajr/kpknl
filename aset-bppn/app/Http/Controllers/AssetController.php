@@ -89,7 +89,7 @@ class AssetController extends Controller
 
     public function restore($id)
     {
-        if (!in_array(auth()->user()->role, ['superadmin', 'admin'])) {
+        if (!in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance'])) {
             abort(403, 'Akses tidak diizinkan. Hanya Admin dan Superadmin yang dapat memulihkan aset.');
         }
 

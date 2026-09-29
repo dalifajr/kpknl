@@ -30,6 +30,12 @@
             <li><a href="{{ route('grafik.index') }}" class="{{ request()->routeIs('grafik.*') ? 'active' : '' }}">Grafik</a></li>
 
             <li>
+                <button type="button" onclick="document.getElementById('modalHelpRole').showModal()" style="padding: 5px 12px; border-radius: 20px; cursor: pointer; border: 1px solid #38bdf8; background: #f0f9ff; color: #0284c7; font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;">
+                    📖 Panduan Peran
+                </button>
+            </li>
+
+            <li>
                 <div class="user-badge">
                     <span>{{ Auth::user()->username }}</span>
                     <span class="role-tag role-{{ Auth::user()->role }}">{{ Auth::user()->role }}</span>

@@ -86,14 +86,16 @@ function doPost(e) {
     var headerHeaders = sheet.getRange(headerRowIndex, 1, 1, lastCol).getValues()[0];
     var colMap = {};
     for (var c = 0; c < headerHeaders.length; c++) {
-      var hName = String(headerHeaders[c]).trim().toUpperCase();
+      var hName = normalizeSheetText(headerHeaders[c]).toUpperCase();
       if (hName) {
         colMap[hName] = c + 1;
       }
     }
 
-    var targetNip = cleanNip(payload.nip || (payload.data ? payload.data.nip : ''));
     var data = payload.row_data || payload.data || {};
+    var targetNip = cleanNip(payload.nip || data.NIP || data.nip);
+    var lookupNip = cleanNip(payload.original_nip || targetNip);
+    if (!targetNip) throw new Error('NIP wajib diisi untuk menentukan baris pegawai.');
     var nipCol = colMap['NIP'] || 3;
     var dataStartRow = headerRowIndex + 1;
 
@@ -105,16 +107,22 @@ function doPost(e) {
 
     // 4. Cari Baris Pegawai Berdasarkan NIP
     var targetRow = -1;
+    var currentNipRow = -1;
     if (targetNip && lastRow >= dataStartRow) {
       var nipRange = sheet.getRange(dataStartRow, nipCol, (lastRow - dataStartRow + 1), 1).getValues();
       for (var i = 0; i < nipRange.length; i++) {
         var cellNip = cleanNip(nipRange[i][0]);
-        if (cellNip === targetNip) {
+        if (cellNip === lookupNip) {
           targetRow = dataStartRow + i;
-          break;
         }
+        if (cellNip === targetNip) currentNipRow = dataStartRow + i;
       }
     }
+    if (lookupNip !== targetNip && targetRow !== -1 && currentNipRow !== -1) {
+      throw new Error('NIP baru sudah digunakan oleh baris pegawai lain.');
+    }
+    // A retry after a successful NIP change must find the updated row.
+    if (targetRow === -1 && currentNipRow !== -1) targetRow = currentNipRow;
 
     // 5. Tangani Penambahan Data Baru (CREATE)
     if (action === 'create' || (action === 'update' && targetRow === -1 && targetNip)) {
@@ -132,17 +140,21 @@ function doPost(e) {
       });
     }
 
-    // 6. Tulis Data ke Sel Kolom yang Sesuai
+    // Validate every requested cell before writing so a rejected dropdown cannot
+    // leave an existing employee row partly updated.
+    var writes = [];
     function setCell(colName, val) {
-      if (colMap[colName] && val !== undefined && val !== null && val !== '') {
-        sheet.getRange(targetRow, colMap[colName]).setValue(val);
-      }
+      if (val === undefined || val === null || val === '') return;
+      var colKey = normalizeSheetText(colName).toUpperCase();
+      if (!colMap[colKey]) throw new Error('Kolom tidak ditemukan: ' + colName);
+      var cell = sheet.getRange(targetRow, colMap[colKey]);
+      writes.push({ cell: cell, value: resolveDropdownValue(cell, val, colName) });
     }
 
     // Tulis data pokok
     if (data.nama || data['NAMA']) setCell('NAMA', data.nama || data['NAMA']);
     if (data.nama_lengkap_gelar || data['NAMA DI DATA POKOK HRIS']) setCell('NAMA DI DATA POKOK HRIS', data.nama_lengkap_gelar || data['NAMA DI DATA POKOK HRIS']);
-    if (targetNip) sheet.getRange(targetRow, nipCol).setValue("'" + targetNip);
+    if (targetNip) setCell('NIP', "'" + targetNip);
     if (data.nik || data['NIK']) setCell('NIK', "'" + cleanNip(data.nik || data['NIK']));
     if (data.nama_jabatan_raw || data['JABATAN']) setCell('JABATAN', data.nama_jabatan_raw || data['JABATAN']);
     if (data.per_jabatan || data['PER.JABATAN']) setCell('PER.JABATAN', data.per_jabatan || data['PER.JABATAN']);
@@ -156,7 +168,7 @@ function doPost(e) {
     if (data.tmt_golongan || data['TMT GOLONGAN']) setCell('TMT GOLONGAN', formatDate(data.tmt_golongan || data['TMT GOLONGAN']));
     if (data.tmt_kgb || data['TMT KGB']) setCell('TMT KGB', formatDate(data.tmt_kgb || data['TMT KGB']));
     if (data.tmt_grading || data['TMT GRADING']) setCell('TMT GRADING', formatDate(data.tmt_grading || data['TMT GRADING']));
-    if (data.jenis_kelamin || data['JENIS KELAMIN']) setCell('JENIS KELAMIN', (data.jenis_kelamin || data['JENIS KELAMIN']).toUpperCase());
+    if (data.jenis_kelamin || data['JENIS KELAMIN']) setCell('JENIS KELAMIN', String(data.jenis_kelamin || data['JENIS KELAMIN']).trim().toUpperCase());
     if (data.pendidikan_terakhir || data['PENDIDIKAN (HRIS)']) setCell('PENDIDIKAN (HRIS)', data.pendidikan_terakhir || data['PENDIDIKAN (HRIS)']);
     if (data.fakultas || data['FAKULTAS']) setCell('FAKULTAS', data.fakultas || data['FAKULTAS']);
     if (data.jurusan || data['JURUSAN']) setCell('JURUSAN', data.jurusan || data['JURUSAN']);
@@ -164,8 +176,10 @@ function doPost(e) {
     if (data.nama_universitas || data['NAMA UNIVERSITAS']) setCell('NAMA UNIVERSITAS', data.nama_universitas || data['NAMA UNIVERSITAS']);
     if (data.tmt_ue_iv || data['TMT UE IV']) setCell('TMT UE IV', data.tmt_ue_iv || data['TMT UE IV']);
     if (data.lama_bertugas_ue_iv || data['LAMA BERTUGAS DI UE IV']) setCell('LAMA BERTUGAS DI UE IV', data.lama_bertugas_ue_iv || data['LAMA BERTUGAS DI UE IV']);
-    if (data.status_gelar || data['Status Pendidikan dan Pencantuman Gelar Akademik']) setCell('Status Pendidikan dan Pencantuman Gelar Akademik', data.status_gelar || data['Status Pendidikan dan Pencantuman Gelar Akademik']);
+    var valStatusGelar = data.status_gelar || data['STATUS PENDIDIKAN DAN PENCANTUMAN GELAR AKADEMIK'] || data['Status Pendidikan dan Pencantuman Gelar Akademik'];
+    if (valStatusGelar) setCell('STATUS PENDIDIKAN DAN PENCANTUMAN GELAR AKADEMIK', valStatusGelar);
 
+    writes.forEach(function (write) { write.cell.setValue(write.value); });
     SpreadsheetApp.flush();
 
     return respondJson({
@@ -184,6 +198,31 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+function normalizeSheetText(value) {
+  return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+}
+
+function resolveDropdownValue(cell, value, columnName) {
+  var rule = cell.getDataValidation();
+  if (!rule) return value;
+  var type = rule.getCriteriaType();
+  var args = rule.getCriteriaValues();
+  var choices;
+  if (type === SpreadsheetApp.DataValidationCriteria.VALUE_IN_LIST) {
+    choices = args[0];
+  } else if (type === SpreadsheetApp.DataValidationCriteria.VALUE_IN_RANGE) {
+    choices = args[0].getValues().reduce(function (all, row) { return all.concat(row); }, []);
+  } else {
+    return value;
+  }
+  var normalized = normalizeSheetText(value).toLowerCase();
+  for (var i = 0; i < choices.length; i++) {
+    if (normalizeSheetText(choices[i]).toLowerCase() === normalized) return choices[i];
+  }
+  throw new Error('Nilai "' + value + '" tidak tersedia pada dropdown ' + columnName +
+    '. Samakan pilihan pada aplikasi dan spreadsheet, lalu sinkronkan ulang.');
 }
 
 function doGet(e) {

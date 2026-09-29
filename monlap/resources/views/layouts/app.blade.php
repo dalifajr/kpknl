@@ -156,7 +156,7 @@
                     </a>
                 </li>
                 
-                @if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin')
+                @if(in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance'], true))
                 <li>
                     <a href="{{ route('tasks.index') }}" class="nav-item {{ request()->routeIs('tasks.*') ? 'active' : '' }}" title="Tugas Induk">
                         <i class="material-icons">assignment</i>
@@ -203,6 +203,9 @@
                     <div class="topbar-title">@yield('title', 'Dashboard')</div>
                 </div>
                 <div class="topbar-actions">
+                    <button type="button" class="icon-btn" onclick="document.getElementById('modalMonlapRoleHelp').showModal()" title="Panduan Peran &amp; Fitur MonLap" style="margin-right: 8px; color: var(--primary);">
+                        <i class="material-icons">help_outline</i>
+                    </button>
                     <button type="button" class="icon-btn" id="themeToggleBtn" title="Toggle Dark Mode" style="margin-right: 8px;">
                         <i class="material-icons" id="themeIcon">dark_mode</i>
                     </button>
@@ -605,5 +608,8 @@
             }, 3500);
         }
     </script>
+
+    @include('components.role-help')
+
 </body>
 </html>

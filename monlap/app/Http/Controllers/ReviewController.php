@@ -90,9 +90,9 @@ class ReviewController extends Controller
         
         // 2. Process Revisi
         elseif ($request->action === 'revisi') {
-            if ($assignment->status === 'acc' && $user->role !== 'superadmin') {
-                if ($request->ajax()) return response()->json(['message' => 'ACC bersifat final untuk Admin.', 'errors' => ['error' => ['ACC bersifat final untuk Admin. Hanya Superadmin yang dapat merevisi laporan yang sudah di-ACC.']]], 400);
-                return redirect()->back()->withErrors(['error' => 'ACC bersifat final untuk Admin. Hanya Superadmin yang dapat merevisi laporan yang sudah di-ACC.']);
+            if ($assignment->status === 'acc' && !in_array($user->role, ['superadmin', 'maintenance'], true)) {
+                if ($request->ajax()) return response()->json(['message' => 'ACC bersifat final untuk Admin.', 'errors' => ['error' => ['ACC bersifat final untuk Admin. Hanya Superadmin atau Maintenance yang dapat merevisi laporan yang sudah di-ACC.']]], 400);
+                return redirect()->back()->withErrors(['error' => 'ACC bersifat final untuk Admin. Hanya Superadmin atau Maintenance yang dapat merevisi laporan yang sudah di-ACC.']);
             }
             if (empty($request->comment)) {
                 if ($request->ajax()) return response()->json(['message' => 'Komentar wajib diisi jika status Revisi.', 'errors' => ['error' => ['Komentar wajib diisi jika status Revisi.']]], 400);
@@ -112,9 +112,9 @@ class ReviewController extends Controller
 
         // 3. Process Batal ACC (Only Superadmin)
         elseif ($request->action === 'batal_acc') {
-            if ($user->role !== 'superadmin') {
-                if ($request->ajax()) return response()->json(['message' => 'Hanya Superadmin yang dapat membatalkan ACC.', 'errors' => ['error' => ['Hanya Superadmin yang dapat membatalkan ACC.']]], 403);
-                return redirect()->back()->withErrors(['error' => 'Hanya Superadmin yang dapat membatalkan ACC.']);
+            if (!in_array($user->role, ['superadmin', 'maintenance'], true)) {
+                if ($request->ajax()) return response()->json(['message' => 'Hanya Superadmin atau Maintenance yang dapat membatalkan ACC.', 'errors' => ['error' => ['Hanya Superadmin atau Maintenance yang dapat membatalkan ACC.']]], 403);
+                return redirect()->back()->withErrors(['error' => 'Hanya Superadmin atau Maintenance yang dapat membatalkan ACC.']);
             }
             $assignment->update(['status' => 'submitted', 'reviewed_by' => null]);
             $msg = 'Status ACC berhasil dibatalkan.';
@@ -122,9 +122,9 @@ class ReviewController extends Controller
 
         // 4. Process Cancel Submission (Only Superadmin)
         elseif ($request->action === 'cancel_submission') {
-            if ($user->role !== 'superadmin') {
-                if ($request->ajax()) return response()->json(['message' => 'Hanya Superadmin yang dapat membatalkan pengisian.', 'errors' => ['error' => ['Hanya Superadmin yang dapat membatalkan pengisian.']]], 403);
-                return redirect()->back()->withErrors(['error' => 'Hanya Superadmin yang dapat membatalkan pengisian.']);
+            if (!in_array($user->role, ['superadmin', 'maintenance'], true)) {
+                if ($request->ajax()) return response()->json(['message' => 'Hanya Superadmin atau Maintenance yang dapat membatalkan pengisian.', 'errors' => ['error' => ['Hanya Superadmin atau Maintenance yang dapat membatalkan pengisian.']]], 403);
+                return redirect()->back()->withErrors(['error' => 'Hanya Superadmin atau Maintenance yang dapat membatalkan pengisian.']);
             }
             if ($assignment->status === 'acc') {
                 if ($request->ajax()) return response()->json(['message' => 'Batalkan status ACC terlebih dahulu sebelum membatalkan pengisian.', 'errors' => ['error' => ['Batalkan status ACC terlebih dahulu sebelum membatalkan pengisian.']]], 400);

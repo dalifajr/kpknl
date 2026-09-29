@@ -52,7 +52,7 @@ class UserTaskController extends Controller
         $assignments = $query->orderBy('deadline_date', 'asc')->paginate($perPage)->withQueryString();
         
         $users = [];
-        if (in_array(auth()->user()->role, ['admin', 'superadmin'])) {
+        if (in_array(auth()->user()->role, ['admin', 'superadmin', 'maintenance'])) {
             $users = \App\Models\User::where('role', 'user')->orderBy('name')->get();
         }
 
@@ -62,11 +62,11 @@ class UserTaskController extends Controller
     public function show(TaskAssignment $assignment)
     {
         $user = auth()->user();
-        if ($assignment->user_id !== $user->id && !in_array($user->role, ['admin', 'superadmin'])) {
+        if ($assignment->user_id !== $user->id && !in_array($user->role, ['admin', 'superadmin', 'maintenance'])) {
             abort(403);
         }
 
-        if (in_array($user->role, ['admin', 'superadmin']) && in_array($assignment->status, ['submitted', 'acc', 'revisi'])) {
+        if (in_array($user->role, ['admin', 'superadmin', 'maintenance']) && in_array($assignment->status, ['submitted', 'acc', 'revisi'])) {
             return redirect()->route('reviews.show', $assignment->id);
         }
 
@@ -83,7 +83,7 @@ class UserTaskController extends Controller
     public function submit(Request $request, TaskAssignment $assignment, \App\Services\NotificationService $notificationService)
     {
         $user = auth()->user();
-        if ($assignment->user_id !== $user->id && !in_array($user->role, ['admin', 'superadmin'])) {
+        if ($assignment->user_id !== $user->id && !in_array($user->role, ['admin', 'superadmin', 'maintenance'])) {
             abort(403);
         }
 
@@ -173,7 +173,7 @@ class UserTaskController extends Controller
                 }
                 
                 // Notification logic for normal PIC submission
-                $admins = \App\Models\User::whereIn('role', ['admin', 'superadmin'])->get();
+                $admins = \App\Models\User::whereIn('role', ['admin', 'superadmin', 'maintenance'])->get();
                 foreach ($admins as $admin) {
                     $notificationService->send(
                         $admin,
@@ -190,7 +190,7 @@ class UserTaskController extends Controller
     public function addComment(Request $request, TaskAssignment $assignment)
     {
         $user = auth()->user();
-        if ($assignment->user_id !== $user->id && !in_array($user->role, ['admin', 'superadmin'])) {
+        if ($assignment->user_id !== $user->id && !in_array($user->role, ['admin', 'superadmin', 'maintenance'])) {
             abort(403);
         }
 
@@ -219,7 +219,7 @@ class UserTaskController extends Controller
         
 
 
-        if ($assignment->user_id !== $user->id && !in_array($user->role, ['admin', 'superadmin'])) {
+        if ($assignment->user_id !== $user->id && !in_array($user->role, ['admin', 'superadmin', 'maintenance'])) {
             abort(403);
         }
 
@@ -263,8 +263,8 @@ class UserTaskController extends Controller
     public function destroy(Request $request, TaskAssignment $assignment)
     {
         $user = auth()->user();
-        if ($user->role !== 'superadmin') {
-            abort(403, 'Hanya superadmin yang dapat menghapus penugasan ini.');
+        if (!in_array($user->role, ['superadmin', 'maintenance'], true)) {
+            abort(403, 'Hanya superadmin atau maintenance yang dapat menghapus penugasan ini.');
         }
 
         if (in_array($assignment->status, ['acc'])) {

@@ -26,7 +26,7 @@ class MaintenanceSeeder extends Seeder
             [
                 'name' => 'Tim Maintenance KPKNL Palembang',
                 'email' => 'maintenance@kpknl.go.id',
-                'password' => Hash::make('admin123'),
+                'password' => Hash::make('Password123!@#'),
                 'status' => 'active',
                 'created_by' => 1,
             ]
@@ -36,11 +36,11 @@ class MaintenanceSeeder extends Seeder
             $user->roles()->sync([$role->id]);
         }
 
-        // Assign all active applications
-        $apps = Application::where('status', 'active')->pluck('id')->toArray();
+        // Assign all active applications with role maintenance
+        $apps = Application::all()->pluck('id')->toArray();
         $syncData = [];
         foreach ($apps as $appId) {
-            $syncData[$appId] = ['assigned_by' => 1, 'role' => 'admin'];
+            $syncData[$appId] = ['assigned_by' => 1, 'role' => 'maintenance'];
         }
         $user->applications()->sync($syncData);
     }

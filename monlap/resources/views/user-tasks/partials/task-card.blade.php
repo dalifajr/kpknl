@@ -19,7 +19,7 @@
                     </span>
                 </div>
                 <h3 style="font-size: 18px; margin-bottom: 4px;">{{ $assignment->task->title }}</h3>
-                @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(in_array(auth()->user()->role, ['admin', 'superadmin', 'maintenance']))
                     <div style="font-size: 12px; color: var(--primary); margin-bottom: 8px; font-weight: 500;">
                         <i class="material-icons" style="font-size: 14px; vertical-align: middle;">person</i> PIC: {{ optional($assignment->user)->name }}
                     </div>

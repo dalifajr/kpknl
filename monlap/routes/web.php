@@ -34,7 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/{notification}/read', [\App\Http\Controllers\MonlapNotificationController::class, 'read'])->name('notifications.read');
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\MonlapNotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
 
-    Route::middleware(['role:superadmin,admin'])->group(function () {
+    Route::middleware(['role:superadmin,admin,maintenance'])->group(function () {
         Route::post('tasks/preview-deadline', [TaskController::class, 'previewDeadline'])->name('tasks.preview-deadline');
         Route::post('tasks/bulk-assign', [TaskController::class, 'bulkAssign'])->name('tasks.bulk-assign');
         Route::post('tasks/bulk-action', [TaskController::class, 'bulkAction'])->name('tasks.bulk-action');

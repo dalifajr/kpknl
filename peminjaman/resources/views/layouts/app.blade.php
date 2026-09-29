@@ -31,6 +31,8 @@
         &copy; {{ date('Y') }} Kantor Pelayanan Kekayaan Negara dan Lelang (KPKNL). All rights reserved.
     </footer>
 
+    @include('components.help_modal')
+
     @stack('scripts')
 </body>
 </html>

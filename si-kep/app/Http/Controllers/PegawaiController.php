@@ -339,9 +339,24 @@ class PegawaiController extends Controller
             $pegawai->pangkat_golongan_id = $request->pangkat_golongan_id;
             $pegawai->nama_jabatan_raw = trim($request->nama_jabatan_raw);
             $pegawai->job_grade = $request->filled('job_grade') ? (int) $request->job_grade : null;
-            $pegawai->jenis_kelamin = $request->input('jenis_kelamin', 'L');
+            $pegawai->jenis_kelamin = strtoupper(trim($request->input('jenis_kelamin', 'L')));
             $pegawai->tempat_lahir = trim($request->tempat_lahir);
             $pegawai->status_gelar = trim($request->status_gelar ?: 'Sudah Clear (sesuai dengan HRIS)');
+
+            // Synchronize derived strings from selected dropdown foreign keys for spreadsheet dual-write
+            if ($pegawai->pangkat_golongan_id) {
+                $pangkatModel = \App\Models\PangkatGolongan::find($pegawai->pangkat_golongan_id);
+                if ($pangkatModel) {
+                    $golDisplay = str_replace('/', '.', $pangkatModel->golongan_ruang);
+                    $pegawai->pangkat_golongan_raw = $pangkatModel->nama_pangkat . ' / ' . $golDisplay;
+                }
+            }
+            if ($pegawai->unit_kerja_id) {
+                $unitModel = \App\Models\UnitKerja::find($pegawai->unit_kerja_id);
+                if ($unitModel) {
+                    $pegawai->per_jabatan = $unitModel->nama_unit;
+                }
+            }
 
             // Tanggal Lahir & Usia
             if ($request->filled('tanggal_lahir')) {
@@ -458,9 +473,24 @@ class PegawaiController extends Controller
             $pegawai->pangkat_golongan_id = $request->pangkat_golongan_id;
             $pegawai->nama_jabatan_raw = trim($request->nama_jabatan_raw);
             $pegawai->job_grade = $request->filled('job_grade') ? (int) $request->job_grade : $pegawai->job_grade;
-            $pegawai->jenis_kelamin = $request->input('jenis_kelamin', $pegawai->jenis_kelamin);
+            $pegawai->jenis_kelamin = strtoupper(trim($request->input('jenis_kelamin', $pegawai->jenis_kelamin ?: 'L')));
             $pegawai->tempat_lahir = trim($request->tempat_lahir);
             $pegawai->status_gelar = trim($request->status_gelar ?: $pegawai->status_gelar);
+
+            // Synchronize derived strings from selected dropdown foreign keys for spreadsheet dual-write
+            if ($pegawai->pangkat_golongan_id) {
+                $pangkatModel = \App\Models\PangkatGolongan::find($pegawai->pangkat_golongan_id);
+                if ($pangkatModel) {
+                    $golDisplay = str_replace('/', '.', $pangkatModel->golongan_ruang);
+                    $pegawai->pangkat_golongan_raw = $pangkatModel->nama_pangkat . ' / ' . $golDisplay;
+                }
+            }
+            if ($pegawai->unit_kerja_id) {
+                $unitModel = \App\Models\UnitKerja::find($pegawai->unit_kerja_id);
+                if ($unitModel) {
+                    $pegawai->per_jabatan = $unitModel->nama_unit;
+                }
+            }
 
             // Tanggal Lahir & Usia
             if ($request->filled('tanggal_lahir')) {

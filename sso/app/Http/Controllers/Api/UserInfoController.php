@@ -30,7 +30,8 @@ class UserInfoController extends Controller
         }
 
         $roles = $user->roles->pluck('name')->toArray();
-        $primaryRole = $roles[0] ?? 'user';
+        $primaryRole = $user->isMaintenance() ? 'maintenance'
+            : ($user->isSuperadmin() ? 'superadmin' : ($user->isAdmin() ? 'admin' : 'user'));
 
         // Retrieve application-specific role (e.g. admin, peminjam, pelelang for peminjaman-lelang)
         $tokenRecord = \App\Models\OAuthToken::where('access_token', $token)->first();
@@ -55,7 +56,8 @@ class UserInfoController extends Controller
                 'status' => $user->status,
                 'roles' => $roles,
                 'primary_role' => $primaryRole,
-                'app_role' => $appRole ?? ($user->isSuperadmin() || $user->isMaintenance() ? 'admin' : ($user->isAdmin() ? 'pelelang' : 'peminjam')),
+                'app_role' => in_array($primaryRole, ['maintenance', 'superadmin'], true)
+                    ? $primaryRole : ($appRole ?? $primaryRole),
                 'is_superadmin' => $user->isSuperadmin(),
                 'is_admin' => $user->isAdmin(),
                 'is_maintenance' => $user->isMaintenance(),

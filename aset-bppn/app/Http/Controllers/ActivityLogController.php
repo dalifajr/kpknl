@@ -12,7 +12,7 @@ class ActivityLogController extends Controller
     public function index(Request $request)
     {
         // Restrict to superadmin and admin roles
-        if (!in_array(auth()->user()->role, ['superadmin', 'admin'])) {
+        if (!in_array(auth()->user()->role, ['superadmin', 'admin', 'maintenance'])) {
             abort(403, 'Akses tidak diizinkan. Hanya Admin dan Superadmin yang dapat mengakses Log Aktifitas.');
         }
 

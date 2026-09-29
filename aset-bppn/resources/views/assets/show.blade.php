@@ -104,7 +104,7 @@
                     </p>
                 </div>
             </div>
-            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(in_array(auth()->user()->role, ['admin', 'superadmin', 'maintenance']))
             <div>
                 <form action="{{ route('assets.restore', $asset->id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Apakah Anda yakin ingin memulihkan aset ini?')">
                     @csrf

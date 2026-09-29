@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Exception;
-use PDO;
 
 class SsoController extends Controller
 {
@@ -119,81 +117,21 @@ class SsoController extends Controller
                 }
             }
 
-            if (!$userPayload) {
+            if (!$accessToken || !is_array($userPayload) || empty($userPayload['id'])) {
                 return redirect()->route('sso.redirect')->with('error', 'Gagal mengambil data profil dari server SSO.');
             }
 
             $ssoUserId = $userPayload['id'] ?? null;
             $email = $userPayload['email'] ?? ($userPayload['username'] ? $userPayload['username'].'@kpknl.go.id' : 'user@kpknl.go.id');
             $name = $userPayload['name'] ?? 'Pengguna SSO';
-            $isSuperadmin = !empty($userPayload['is_superadmin']) && $userPayload['is_superadmin'] === true;
-            $isMaintenance = (!empty($userPayload['is_maintenance']) && $userPayload['is_maintenance'] === true)
-                || (!empty($userPayload['primary_role']) && $userPayload['primary_role'] === 'maintenance')
-                || (isset($userPayload['roles']) && in_array('maintenance', (array)$userPayload['roles']))
-                || (($userPayload['username'] ?? '') === 'maintenance');
-
-            // 2. Check application assignment in SSO DB
-            $isAssigned = $isSuperadmin || $isMaintenance;
-            $assignedRole = null;
-
-            if ($ssoUserId) {
-                try {
-                    $pdo = new PDO("mysql:host=127.0.0.1;dbname=sso_kpknl_palembang", "root", "");
-                    
-                    // If not yet flagged as assigned, check user_role table in SSO DB
-                    if (!$isAssigned) {
-                        $stmtRole = $pdo->prepare("
-                            SELECT r.name FROM roles r 
-                            JOIN user_role ur ON ur.role_id = r.id 
-                            WHERE ur.user_id = :user_id AND r.name IN ('superadmin', 'maintenance')
-                            LIMIT 1
-                        ");
-                        $stmtRole->execute(['user_id' => $ssoUserId]);
-                        if ($stmtRole->fetch()) {
-                            $isAssigned = true;
-                            $isMaintenance = true;
-                        }
-                    }
-
-                    $stmt = $pdo->prepare("
-                        SELECT ua.role FROM user_application ua 
-                        JOIN applications a ON ua.application_id = a.id 
-                        WHERE ua.user_id = :user_id 
-                        AND (a.client_id = :client_id OR a.slug LIKE '%peminjam%' OR a.slug LIKE '%lelang%')
-                        LIMIT 1
-                    ");
-                    $stmt->execute([
-                        'user_id' => $ssoUserId,
-                        'client_id' => $clientId,
-                    ]);
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if ($row) {
-                        $isAssigned = true;
-                        $assignedRole = $row['role'];
-                    }
-                } catch (Exception $dbEx) {
-                    Log::warning("SSO DB check warning: " . $dbEx->getMessage());
-                    $isAssigned = true;
-                }
-            }
-
-            // 3. Map application role per KPKNL business rules:
-            // - Pegawai / User Biasa = peminjam (Peminjam Berkas)
-            // - Admin (Pejabat Lelang) = pelelang (Pejabat Lelang)
-            // - Superadmin & Maintenance = admin (Administrator Arsip)
-            $roles = $userPayload['roles'] ?? [];
-            $primaryRole = $userPayload['primary_role'] ?? ($roles[0] ?? 'user');
-            $isSuperadmin = !empty($userPayload['is_superadmin']) || in_array('superadmin', $roles);
-            $isMaintenance = !empty($userPayload['is_maintenance']) || in_array('maintenance', $roles) || ($userPayload['username'] ?? '') === 'maintenance';
-            $isAdmin = !empty($userPayload['is_admin']) || in_array('admin', $roles) || $primaryRole === 'admin';
-
-            if ($isSuperadmin || $isMaintenance) {
-                $role = 'admin'; // Administrator Arsip
-            } elseif ($isAdmin || ($assignedRole ?? null) === 'pelelang' || ($assignedRole ?? null) === 'pejabat_lelang' || ($userPayload['app_role'] ?? null) === 'pelelang') {
-                $role = 'pelelang'; // Pejabat Lelang
-            } else {
-                $role = 'peminjam'; // Peminjam Berkas (Pegawai / User Biasa)
-            }
+            $ssoRole = \App\Support\SsoRole::resolve($userPayload);
+            // This application's existing SQL enum stores its three business roles.
+            $role = match ($ssoRole) {
+                'maintenance', 'superadmin' => 'admin',
+                'admin' => !empty($userPayload['app_role']) ? 'admin' : 'pelelang',
+                'pelelang', 'pejabat_lelang' => 'pelelang',
+                default => 'peminjam',
+            };
 
             // 4. Update or create local user strictly synced with SSO profile
             $user = null;
@@ -229,6 +167,7 @@ class SsoController extends Controller
             session([
                 'sso_access_token' => $accessToken,
                 'sso_user_id' => $ssoUserId,
+                'sso_role' => $ssoRole,
             ]);
 
             Auth::login($user, false);

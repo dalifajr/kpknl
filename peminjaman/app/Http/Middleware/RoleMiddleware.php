@@ -23,6 +23,10 @@ class RoleMiddleware
 
         $user = Auth::user();
 
+        if (in_array($user->role, ['maintenance', 'superadmin'], true) || session('sso_role') === 'maintenance') {
+            return $next($request);
+        }
+
         if (!in_array($user->role, $roles)) {
             abort(403, 'Akses ditolak. Anda tidak memiliki hak akses untuk halaman ini.');
         }

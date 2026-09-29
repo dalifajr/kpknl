@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Exception;
-use PDO;
 
 class SsoController extends Controller
 {
@@ -98,52 +96,15 @@ class SsoController extends Controller
                 }
             }
 
-            if (!$userPayload) {
+            if (!$accessToken || !is_array($userPayload) || empty($userPayload['id'])) {
                 return redirect()->route('login')->with('error', 'Gagal mengambil data profil dari server SSO.');
             }
 
             $ssoUserId = $userPayload['id'] ?? null;
             $email = $userPayload['email'] ?? ($userPayload['username'] ? $userPayload['username'].'@kpknl.go.id' : 'user@kpknl.go.id');
             $name = $userPayload['name'] ?? 'Pengguna SSO';
-            $isSuperadmin = !empty($userPayload['is_superadmin']) && $userPayload['is_superadmin'] === true;
-
-            // 2. CHECK APPLICATION ASSIGNMENT
-            // Superadmin has universal access, otherwise verify in sso_kpknl_palembang database
-            $isAssigned = $isSuperadmin;
-
-            if (!$isAssigned && $ssoUserId) {
-                try {
-                    $pdo = new PDO('mysql:host=127.0.0.1;dbname=sso_kpknl_palembang', 'root', '');
-                    $stmt = $pdo->prepare("
-                        SELECT COUNT(*) FROM user_application ua 
-                        JOIN applications a ON ua.application_id = a.id 
-                        WHERE ua.user_id = :user_id 
-                        AND (a.id = 7 OR a.client_id = :client_id OR a.slug LIKE '%bmn%')
-                    ");
-                    $stmt->execute([
-                        'user_id' => $ssoUserId,
-                        'client_id' => $clientId,
-                    ]);
-                    $isAssigned = $stmt->fetchColumn() > 0;
-                } catch (Exception $dbEx) {
-                    Log::warning('SSO DB direct check failed: ' . $dbEx->getMessage());
-                    // Fallback to true if DB connection to SSO is inaccessible
-                    $isAssigned = true;
-                }
-            }
-
-            if (!$isAssigned) {
-                Log::warning("User {$name} (ID: {$ssoUserId}) ditolak masuk: Belum di-assign ke aplikasi Dashboard BMN.");
-                return redirect()->route('login')->with('error', "Akses Ditolak: Akun '{$name}' belum diberikan izin akses/assign ke aplikasi Executive Dashboard Pengelolaan BMN oleh Administrator SSO. Silakan hubungi Administrator KPKNL Palembang.");
-            }
-
-            // 3. User is authorized, determine role
-            $role = $userPayload['primary_role'] ?? ($userPayload['role'] ?? 'pegawai');
-            if ($isSuperadmin) {
-                $role = 'superadmin';
-            } elseif (!empty($userPayload['is_admin']) && $userPayload['is_admin'] === true) {
-                $role = 'admin';
-            }
+            $role = \App\Support\SsoRole::resolve($userPayload);
+            $role = in_array($role, ['maintenance', 'superadmin', 'admin', 'eksekutif'], true) ? $role : 'pegawai';
 
             $user = User::updateOrCreate(
                 ['email' => $email],
