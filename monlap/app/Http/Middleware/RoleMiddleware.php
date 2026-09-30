@@ -19,7 +19,14 @@ class RoleMiddleware
             return redirect('login');
         }
 
-        if (!in_array(auth()->user()->role, $roles)) {
+        $userRole = auth()->user()->role;
+
+        // Role maintenance memiliki hak akses penuh administratif setara superadmin
+        if ($userRole === 'maintenance' && (in_array('maintenance', $roles, true) || in_array('superadmin', $roles, true) || in_array('admin', $roles, true))) {
+            return $next($request);
+        }
+
+        if (!in_array($userRole, $roles, true)) {
             abort(403, 'Akses Ditolak.');
         }
 

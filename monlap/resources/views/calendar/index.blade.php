@@ -449,7 +449,7 @@
 var calendar;
 var currentSelectedDate = null;
 const userRole = '{{ Auth::user()->role }}';
-const canManageAgenda = (userRole === 'admin' || userRole === 'superadmin');
+const canManageAgenda = ['admin', 'superadmin', 'maintenance'].includes(userRole);
 
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');

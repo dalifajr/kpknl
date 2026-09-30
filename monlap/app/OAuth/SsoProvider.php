@@ -59,8 +59,8 @@ class SsoProvider extends AbstractProvider implements ProviderInterface
             'id' => $user['id'],
             'name' => $user['name'],
             'email' => $user['email'],
-            // We can also extract custom data like role, subbidang_id, etc.
-            'role' => $user['role'] ?? 'user',
+            // Extract custom data like role, subbidang_id, etc.
+            'role' => \App\Support\SsoRole::resolve($user),
             'subbidang_id' => $user['subbidang_id'] ?? null,
         ]);
     }

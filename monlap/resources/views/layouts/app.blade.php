@@ -220,8 +220,25 @@
                             </span>
                         @endif
                     </a>
-                    <div style="font-weight: 500; margin-left: 16px;">
-                        {{ auth()->user()->name }}
+                    <div style="display: flex; align-items: center; gap: 8px; margin-left: 16px;">
+                        <span style="font-weight: 500;">{{ auth()->user()->name }}</span>
+                        @if(auth()->user()->role === 'maintenance')
+                            <span class="badge" style="background: #e65100; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px;" title="Peran: Maintenance (Akses Penuh)">
+                                <i class="material-icons" style="font-size: 12px;">build</i> Maintenance
+                            </span>
+                        @elseif(auth()->user()->role === 'superadmin')
+                            <span class="badge" style="background: var(--primary); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px;" title="Peran: Superadmin">
+                                Superadmin
+                            </span>
+                        @elseif(auth()->user()->role === 'admin')
+                            <span class="badge" style="background: #0288d1; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px;" title="Peran: Admin">
+                                Admin
+                            </span>
+                        @else
+                            <span class="badge" style="background: #757575; color: #fff; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 12px;" title="Peran: User PIC">
+                                User
+                            </span>
+                        @endif
                     </div>
                     <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                         @csrf

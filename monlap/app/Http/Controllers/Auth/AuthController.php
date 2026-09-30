@@ -30,9 +30,13 @@ class AuthController extends Controller
             $user->name = $ssoUser->name;
             $user->email = $ssoUser->email;
             
-            $role = \App\Support\SsoRole::resolve($ssoUser->user ?? []);
+            $rawProfile = is_array($ssoUser->user) ? $ssoUser->user : [];
+            if (!empty($ssoUser->role) && empty($rawProfile['app_role']) && empty($rawProfile['primary_role'])) {
+                $rawProfile['app_role'] = $ssoUser->role;
+            }
+            $role = \App\Support\SsoRole::resolve($rawProfile);
             $user->role = in_array($role, ['maintenance', 'superadmin', 'admin'], true) ? $role : 'user';
-            $user->username = $ssoUser->user['username'] ?? $user->username;
+            $user->username = $ssoUser->user['username'] ?? $ssoUser->nickname ?? $user->username;
             
             $user->save();
 

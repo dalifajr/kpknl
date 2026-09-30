@@ -31,8 +31,21 @@ class MaintenanceAccessTest extends TestCase
         foreach (['tasks.index', 'tasks.create', 'reviews.index', 'calendar.index', 'dashboard'] as $route) {
             $this->get(route($route))->assertOk();
         }
-        $this->get(route('dashboard'))->assertSee('Tugas Induk')->assertSee('Membuat dan meninjau tugas');
-        $this->get(route('calendar.index'))->assertSee('url = "' . url('reviews') . '/" + props.assignment_id;', false);
+        $this->get(route('calendar.index'))
+            ->assertSee("['admin', 'superadmin', 'maintenance'].includes(userRole)", false)
+            ->assertSee('url = "' . url('reviews') . '/" + props.assignment_id;', false);
+        $this->get(route('dashboard'))
+            ->assertSee('Maintenance')
+            ->assertSee('build');
+
+        $freshUser = $user->fresh();
+        $this->assertTrue($freshUser->isMaintenance());
+        $this->assertTrue($freshUser->isSuperadmin());
+        $this->assertTrue($freshUser->isAdmin());
+        $this->assertFalse($freshUser->isUser());
+        $this->assertTrue($freshUser->hasRole('maintenance'));
+        $this->assertTrue($freshUser->hasRole(['admin', 'maintenance']));
+
         $task = Task::create(['title' => 'Uji', 'period_type' => 'bulanan']);
         $assignment = TaskAssignment::create(['task_id' => $task->id, 'user_id' => $user->id, 'status' => 'acc']);
         $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])->postJson(route('reviews.process', $assignment), ['action' => 'batal_acc'])->assertOk();
