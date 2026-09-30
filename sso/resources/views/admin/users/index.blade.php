@@ -161,7 +161,15 @@
                         </td>
                         <td>
                             @forelse($user->applications as $app)
-                                <span class="badge bg-secondary-subtle text-secondary rounded-pill me-1 mb-1 fs-8">{{ $app->name }}</span>
+                                @php
+                                    $pivotRole = $app->pivot->role ?? null;
+                                @endphp
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill me-1 mb-1 fs-8 border border-secondary-subtle">
+                                    {{ $app->name }}
+                                    @if($pivotRole)
+                                        <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5 ms-1" style="font-size: 0.65rem;">{{ $pivotRole }}</span>
+                                    @endif
+                                </span>
                             @empty
                                 <span class="text-muted fs-8">-</span>
                             @endforelse

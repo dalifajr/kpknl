@@ -101,7 +101,10 @@ class UserController extends Controller
         if ($request->has('applications')) {
             $syncData = [];
             foreach ($request->applications as $appId) {
-                $syncData[$appId] = ['assigned_by' => auth()->id()];
+                $syncData[$appId] = [
+                    'assigned_by' => auth()->id(),
+                    'role' => $request->input("app_roles.{$appId}"),
+                ];
             }
             $user->applications()->sync($syncData);
         }
@@ -127,9 +130,10 @@ class UserController extends Controller
             : Role::all();
         $applications = Application::where('status', 'active')->get();
         $userAppIds = $user->applications->pluck('id')->toArray();
+        $userAppRoles = $user->applications->pluck('pivot.role', 'id')->toArray();
         $userRoleId = $user->roles->first()?->id;
 
-        return view('admin.users.edit', compact('user', 'roles', 'applications', 'userAppIds', 'userRoleId'));
+        return view('admin.users.edit', compact('user', 'roles', 'applications', 'userAppIds', 'userAppRoles', 'userRoleId'));
     }
 
     public function update(Request $request, User $user)
@@ -185,7 +189,10 @@ class UserController extends Controller
         $syncData = [];
         if ($request->has('applications')) {
             foreach ($request->applications as $appId) {
-                $syncData[$appId] = ['assigned_by' => auth()->id()];
+                $syncData[$appId] = [
+                    'assigned_by' => auth()->id(),
+                    'role' => $request->input("app_roles.{$appId}"),
+                ];
             }
         }
         $user->applications()->sync($syncData);

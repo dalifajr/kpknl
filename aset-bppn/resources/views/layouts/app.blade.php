@@ -213,6 +213,7 @@
         @endif
         <li class="hide-on-large-only"><div class="divider"></div></li>
         <li class="hide-on-large-only"><a class="subheader">Akun</a></li>
+        <li><a href="#modalAsetRoleHelp" class="waves-effect modal-trigger"><i class="material-icons">help</i><span>Panduan Aplikasi</span></a></li>
         <li class="hide-on-large-only"><a href="#!" onclick="document.getElementById('logout-form').submit();" class="waves-effect"><i class="material-icons">exit_to_app</i><span>Logout SSO</span></a></li>
         @endauth
 
@@ -236,6 +237,8 @@
             @yield('content')
         </div>
     </main>
+
+    @include('components.role-help')
 
     {{-- Global Export Progress Modal --}}
     <div id="modalExportProgress" class="modal" style="max-width: 520px; border-radius: 12px; overflow: hidden;">

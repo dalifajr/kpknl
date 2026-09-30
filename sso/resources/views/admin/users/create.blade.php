@@ -73,12 +73,17 @@
                             @php
                                 $oldAppIds = is_array(old('applications')) ? old('applications') : [];
                                 $selectedApps = $applications->filter(fn($app) => in_array($app->id, $oldAppIds));
+                                $initialSummary = [];
+                                foreach ($selectedApps as $sa) {
+                                    $r = old('app_roles.'.$sa->id);
+                                    $initialSummary[] = $r ? "{$sa->name} ({$r})" : $sa->name;
+                                }
                             @endphp
                             <span class="d-block fw-bold text-dark fs-6" id="appSummaryTitle" style="font-family: var(--font-heading);">
                                 {{ count($selectedApps) }} Aplikasi Dipilih
                             </span>
                             <small class="text-muted fs-7" id="appSummaryText">
-                                {{ count($selectedApps) > 0 ? implode(', ', $selectedApps->pluck('name')->toArray()) : 'Belum ada aplikasi yang di-assign.' }}
+                                {{ count($initialSummary) > 0 ? implode(', ', $initialSummary) : 'Belum ada aplikasi yang di-assign.' }}
                             </small>
                         </div>
                     </div>
@@ -92,6 +97,7 @@
                 <div id="hiddenAppCheckboxes" class="d-none">
                     @foreach($applications as $app)
                         <input type="checkbox" name="applications[]" value="{{ $app->id }}" id="app_{{ $app->id }}" {{ in_array($app->id, $oldAppIds) ? 'checked' : '' }}>
+                        <input type="hidden" name="app_roles[{{ $app->id }}]" id="app_role_{{ $app->id }}" value="{{ old('app_roles.'.$app->id) }}">
                     @endforeach
                 </div>
             </div>
@@ -110,22 +116,36 @@
 @section('scripts')
 <script>
     document.getElementById('openAssignAppsModal')?.addEventListener('click', function() {
-        let appsHtml = '<div class="text-start py-2" style="max-height: 340px; overflow-y: auto;">';
+        let appsHtml = '<div class="text-start py-2" style="max-height: 360px; overflow-y: auto;">';
         @foreach($applications as $app)
             const isChecked_{{ $app->id }} = document.getElementById('app_{{ $app->id }}')?.checked ? 'checked' : '';
             appsHtml += `
                 <div class="p-3 mb-2 rounded-4 d-flex align-items-center justify-content-between" style="background-color: var(--md-sys-color-surface-container);">
-                    <div class="d-flex align-items-center gap-3 ms-1">
-                        <div class="p-2 rounded-circle text-primary" style="background-color: var(--md-sys-color-primary-container);">
+                    <div class="d-flex align-items-center gap-3 ms-1" style="max-width: 55%;">
+                        <div class="p-2 rounded-circle text-primary flex-shrink-0" style="background-color: var(--md-sys-color-primary-container);">
                             <i class="fa-solid fa-cube fs-6"></i>
                         </div>
-                        <div>
-                            <div class="fw-bold text-dark fs-6" style="font-family: var(--font-heading);">{{ addslashes($app->name) }}</div>
-                            <small class="text-muted fs-8">{{ addslashes($app->url) }}</small>
+                        <div class="overflow-hidden">
+                            <div class="fw-bold text-dark fs-6 text-truncate" style="font-family: var(--font-heading);">{{ addslashes($app->name) }}</div>
+                            <small class="text-muted fs-8 text-truncate d-block">{{ addslashes($app->url) }}</small>
                         </div>
                     </div>
-                    <div class="form-check form-switch me-2">
-                        <input class="form-check-input swal-app-switch" type="checkbox" data-app-id="{{ $app->id }}" data-app-name="{{ addslashes($app->name) }}" id="swal_app_{{ $app->id }}" ${isChecked_{{ $app->id }}} style="width: 2.5em; height: 1.25em; cursor: pointer;">
+                    <div class="d-flex align-items-center gap-2 me-2">
+                        <select class="form-select form-select-sm swal-app-role" id="swal_role_{{ $app->id }}" data-app-id="{{ $app->id }}" style="width: 155px; display: none;">
+                            <option value="">(Bawaan Akun)</option>
+                            @if(str_contains($app->slug, 'lelang') || str_contains($app->slug, 'peminjam'))
+                                <option value="peminjam">📋 Peminjam</option>
+                                <option value="pelelang">🔨 Pelelang</option>
+                                <option value="admin">🛡️ Admin</option>
+                            @else
+                                <option value="user">👤 User / Pegawai</option>
+                                <option value="operator">⚙️ Operator</option>
+                                <option value="admin">🛡️ Admin</option>
+                            @endif
+                        </select>
+                        <div class="form-check form-switch ms-1">
+                            <input class="form-check-input swal-app-switch" type="checkbox" data-app-id="{{ $app->id }}" data-app-name="{{ addslashes($app->name) }}" id="swal_app_{{ $app->id }}" ${isChecked_{{ $app->id }}} style="width: 2.5em; height: 1.25em; cursor: pointer;">
+                        </div>
                     </div>
                 </div>
             `;
@@ -133,7 +153,7 @@
         appsHtml += '</div>';
 
         Swal.fire({
-            title: 'Assign Aplikasi User',
+            title: 'Assign Aplikasi & Role User',
             html: appsHtml,
             showCancelButton: true,
             confirmButtonText: '<i class="fa-solid fa-check me-1"></i> Simpan Pilihan',
@@ -145,22 +165,47 @@
                 cancelButton: 'btn btn-tonal rounded-pill px-4'
             },
             buttonsStyling: false,
-            focusConfirm: false
+            focusConfirm: false,
+            didOpen: () => {
+                document.querySelectorAll('.swal-app-switch').forEach(el => {
+                    const appId = el.getAttribute('data-app-id');
+                    const selectEl = document.getElementById('swal_role_' + appId);
+                    const hiddenRoleEl = document.getElementById('app_role_' + appId);
+                    
+                    if (el.checked) {
+                        selectEl.style.display = 'block';
+                        if (hiddenRoleEl && hiddenRoleEl.value) {
+                            selectEl.value = hiddenRoleEl.value;
+                        }
+                    }
+
+                    el.addEventListener('change', function() {
+                        selectEl.style.display = this.checked ? 'block' : 'none';
+                        if (!this.checked) selectEl.value = '';
+                    });
+                });
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 let selectedCount = 0;
-                let selectedNames = [];
+                let summaryDetails = [];
 
                 document.querySelectorAll('.swal-app-switch').forEach(el => {
                     const appId = el.getAttribute('data-app-id');
                     const appName = el.getAttribute('data-app-name');
                     const mainCheckbox = document.getElementById('app_' + appId);
+                    const hiddenRoleEl = document.getElementById('app_role_' + appId);
+                    const selectEl = document.getElementById('swal_role_' + appId);
 
                     if (mainCheckbox) {
                         mainCheckbox.checked = el.checked;
                         if (el.checked) {
                             selectedCount++;
-                            selectedNames.push(appName);
+                            const chosenRole = selectEl ? selectEl.value : '';
+                            if (hiddenRoleEl) hiddenRoleEl.value = chosenRole;
+                            summaryDetails.push(chosenRole ? `${appName} (${chosenRole})` : `${appName}`);
+                        } else {
+                            if (hiddenRoleEl) hiddenRoleEl.value = '';
                         }
                     }
                 });
@@ -168,7 +213,7 @@
                 const titleEl = document.getElementById('appSummaryTitle');
                 const textEl = document.getElementById('appSummaryText');
                 if (titleEl) titleEl.innerText = selectedCount + ' Aplikasi Dipilih';
-                if (textEl) textEl.innerText = selectedNames.length > 0 ? selectedNames.join(', ') : 'Belum ada aplikasi yang di-assign.';
+                if (textEl) textEl.innerText = summaryDetails.length > 0 ? summaryDetails.join(', ') : 'Belum ada aplikasi yang di-assign.';
             }
         });
     });

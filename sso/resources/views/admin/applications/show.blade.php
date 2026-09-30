@@ -68,11 +68,9 @@
                 <h5 class="fw-bold mb-0" style="font-family: var(--font-heading);">
                     <i class="fa-solid fa-users me-2 text-primary"></i>User Terdaftar di Aplikasi Ini ({{ $assignedUsers->count() }})
                 </h5>
-                @if($isLelang)
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 rounded-pill fs-8">
-                        <i class="fa-solid fa-gavel me-1"></i> Peran Khusus: Admin, Pelelang, Peminjam
-                    </span>
-                @endif
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 rounded-pill fs-8">
+                    <i class="fa-solid fa-user-shield me-1"></i> Otorisasi Role Per-Aplikasi Aktif
+                </span>
             </div>
 
             <div class="table-expressive-container">
@@ -82,7 +80,7 @@
                             <tr>
                                 <th>Nama User</th>
                                 <th>Username</th>
-                                <th>{{ $isLelang ? 'Role Aplikasi (Lelang)' : 'Role' }}</th>
+                                <th>Role di Aplikasi Ini</th>
                                 <th>Di-assign Tanggal</th>
                                 <th class="text-end">Aksi</th>
                             </tr>
@@ -95,24 +93,25 @@
                                     </td>
                                     <td><code class="px-2 py-0.5 bg-light rounded text-primary">{{ $user->username }}</code></td>
                                     <td>
-                                        @if($isLelang)
-                                            @php
-                                                $appRole = $user->pivot->role ?? 'peminjam';
-                                            @endphp
-                                            <form action="{{ route('admin.applications.update-user-role', ['application' => $application->id, 'user' => $user->id]) }}" method="POST" class="d-inline-flex align-items-center gap-1">
-                                                @csrf
-                                                @method('PUT')
-                                                <select name="role" class="form-select form-select-sm py-1 px-2.5 rounded-pill border-0 fw-bold fs-8 shadow-xs" onchange="this.form.submit()" style="width: auto; cursor: pointer; background-color: {{ $appRole === 'admin' ? '#e0e7ff; color: #1e3a8a;' : ($appRole === 'pelelang' ? '#fef3c7; color: #92400e;' : '#dcfce7; color: #166534;') }}" title="Klik untuk mengubah role pada aplikasi peminjaman">
-                                                    <option value="admin" {{ $appRole === 'admin' ? 'selected' : '' }}>🛡️ Admin</option>
-                                                    <option value="pelelang" {{ $appRole === 'pelelang' ? 'selected' : '' }}>🔨 Pelelang</option>
+                                        @php
+                                            $appRole = $user->pivot->role ?? '';
+                                        @endphp
+                                        <form action="{{ route('admin.applications.update-user-role', ['application' => $application->id, 'user' => $user->id]) }}" method="POST" class="d-inline-flex align-items-center gap-1">
+                                            @csrf
+                                            @method('PUT')
+                                            <select name="role" class="form-select form-select-sm py-1 px-2.5 rounded-pill border fw-semibold fs-8 shadow-xs" onchange="this.form.submit()" style="width: auto; cursor: pointer;" title="Klik untuk mengubah role khusus pada aplikasi ini">
+                                                <option value="" {{ empty($appRole) ? 'selected' : '' }}>⚙️ Bawaan ({{ $user->roles->first()?->display_name ?? 'User' }})</option>
+                                                @if($isLelang)
                                                     <option value="peminjam" {{ $appRole === 'peminjam' ? 'selected' : '' }}>📋 Peminjam</option>
-                                                </select>
-                                            </form>
-                                        @else
-                                            <span class="badge badge-role badge-{{ $user->roles->first()?->name ?? 'user' }}">
-                                                {{ $user->roles->first()?->display_name ?? 'User' }}
-                                            </span>
-                                        @endif
+                                                    <option value="pelelang" {{ $appRole === 'pelelang' ? 'selected' : '' }}>🔨 Pelelang</option>
+                                                    <option value="admin" {{ $appRole === 'admin' ? 'selected' : '' }}>🛡️ Admin</option>
+                                                @else
+                                                    <option value="user" {{ $appRole === 'user' ? 'selected' : '' }}>👤 User / Pegawai</option>
+                                                    <option value="operator" {{ $appRole === 'operator' ? 'selected' : '' }}>⚙️ Operator</option>
+                                                    <option value="admin" {{ $appRole === 'admin' ? 'selected' : '' }}>🛡️ Admin</option>
+                                                @endif
+                                            </select>
+                                        </form>
                                     </td>
                                     <td class="text-muted">{{ $user->pivot->created_at ? $user->pivot->created_at->format('d/m/Y') : '-' }}</td>
                                     <td class="text-end">
@@ -145,17 +144,22 @@
             @if($unassignedUsers->count() > 0)
                 <form action="{{ route('admin.applications.assign-users', $application->id) }}" method="POST">
                     @csrf
-                    @if($isLelang)
-                        <div class="mb-3">
-                            <label class="form-label fs-7 fw-bold mb-1 text-dark">Pilih Role Aplikasi</label>
-                            <select name="role" class="form-select rounded-3 py-2 fw-semibold fs-7" required>
-                                <option value="admin">🛡️ Admin (Administrator Arsip / Seksi HI)</option>
+                    <div class="mb-3">
+                        <label class="form-label fs-7 fw-bold mb-1 text-dark">Pilih Role di Aplikasi Ini</label>
+                        <select name="role" class="form-select rounded-3 py-2 fw-semibold fs-7">
+                            <option value="">⚙️ Bawaan (Mengikuti Role Akun User)</option>
+                            @if($isLelang)
                                 <option value="peminjam" selected>📋 Peminjam (Pegawai / Peminjam Berkas)</option>
                                 <option value="pelelang">🔨 Pelelang (Pejabat Lelang)</option>
-                            </select>
-                            <small class="text-muted fs-8 mt-1 d-block">User yang dipilih akan memiliki peran ini di aplikasi peminjaman.</small>
-                        </div>
-                    @endif
+                                <option value="admin">🛡️ Admin (Administrator Arsip / Seksi HI)</option>
+                            @else
+                                <option value="user" selected>👤 User / Pegawai Standar</option>
+                                <option value="operator">⚙️ Operator Aplikasi</option>
+                                <option value="admin">🛡️ Admin Aplikasi</option>
+                            @endif
+                        </select>
+                        <small class="text-muted fs-8 mt-1 d-block">Role yang dipilih berlaku khusus untuk aplikasi {{ $application->name }}.</small>
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label fs-7 fw-bold mb-1">Pilih User untuk Di-assign</label>

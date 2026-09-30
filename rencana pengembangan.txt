@@ -1,53 +1,6 @@
 RENCANA PENGEMBANGAN APLIKASI SSO KPKNL DAN APLIKASI DIDALAMNYA.
 
-saya ingin dibuatkan dokumentasi dan help untuk membantu user dalam memmahami fitur pada aplikasi yang terintegerasi dalam sso seperti SI-KEP, Peminjaman Risalah Lelang, MonLap, dan Portal SSO. Dokumentasi ini akan mencakup panduan penggunaan yang akan ditampilkan pada setiap masing-masing aplikasi sesuai dengan peran user yang telah ditentukan. Dokumentasi ini akan membantu user dalam memahami fitur-fitur yang tersedia, serta memberikan panduan langkah demi langkah untuk menggunakan aplikasi dengan efektif.
 
-to
+saya ingin user maintenance dapat mengassign role user per-aplikasi. karena untuk saat ini settings role berlaku untuk seluruh aplikasi. untuk kedepannya user maintenance dapat mengatur role user per aplikasi. beritahu juga dimana menu untuk mengaturnya dan pastikan kamu mengetesnya. seperti popup, alur, logika dll. (SELESAI ✓)
 
 
-==permintaan==
-[SELESAI ✓] - lakukan analisa mendalam terlebih dahulu sebelum membuat diagram, untuk mengetahui aktor, relasi dll.
-  -> Dokumen: ANALISIS_DAN_BRAINSTORMING_PENGEMBANGAN_SSO_DAN_APLIKASI.md
-[SELESAI ✓] - jelajahi semua fitur untuk pemahaman yang lebih jelas.
-  -> Eksplorasi menyeluruh: SSO OAuth2, SI-KEP Dual-Write, Peminjaman Risalah Lelang, MonLap TODO-List.
-[SELESAI ✓] - jawab melalui dokumen yang bisa saya simpan.
-  -> Tersimpan rapi dalam berkas markdown (.md) di direktori utama d:\laragon\www.
-[SELESAI ✓] - berikan syntax diagram yang bisa saya tampilkan di draw.io. atau plantuml. atau mermaid. mana saja yang bisa saya gunakan.
-  -> Dokumen: DIAGRAM_ARSITEKTUR_ERD_USECASE_BPMN.md (Mermaid, PlantUML, Draw.io XML).
-[SELESAI ✓] - setelah itu lanjutkan dengan membuat gambar ERD dan UseCase Diagram dan Diagram BPMN.
-  -> Tersimpan di d:\laragon\www\diagram_assets\ (erd_diagram.jpg, usecase_diagram.jpg, bpmn_diagram.jpg).
-[SELESAI ✓] - tidak usah melakukan verifikasi menggunakan browser agent.
-  -> Dipatuhi secara ketat. Verifikasi dilakukan melalui unit testing & script tinker internal.
-[SELESAI ✓] - buatkan walktrough dan perencanaan serta laporan berupa file yang dapat saya baca.
-  -> Dokumen: WALKTHROUGH_PERENCANAAN_DAN_LAPORAN_PENGEMBANGAN.md.
-[SELESAI ✓] - lakukan brainstroming dan analisa mendalam serta kritik dan saran agar mendapatkan hasil yang maksimal.
-  -> Tercakup lengkap dalam ANALISIS_DAN_BRAINSTORMING_PENGEMBANGAN_SSO_DAN_APLIKASI.md.
-
-==TAMBAHAN PENYELESAIAN MASALAH FITUR & INTEGRASI==
-[SELESAI ✓] 1. Perbaikan Bug Dropdown Sync SI-KEP:
-  - Sinkronisasi derived string (pangkat_golongan_raw, per_jabatan, gender, status_gelar) di PegawaiController.
-  - Fallback column derivation di GoogleSheetSyncService.
-  - Case-insensitive column lookup di GOOGLE_APPS_SCRIPT_WEBHOOK.js.
-[SELESAI ✓] 2. Seeder Persona Pengguna SSO (UserPersonaSeeder.php):
-  - User Peminjaman (petugas_peminjaman): Admin Peminjaman, User SI-KEP.
-  - User Sekretaris (sekretaris): Peminjam di Peminjaman, User SI-KEP, Admin di MonLap.
-  - User PIC Eselon IV (pic_eselon4 & seksi): Peminjam di Peminjaman, User SI-KEP, User/PIC di MonLap.
-  - User Kepala Kantor (kepala_kantor): Superadmin di seluruh aplikasi.
-[SELESAI ✓] 3. Pemulihan Penuh & Pengaktifan Role User Maintenance di Seluruh Ekosistem:
-  - SSO Database: User maintenance (ID 18) pivot role user_application disetel ke 'maintenance' untuk seluruh aplikasi terintegrasi.
-  - SSO API (UserInfoController): Menjamin operator maintenance mengembalikan primary_role='maintenance', app_role='maintenance', dan is_maintenance=true.
-  - SI-KEP: Database SQLite diperbarui ke role 'maintenance'. Fitur teknis (Pengaturan Webhook, Uji Izin Spreadsheet, Sync-Pending, Wipe Data, Rollback) aktif sepenuhnya.
-  - Peminjaman Risalah Lelang: Kolom role diperluas ke VARCHAR(50). User model & RoleMiddleware mendukung role 'maintenance' secara native dengan hak akses penuh Administrator Arsip (Validasi, Pendaftaran, Revisi, Approval, Verifikasi).
-  - MonLap: Database MySQL diperbarui ke role 'maintenance'. Fitur teknis (Tugas Induk, Daftar Laporan, Batal ACC, Batalkan Pengisian) aktif sepenuhnya.
-[SELESAI ✓] 4. Dokumentasi & Panduan Bantuan Langkah Demi Langkah (Step-by-Step Help) Sesuai Peran:
-  - SI-KEP: Komponen role-help.blade.php menyajikan panduan terstruktur langkah demi langkah untuk Tim Maintenance, Administrator Kepegawaian, dan Pegawai Biasa.
-  - Peminjaman Risalah Lelang: Komponen role-help.blade.php menyajikan panduan alur 5 tahap untuk Tim Maintenance, Petugas Arsip Seksi HI, Pejabat Lelang, dan Peminjam Berkas. Tombol Panduan aktif terpasang di topbar bmn_master dengan atribut aria-haspopup="dialog".
-  - MonLap: Komponen role-help.blade.php menyajikan panduan operasional langkah demi langkah untuk Tim Maintenance & Superadmin, Administrator/Sekretaris, serta Staf/PIC Pelaksana.
-  - Portal SSO: Komponen role-help.blade.php menyajikan panduan langkah demi langkah untuk Tim Maintenance (Kelola Aplikasi & Hak Akses), Superadmin (Kelola Pengguna & Audit), dan Pengguna Layanan Terpadu (App Launcher & Sesi).
-
-==HASIL VERIFIKASI PENGUJIAN OTOMATIS (TEST SUITE)==
-- SI-KEP Suite Lengkap        : 41 Passed (191 assertions) - 100% Lulus
-- SSO Suite Lengkap           : 25 Passed (137 assertions) - 100% Lulus
-- MonLap Suite Lengkap        : 9 Passed (53 assertions) - 100% Lulus
-- Peminjaman (Role & Sesi)    : 8 Passed (53 assertions) - 100% Lulus
-Laporan utama: LAPORAN_PELAKSANAAN_RENCANA_20260930.md

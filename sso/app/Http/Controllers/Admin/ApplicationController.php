@@ -172,15 +172,10 @@ class ApplicationController extends Controller
         $request->validate([
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
-            'role' => 'nullable|string',
+            'role' => 'nullable|string|max:50',
         ]);
 
-        $role = $request->input('role', 'peminjam');
-        if (str_contains($application->slug, 'lelang') || str_contains($application->slug, 'peminjam')) {
-            if (!in_array($role, ['admin', 'peminjam', 'pelelang'])) {
-                $role = 'peminjam';
-            }
-        }
+        $role = $request->input('role') ?: null;
 
         $syncData = [];
         foreach ($request->user_ids as $userId) {
@@ -192,37 +187,40 @@ class ApplicationController extends Controller
 
         $application->users()->syncWithoutDetaching($syncData);
 
+        $roleLabel = $role ? "[{$role}]" : "[Bawaan Akun]";
+        $actor = auth()->user()->isSuperadmin() ? 'Superadmin' : (auth()->user()->isMaintenance() ? 'Maintenance' : 'Admin');
         ActivityLogService::log(
             'application_users_assigned',
-            "Superadmin mengassign " . count($request->user_ids) . " user ke aplikasi '{$application->name}' dengan role [{$role}]",
+            "{$actor} mengassign " . count($request->user_ids) . " user ke aplikasi '{$application->name}' dengan role {$roleLabel}",
             null,
             $application->id
         );
 
-        return back()->with('success', 'User berhasil di-assign ke aplikasi dengan role [' . $role . '].');
+        return back()->with('success', "User berhasil di-assign ke aplikasi dengan role {$roleLabel}.");
     }
 
     public function updateUserRole(Request $request, Application $application, User $user)
     {
-        $role = $request->input('role');
-        if (str_contains($application->slug, 'lelang') || str_contains($application->slug, 'peminjam')) {
-            $request->validate([
-                'role' => 'required|in:admin,peminjam,pelelang',
-            ]);
-        }
+        $request->validate([
+            'role' => 'nullable|string|max:50',
+        ]);
+
+        $role = $request->input('role') ?: null;
 
         $application->users()->updateExistingPivot($user->id, [
             'role' => $role,
         ]);
 
+        $roleLabel = $role ? "[{$role}]" : "[Bawaan Akun]";
+        $actor = auth()->user()->isSuperadmin() ? 'Superadmin' : (auth()->user()->isMaintenance() ? 'Maintenance' : 'Admin');
         ActivityLogService::log(
             'application_user_role_updated',
-            "Superadmin mengubah role user '{$user->name}' pada aplikasi '{$application->name}' menjadi '{$role}'",
+            "{$actor} mengubah role user '{$user->name}' pada aplikasi '{$application->name}' menjadi {$roleLabel}",
             $user->id,
             $application->id
         );
 
-        return back()->with('success', "Peran user '{$user->name}' pada aplikasi berhasil diperbarui menjadi [{$role}].");
+        return back()->with('success', "Peran user '{$user->name}' pada aplikasi {$application->name} berhasil diperbarui menjadi {$roleLabel}.");
     }
 
     public function revokeUser(Application $application, User $user)

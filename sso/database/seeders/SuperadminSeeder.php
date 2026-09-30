@@ -13,18 +13,33 @@ class SuperadminSeeder extends Seeder
     {
         $superadminRole = Role::where('name', 'superadmin')->first();
 
-        $user = User::updateOrCreate(
-            ['username' => 'kepala_kantor'],
+        $accounts = [
             [
+                'username' => 'kepala_kantor',
                 'name' => 'Kepala Kantor',
                 'email' => 'kepala_kantor@kpknl.go.id',
-                'password' => Hash::make('admin123'),
-                'status' => 'active',
-            ]
-        );
+            ],
+            [
+                'username' => 'mardanus',
+                'name' => 'Mardanus',
+                'email' => 'mardanus@kpknl.go.id',
+            ],
+        ];
 
-        if ($superadminRole && !$user->roles()->where('role_id', $superadminRole->id)->exists()) {
-            $user->roles()->attach($superadminRole->id);
+        foreach ($accounts as $acc) {
+            $user = User::updateOrCreate(
+                ['username' => $acc['username']],
+                [
+                    'name' => $acc['name'],
+                    'email' => $acc['email'],
+                    'password' => Hash::make('admin123'),
+                    'status' => 'active',
+                ]
+            );
+
+            if ($superadminRole && !$user->roles()->where('role_id', $superadminRole->id)->exists()) {
+                $user->roles()->attach($superadminRole->id);
+            }
         }
     }
 }

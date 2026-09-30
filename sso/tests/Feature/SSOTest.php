@@ -173,6 +173,8 @@ class SSOTest extends TestCase
             'password' => 'StrongPass123!',
         ]);
         $userResponse->assertSessionHasErrors(['login']);
+
+        \App\Models\Setting::set('maintenance_mode', 'inactive');
     }
 
     public function test_notifications_page_and_mark_all_read()
