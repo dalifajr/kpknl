@@ -26,7 +26,7 @@ class MaintenanceSeeder extends Seeder
             [
                 'name' => 'Tim Maintenance KPKNL Palembang',
                 'email' => 'maintenance@kpknl.go.id',
-                'password' => Hash::make('Password123!@#'),
+                'password' => Hash::make('Password123!'),
                 'status' => 'active',
                 'created_by' => 1,
             ]

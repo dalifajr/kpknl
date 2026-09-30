@@ -30,7 +30,7 @@ class UserPersonaSeeder extends Seeder
         $superadminUser = User::where('username', 'mardanus')->orWhere('username', 'superadmin')->first();
         $assignedById = $superadminUser ? $superadminUser->id : 1;
 
-        $defaultPassword = Hash::make('Password123!@#');
+        $defaultPassword = Hash::make('Password123!');
 
         // Helper upsert with soft-delete safety
         $upsertUser = function (string $username, array $attributes) {
@@ -50,7 +50,7 @@ class UserPersonaSeeder extends Seeder
         // PERSONA 1: User Peminjaman (Petugas Peminjaman Arsip)
         // Akses: peminjaman (role: admin), si-kep (role: user)
         // ==========================================
-        $userPeminjaman = $upsertUser('petugas_peminjaman', [
+        $userPeminjaman = $upsertUser('peminjaman', [
             'name' => 'Petugas Peminjaman Risalah Lelang',
             'email' => 'petugas.peminjaman@kpknl.go.id',
             'password' => $defaultPassword,
@@ -104,32 +104,32 @@ class UserPersonaSeeder extends Seeder
                 'email' => 'pic.eselon4@kpknl.go.id',
             ],
             [
-                'username' => 'pic_subbag_umum',
+                'username' => 'subbag_umum',
                 'name' => 'PIC Subbagian Umum',
                 'email' => 'pic.umum@kpknl.go.id',
             ],
             [
-                'username' => 'pic_seksi_pkn',
+                'username' => 'seksi_pkn',
                 'name' => 'PIC Seksi Pengelolaan Kekayaan Negara',
                 'email' => 'pic.pkn@kpknl.go.id',
             ],
             [
-                'username' => 'pic_seksi_lelang',
+                'username' => 'seksi_lelang',
                 'name' => 'PIC Seksi Pelayanan Lelang',
                 'email' => 'pic.lelang@kpknl.go.id',
             ],
             [
-                'username' => 'pic_seksi_pn',
+                'username' => 'seksi_pn',
                 'name' => 'PIC Seksi Piutang Negara',
                 'email' => 'pic.pn@kpknl.go.id',
             ],
             [
-                'username' => 'pic_seksi_hi',
+                'username' => 'seksi_hi',
                 'name' => 'PIC Seksi Hukum dan Informasi',
                 'email' => 'pic.hi@kpknl.go.id',
             ],
             [
-                'username' => 'pic_seksi_ki',
+                'username' => 'seksi_ki',
                 'name' => 'PIC Seksi Kepatuhan Internal',
                 'email' => 'pic.ki@kpknl.go.id',
             ],
@@ -162,7 +162,7 @@ class UserPersonaSeeder extends Seeder
         // PERSONA 4: User Kepala Kantor
         // Akses: Semua aplikasi dengan role superadmin
         // ==========================================
-        $userKepalaKantor = $upsertUser('kepala_kantor', [
+        $userKepalaKantor = $upsertUser('kpknlpalembang', [
             'name' => 'Kepala KPKNL Palembang',
             'email' => 'kepala.kantor@kpknl.go.id',
             'password' => $defaultPassword,
