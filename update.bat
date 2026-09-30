@@ -246,6 +246,12 @@ if exist "%SUB_APP_PATH%\artisan" (
     "%PHP_BIN%" artisan optimize:clear >nul 2>&1
     echo  [OK] Cache dibersihkan dan disegarkan.
     
+    if "%SUB_APP_NAME%"=="monlap" (
+        echo  [*] Menyinkronkan pengguna PIC MonLap dari SSO [artisan monlap:sync-sso-users]...
+        "%PHP_BIN%" artisan monlap:sync-sso-users >nul 2>&1
+        echo  [OK] User PIC MonLap tersinkronisasi.
+    )
+    
     if not exist "%SUB_APP_PATH%\public\storage" (
         echo  [*] Menghubungkan storage publik [artisan storage:link]...
         "%PHP_BIN%" artisan storage:link >nul 2>&1

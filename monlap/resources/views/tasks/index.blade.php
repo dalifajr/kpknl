@@ -214,8 +214,7 @@
         <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--divider); border-radius: 4px; padding: 10px; margin-bottom: 16px;">
             @php 
                 // Fetch users once for modal — only show PIC users, hide admin & superadmin
-                \App\Models\User::syncFromSso();
-                $allUsers = \App\Models\User::where('role', 'user')->orderBy('name', 'asc')->get();
+                $allUsers = \App\Models\User::getAssignableUsers();
             @endphp
             @forelse($allUsers as $user)
                 <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #F0F0F0;">

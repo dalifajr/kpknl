@@ -94,14 +94,29 @@ class User extends Authenticatable
         return $this->role === 'user';
     }
 
-    public static function syncFromSso()
+    public static function syncFromSso(): void
     {
         try {
+            $ssoApp = \Illuminate\Support\Facades\DB::connection('sso_db')
+                ->table('applications')
+                ->where('slug', 'monitoring')
+                ->orWhere('folder_path', 'monlap')
+                ->first();
+            $appId = $ssoApp ? $ssoApp->id : 4;
+
             $ssoUsers = \Illuminate\Support\Facades\DB::connection('sso_db')
                 ->table('user_application')
                 ->join('users', 'user_application.user_id', '=', 'users.id')
-                ->where('user_application.application_id', 4)
-                ->select('users.id', 'users.name', 'users.email', 'user_application.role as app_role')
+                ->where('user_application.application_id', $appId)
+                ->whereNull('users.deleted_at')
+                ->where('users.status', 'active')
+                ->select(
+                    'users.id',
+                    'users.name',
+                    'users.username',
+                    'users.email',
+                    'user_application.role as app_role'
+                )
                 ->get();
 
             // Fetch any privileged global roles from user_role in sso_db
@@ -113,10 +128,17 @@ class User extends Authenticatable
                 ->get()
                 ->groupBy('user_id');
 
+            $syncedSsoIds = [];
+
             foreach ($ssoUsers as $ssoUser) {
-                $user = self::where('sso_id', $ssoUser->id)->first();
+                $syncedSsoIds[] = (string) $ssoUser->id;
+
+                $user = self::where('sso_id', (string) $ssoUser->id)->first();
                 if (!$user && !empty($ssoUser->email)) {
                     $user = self::where('email', $ssoUser->email)->first();
+                }
+                if (!$user && !empty($ssoUser->username)) {
+                    $user = self::where('username', $ssoUser->username)->first();
                 }
                 if (!$user) {
                     $user = new self();
@@ -125,13 +147,22 @@ class User extends Authenticatable
                 $user->sso_id = (string) $ssoUser->id;
                 $user->name = $ssoUser->name;
                 $user->email = $ssoUser->email;
-                
-                // Determine resolved role
+                if (!empty($ssoUser->username)) {
+                    $user->username = $ssoUser->username;
+                } elseif (empty($user->username)) {
+                    $user->username = strstr($ssoUser->email, '@', true) ?: 'user_' . $ssoUser->id;
+                }
+
+                // Determine resolved role:
+                // If user is admin/superadmin/maintenance in MonLap app_role or in global_roles, they are privileged.
+                // Otherwise, they are a regular non-admin user eligible for task assignments.
                 $resolvedRole = 'user';
-                if (!empty($ssoUser->app_role) && in_array($ssoUser->app_role, ['maintenance', 'superadmin', 'admin'], true)) {
-                    $resolvedRole = $ssoUser->app_role;
+                $appRole = strtolower(trim((string) $ssoUser->app_role));
+
+                if (in_array($appRole, ['maintenance', 'superadmin', 'admin'], true)) {
+                    $resolvedRole = $appRole;
                 } elseif (isset($userRoles[$ssoUser->id])) {
-                    $rolesList = $userRoles[$ssoUser->id]->pluck('role_name')->toArray();
+                    $rolesList = $userRoles[$ssoUser->id]->pluck('role_name')->map(fn($r) => strtolower(trim($r)))->toArray();
                     if (in_array('maintenance', $rolesList, true)) {
                         $resolvedRole = 'maintenance';
                     } elseif (in_array('superadmin', $rolesList, true)) {
@@ -140,16 +171,31 @@ class User extends Authenticatable
                         $resolvedRole = 'admin';
                     }
                 }
-                
-                // If user is new, or if resolvedRole is a privileged role (maintenance, superadmin, admin)
-                if (!$user->exists || in_array($resolvedRole, ['maintenance', 'superadmin', 'admin'], true)) {
-                    $user->role = $resolvedRole;
-                }
-                
+
+                $user->role = $resolvedRole;
                 $user->save();
+            }
+
+            // Exclude users from being assignable PICs if they are no longer assigned to MonLap in SSO
+            if (!empty($syncedSsoIds)) {
+                self::where('role', 'user')
+                    ->where(function ($q) use ($syncedSsoIds) {
+                        $q->whereNotIn('sso_id', $syncedSsoIds)
+                          ->orWhereNull('sso_id');
+                    })
+                    ->update(['role' => 'unassigned']);
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('syncFromSso error: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get all users eligible to be assigned tasks (PIC) by admin and superadmin.
+     */
+    public static function getAssignableUsers()
+    {
+        self::syncFromSso();
+        return self::where('role', 'user')->orderBy('name', 'asc')->get();
     }
 }

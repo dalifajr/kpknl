@@ -28,16 +28,14 @@ class TaskController extends Controller
 
         $perPage = $request->query('per_page', 10);
         $tasks = $query->paginate($perPage)->withQueryString();
-        $users = \App\Models\User::where('role', 'user')->orderBy('name', 'asc')->get();
+        $users = \App\Models\User::getAssignableUsers();
 
         return view('tasks.index', compact('tasks', 'users', 'userId', 'search'));
     }
 
     public function create()
     {
-        // Sync & Get all users from SSO
-        \App\Models\User::syncFromSso();
-        $users = \App\Models\User::where('role', 'user')->orderBy('name', 'asc')->get();
+        $users = \App\Models\User::getAssignableUsers();
         
         return view('tasks.create', compact('users'));
     }
@@ -101,8 +99,7 @@ class TaskController extends Controller
 
     public function edit(Task $task)
     {
-        \App\Models\User::syncFromSso();
-        $users = \App\Models\User::where('role', 'user')->orderBy('name', 'asc')->get();
+        $users = \App\Models\User::getAssignableUsers();
         return view('tasks.edit', compact('task', 'users'));
     }
 
