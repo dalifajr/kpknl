@@ -114,7 +114,15 @@ class User extends Authenticatable
                 ->groupBy('user_id');
 
             foreach ($ssoUsers as $ssoUser) {
-                $user = self::firstOrNew(['sso_id' => $ssoUser->id]);
+                $user = self::where('sso_id', $ssoUser->id)->first();
+                if (!$user && !empty($ssoUser->email)) {
+                    $user = self::where('email', $ssoUser->email)->first();
+                }
+                if (!$user) {
+                    $user = new self();
+                }
+
+                $user->sso_id = (string) $ssoUser->id;
                 $user->name = $ssoUser->name;
                 $user->email = $ssoUser->email;
                 

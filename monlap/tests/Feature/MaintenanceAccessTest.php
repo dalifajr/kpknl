@@ -62,4 +62,23 @@ class MaintenanceAccessTest extends TestCase
         $this->get(route('tasks.index'))->assertForbidden();
         $this->get(route('reviews.index'))->assertForbidden();
     }
+
+    public function test_callback_handles_existing_email_with_different_or_colliding_sso_id(): void
+    {
+        // Kondisi bentrok: user target sudah ada by email, tetapi ada record lain yang memegang sso_id 18
+        $collidingUser = User::create(['sso_id' => '18', 'name' => 'Wrong Owner', 'email' => 'wrong@example.test', 'role' => 'user']);
+        $legitMaintenance = User::create(['sso_id' => null, 'name' => 'Tim Maintenance', 'email' => 'maintenance@kpknl.go.id', 'role' => 'user']);
+
+        $profile = (new SocialiteUser)->setRaw(['is_maintenance' => true, 'app_role' => 'maintenance', 'username' => 'maintenance'])
+            ->map(['id' => '18', 'name' => 'Tim Maintenance KPKNL Palembang', 'email' => 'maintenance@kpknl.go.id'])->setToken('test-token');
+        Socialite::shouldReceive('driver->user')->once()->andReturn($profile);
+
+        $this->get(route('auth.callback'))->assertRedirect(route('dashboard'));
+
+        // Harus berhasil login sebagai legitMaintenance dengan sso_id 18 dan role maintenance
+        $this->assertSame($legitMaintenance->id, auth()->id());
+        $this->assertSame('18', $legitMaintenance->fresh()->sso_id);
+        $this->assertSame('maintenance', $legitMaintenance->fresh()->role);
+        $this->assertNull($collidingUser->fresh()->sso_id);
+    }
 }

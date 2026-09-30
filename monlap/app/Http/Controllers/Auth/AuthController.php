@@ -26,9 +26,52 @@ class AuthController extends Controller
                 $ssoUser = Socialite::driver('sso')->stateless()->user();
             }
             
-            $user = User::firstOrNew(['sso_id' => $ssoUser->id]);
+            $ssoId = (string) $ssoUser->id;
+            $email = $ssoUser->email;
+            $username = $ssoUser->user['username'] ?? $ssoUser->nickname ?? null;
+            if (empty($username) && !empty($email)) {
+                $username = explode('@', $email)[0];
+            }
+
+            // 1. Cari berdasarkan email terlebih dahulu (identitas unik utama)
+            $user = null;
+            if (!empty($email)) {
+                $user = User::where('email', $email)->first();
+            }
+
+            // 2. Jika tidak ditemukan via email, cari via sso_id
+            if (!$user && !empty($ssoId)) {
+                $user = User::where('sso_id', $ssoId)->first();
+            }
+
+            // 3. Jika tidak ditemukan, cari via username
+            if (!$user && !empty($username)) {
+                $user = User::where('username', $username)->first();
+            }
+
+            // 4. Jika baru sama sekali, instansiasi
+            if (!$user) {
+                $user = new User();
+            }
+
+            // 5. Bersihkan sso_id pada record lain yang mungkin bentrok
+            if (!empty($ssoId)) {
+                User::where('sso_id', $ssoId)
+                    ->where('id', '!=', $user->id ?? 0)
+                    ->update(['sso_id' => null]);
+            }
+
+            // 6. Bersihkan username pada record lain jika bentrok
+            if (!empty($username)) {
+                User::where('username', $username)
+                    ->where('id', '!=', $user->id ?? 0)
+                    ->update(['username' => null]);
+            }
+
+            $user->sso_id = $ssoId;
             $user->name = $ssoUser->name;
-            $user->email = $ssoUser->email;
+            $user->email = $email;
+            $user->username = $username;
             
             $rawProfile = is_array($ssoUser->user) ? $ssoUser->user : [];
             if (!empty($ssoUser->role) && empty($rawProfile['app_role']) && empty($rawProfile['primary_role'])) {
@@ -36,7 +79,6 @@ class AuthController extends Controller
             }
             $role = \App\Support\SsoRole::resolve($rawProfile);
             $user->role = in_array($role, ['maintenance', 'superadmin', 'admin'], true) ? $role : 'user';
-            $user->username = $ssoUser->user['username'] ?? $ssoUser->nickname ?? $user->username;
             
             $user->save();
 
