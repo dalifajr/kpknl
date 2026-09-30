@@ -61,35 +61,45 @@ class TaskSyncService
         $deadlineDate = null;
         $openDate = null;
 
-        $rule = (int) $task->deadline_rule; 
-        
-        switch ($task->period_type) {
+        $periodType = strtolower(trim((string) $task->period_type));
+
+        // Ekstrak angka batas tanggal jika deadline_rule berbentuk teks atau integer
+        $rule = (int) $task->deadline_rule;
+        if ($rule <= 0 && is_string($task->deadline_rule) && preg_match('/\b\d+\b/', $task->deadline_rule, $matches)) {
+            $rule = (int) $matches[0];
+        }
+
+        // Default baseline tanggal periode
+        $baseDate = Carbon::create($now->year, $now->month, 1)->startOfDay();
+        $endOfPeriod = $now->copy()->endOfMonth()->endOfDay();
+
+        switch ($periodType) {
             case 'bulanan':
                 $label = $now->translatedFormat('F Y');
-                $baseDate = Carbon::create($now->year, $now->month, 1);
-                $endOfPeriod = $now->copy()->endOfMonth();
+                $baseDate = Carbon::create($now->year, $now->month, 1)->startOfDay();
+                $endOfPeriod = $now->copy()->endOfMonth()->endOfDay();
                 break;
                 
             case 'triwulan':
-                $quarter = ceil($now->month / 3);
+                $quarter = (int) ceil($now->month / 3);
                 $label = "Triwulan {$quarter} {$now->year}";
                 $lastMonthOfQuarter = $quarter * 3;
-                $baseDate = Carbon::create($now->year, $lastMonthOfQuarter - 2, 1);
-                $endOfPeriod = Carbon::create($now->year, $lastMonthOfQuarter, 1)->endOfMonth();
+                $baseDate = Carbon::create($now->year, $lastMonthOfQuarter - 2, 1)->startOfDay();
+                $endOfPeriod = Carbon::create($now->year, $lastMonthOfQuarter, 1)->endOfMonth()->endOfDay();
                 break;
 
             case 'semesteran':
                 $semester = $now->month <= 6 ? 1 : 2;
                 $label = "Semester {$semester} {$now->year}";
                 $lastMonthOfSemester = $semester == 1 ? 6 : 12;
-                $baseDate = Carbon::create($now->year, $semester == 1 ? 1 : 7, 1);
-                $endOfPeriod = Carbon::create($now->year, $lastMonthOfSemester, 1)->endOfMonth();
+                $baseDate = Carbon::create($now->year, $semester == 1 ? 1 : 7, 1)->startOfDay();
+                $endOfPeriod = Carbon::create($now->year, $lastMonthOfSemester, 1)->endOfMonth()->endOfDay();
                 break;
 
             case 'tahunan':
                 $label = "Tahun {$now->year}";
-                $baseDate = Carbon::create($now->year, 1, 1);
-                $endOfPeriod = $now->copy()->endOfYear();
+                $baseDate = Carbon::create($now->year, 1, 1)->startOfDay();
+                $endOfPeriod = $now->copy()->endOfYear()->endOfDay();
                 break;
                 
             case 'tidak rutin':
@@ -99,15 +109,23 @@ class TaskSyncService
                 if (!$task->custom_start_date || !$task->custom_end_date) {
                     return null;
                 }
-                $start = Carbon::parse($task->custom_start_date);
-                $end = Carbon::parse($task->custom_end_date);
+                $start = Carbon::parse($task->custom_start_date)->startOfDay();
+                $end = Carbon::parse($task->custom_end_date)->endOfDay();
                 $label = "Custom (" . $start->format('d/m') . " - " . $end->format('d/m') . ")";
-                $openDate = $start;
-                $deadlineDate = $end->endOfDay();
+                return [
+                    'label' => $label,
+                    'open_date' => $start->format('Y-m-d'),
+                    'deadline_date' => $end->format('Y-m-d'),
+                ];
+
+            default:
+                $label = ucfirst($periodType ?: 'bulanan') . ' ' . $now->translatedFormat('F Y');
+                $baseDate = Carbon::create($now->year, $now->month, 1)->startOfDay();
+                $endOfPeriod = $now->copy()->endOfMonth()->endOfDay();
                 break;
         }
 
-        if ($task->period_type !== 'custom') {
+        if ($periodType !== 'custom') {
             if ($task->deadline_next_month) {
                 // If deadline is in the next month after the cycle ends
                 $baseDate = $endOfPeriod->copy()->addDay()->startOfDay();
@@ -121,7 +139,7 @@ class TaskSyncService
                 }
             } else {
                 if ($task->deadline_next_month) {
-                    $deadlineDate = $baseDate->copy()->endOfMonth();
+                    $deadlineDate = $baseDate->copy()->endOfMonth()->endOfDay();
                 } else {
                     $deadlineDate = $endOfPeriod->copy()->endOfDay();
                 }

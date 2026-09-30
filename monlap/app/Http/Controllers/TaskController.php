@@ -247,57 +247,70 @@ class TaskController extends Controller
         $task->custom_start_date = $request->custom_start_date;
         $task->custom_end_date = $request->custom_end_date;
 
-        if ($task->period_type === 'tidak rutin' || !$task->period_type) {
+        $periodType = strtolower(trim((string) $task->period_type));
+
+        if ($periodType === 'tidak rutin' || !$periodType) {
             return response()->json(null);
         }
 
         $now = \Carbon\Carbon::now();
         $label = '';
         $deadlineDate = null;
-        $baseDate = null;
-        $endOfPeriod = null;
 
+        // Ekstrak angka batas tanggal jika deadline_rule berbentuk teks atau integer
         $rule = (int) $task->deadline_rule;
+        if ($rule <= 0 && is_string($task->deadline_rule) && preg_match('/\b\d+\b/', $task->deadline_rule, $matches)) {
+            $rule = (int) $matches[0];
+        }
+
+        // Default baseline tanggal periode
+        $baseDate = \Carbon\Carbon::create($now->year, $now->month, 1)->startOfDay();
+        $endOfPeriod = $now->copy()->endOfMonth()->endOfDay();
         
-        switch ($task->period_type) {
+        switch ($periodType) {
             case 'bulanan':
                 $label = $now->translatedFormat('F Y');
-                $baseDate = \Carbon\Carbon::create($now->year, $now->month, 1);
-                $endOfPeriod = $now->copy()->endOfMonth();
+                $baseDate = \Carbon\Carbon::create($now->year, $now->month, 1)->startOfDay();
+                $endOfPeriod = $now->copy()->endOfMonth()->endOfDay();
                 break;
             case 'triwulan':
                 $quarter = ceil($now->month / 3);
                 $label = "Triwulan {$quarter} {$now->year}";
                 $lastMonthOfQuarter = $quarter * 3;
-                $baseDate = \Carbon\Carbon::create($now->year, $lastMonthOfQuarter - 2, 1);
-                $endOfPeriod = \Carbon\Carbon::create($now->year, $lastMonthOfQuarter, 1)->endOfMonth();
+                $baseDate = \Carbon\Carbon::create($now->year, $lastMonthOfQuarter - 2, 1)->startOfDay();
+                $endOfPeriod = \Carbon\Carbon::create($now->year, $lastMonthOfQuarter, 1)->endOfMonth()->endOfDay();
                 break;
             case 'semesteran':
                 $semester = $now->month <= 6 ? 1 : 2;
                 $label = "Semester {$semester} {$now->year}";
                 $lastMonthOfSemester = $semester == 1 ? 6 : 12;
-                $baseDate = \Carbon\Carbon::create($now->year, $semester == 1 ? 1 : 7, 1);
-                $endOfPeriod = \Carbon\Carbon::create($now->year, $lastMonthOfSemester, 1)->endOfMonth();
+                $baseDate = \Carbon\Carbon::create($now->year, $semester == 1 ? 1 : 7, 1)->startOfDay();
+                $endOfPeriod = \Carbon\Carbon::create($now->year, $lastMonthOfSemester, 1)->endOfMonth()->endOfDay();
                 break;
             case 'tahunan':
                 $label = "Tahun {$now->year}";
-                $baseDate = \Carbon\Carbon::create($now->year, 1, 1);
-                $endOfPeriod = $now->copy()->endOfYear();
+                $baseDate = \Carbon\Carbon::create($now->year, 1, 1)->startOfDay();
+                $endOfPeriod = $now->copy()->endOfYear()->endOfDay();
                 break;
             case 'custom':
                 if (!$task->custom_start_date || !$task->custom_end_date) {
                     return response()->json(null);
                 }
-                $start = \Carbon\Carbon::parse($task->custom_start_date);
-                $end = \Carbon\Carbon::parse($task->custom_end_date);
+                $start = \Carbon\Carbon::parse($task->custom_start_date)->startOfDay();
+                $end = \Carbon\Carbon::parse($task->custom_end_date)->endOfDay();
                 $label = "Custom (" . $start->format('d/m') . " - " . $end->format('d/m') . ")";
                 $deadlineDate = $end->copy()->endOfDay();
+                break;
+            default:
+                $label = ucfirst($periodType) . ' ' . $now->translatedFormat('F Y');
+                $baseDate = \Carbon\Carbon::create($now->year, $now->month, 1)->startOfDay();
+                $endOfPeriod = $now->copy()->endOfMonth()->endOfDay();
                 break;
         }
 
         $skippedDays = [];
 
-        if ($task->period_type !== 'custom') {
+        if ($periodType !== 'custom') {
             if ($task->deadline_next_month) {
                 $baseDate = $endOfPeriod->copy()->addDay()->startOfDay();
             }
@@ -362,18 +375,18 @@ class TaskController extends Controller
         }
 
         $nextPeriodStr = null;
-        if ($task->is_recurring && $task->recurring_interval && $task->period_type === 'custom') {
+        if ($task->is_recurring && $task->recurring_interval && $periodType === 'custom') {
             if ($task->recurring_interval === 'daily') $nextPeriodStr = $start->copy()->addDay()->translatedFormat('d F Y');
             if ($task->recurring_interval === 'weekly') $nextPeriodStr = $start->copy()->addWeek()->translatedFormat('d F Y');
             if ($task->recurring_interval === 'monthly') $nextPeriodStr = $start->copy()->addMonth()->translatedFormat('F Y');
             if ($task->recurring_interval === 'triwulan') $nextPeriodStr = $start->copy()->addMonths(3)->translatedFormat('F Y');
             if ($task->recurring_interval === 'semesteran') $nextPeriodStr = $start->copy()->addMonths(6)->translatedFormat('F Y');
             if ($task->recurring_interval === 'yearly') $nextPeriodStr = $start->copy()->addYear()->translatedFormat('Y');
-        } elseif ($task->period_type !== 'custom') {
-            if ($task->period_type === 'bulanan') $nextPeriodStr = $now->copy()->addMonth()->translatedFormat('F Y');
-            if ($task->period_type === 'triwulan') $nextPeriodStr = "Triwulan Selanjutnya";
-            if ($task->period_type === 'semesteran') $nextPeriodStr = "Semester Selanjutnya";
-            if ($task->period_type === 'tahunan') $nextPeriodStr = $now->copy()->addYear()->translatedFormat('Y');
+        } elseif ($periodType !== 'custom') {
+            if ($periodType === 'bulanan') $nextPeriodStr = $now->copy()->addMonth()->translatedFormat('F Y');
+            if ($periodType === 'triwulan') $nextPeriodStr = "Triwulan Selanjutnya";
+            if ($periodType === 'semesteran') $nextPeriodStr = "Semester Selanjutnya";
+            if ($periodType === 'tahunan') $nextPeriodStr = $now->copy()->addYear()->translatedFormat('Y');
         }
 
         return response()->json([

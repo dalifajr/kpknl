@@ -129,14 +129,17 @@
                     </td>
                     <td style="padding: 12px 8px;">
                         <span style="color: var(--text-secondary); font-size: 13px;">
-                            @if($task->period_type === 'custom' && $task->is_recurring)
-                                {{ date('d M', strtotime($task->custom_end_date)) }} (Berulang)
-                            @elseif($task->period_type === 'custom')
-                                {{ date('d M Y', strtotime($task->custom_end_date)) }}
-                            @elseif($task->period_type === 'tidak rutin')
-                                {{ $task->deadline_rule ? date('d M Y', strtotime($task->deadline_rule)) : '-' }}
+                            @php
+                                $normPeriod = strtolower(trim((string)$task->period_type));
+                            @endphp
+                            @if($normPeriod === 'custom' && $task->is_recurring)
+                                {{ $task->custom_end_date ? date('d M', strtotime($task->custom_end_date)) : '-' }} (Berulang)
+                            @elseif($normPeriod === 'custom')
+                                {{ $task->custom_end_date ? date('d M Y', strtotime($task->custom_end_date)) : '-' }}
+                            @elseif($normPeriod === 'tidak rutin')
+                                {{ $task->deadline_rule && strtotime($task->deadline_rule) ? date('d M Y', strtotime($task->deadline_rule)) : ($task->deadline_rule ?: '-') }}
                             @else
-                                {{ $currentPeriod && $currentPeriod['deadline_date'] ? date('d M Y', strtotime($currentPeriod['deadline_date'])) : 'Tgl ' . $task->deadline_rule }}
+                                {{ $currentPeriod && !empty($currentPeriod['deadline_date']) ? date('d M Y', strtotime($currentPeriod['deadline_date'])) : ($task->deadline_rule ? 'Tgl ' . $task->deadline_rule : '-') }}
                             @endif
                         </span>
                     </td>
