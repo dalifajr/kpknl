@@ -1,7 +1,6 @@
  PERBAIKAN APLIKASI SI-KEP;
 
 1. Kemudian saat saya melakukan perubahan baik itu edit, create, data pegawai dari SI-KEP, data tersebut tidak ter-write pada spreadsheet. data yang dirubah pada awalnya tampil pada aplikasi si-kep. namun karena data tida ter-write pada spreadsheet, saat saya klik sinkronisasi, data kembali ke kondisi awal sebelum diedit karena mengikuti data pada spreadsheet yang tidak terwrite.
-
 catat untuk kamu;
 - lakukan brainstorming dan analisa kritik dan saran sebelum melakukan eksekusi.
 - pelajari error dengan seksama.

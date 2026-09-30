@@ -130,4 +130,6 @@ diagram_assets/
 
 /referensi_desain
 /teraskota
-teraskota
+
+keep-awake.bat
+keep-awake.ps1
