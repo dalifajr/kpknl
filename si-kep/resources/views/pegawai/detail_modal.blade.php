@@ -1,8 +1,5 @@
-<div class="modal-header border-0 pb-3 pt-3 px-4 bg-white d-flex align-items-center justify-content-between border-bottom flex-wrap gap-2">
-    <div class="d-flex align-items-center gap-2 flex-wrap">
-        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-xs" id="btnHeaderBackToList" onclick="backToAggregateList()" style="display: none;" title="Kembali ke daftar pegawai sebelumnya">
-            <i class="fas fa-arrow-left me-1.5"></i> <span id="btnHeaderBackToListText">Kembali ke Daftar</span>
-        </button>
+<div class="modal-header border-0 pb-3 pt-3 px-4 bg-white d-flex align-items-center justify-content-between border-bottom">
+    <div class="d-flex align-items-center gap-2">
         <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill" style="font-size: 0.75rem; letter-spacing: 0.05em;">
             <i class="fas fa-id-card me-1"></i> PROFIL PEGAWAI
         </span>
@@ -10,20 +7,7 @@
             {{ strtoupper($pegawai->tipe_pegawai) }} DEFINITIF
         </span>
     </div>
-    <div class="d-flex align-items-center gap-2 flex-wrap">
-        <!-- Prev / Next Navigation Controls in Header -->
-        <div class="btn-group btn-group-sm rounded-pill border shadow-xs overflow-hidden me-1" id="headerNavGroup" style="display: none;" role="group">
-            <button type="button" class="btn btn-light px-2.5 py-1 text-secondary" id="btnPrevPegawai" onclick="navigatePegawaiDetail(-1)" title="Pegawai Sebelumnya">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <span class="btn btn-light px-2 py-1 text-muted fw-semibold border-start border-end" style="font-size: 0.72rem; pointer-events: none;" id="pegawaiNavCounter">
-                1 / 1
-            </span>
-            <button type="button" class="btn btn-light px-2.5 py-1 text-secondary" id="btnNextPegawai" onclick="navigatePegawaiDetail(1)" title="Pegawai Selanjutnya">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-
+    <div class="d-flex align-items-center gap-2">
         @auth
             @if(in_array(auth()->user()->role, ['superadmin', 'maintenance', 'administrator']))
                 <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs" onclick="openPegawaiFormModal({{ $pegawai->id }})" title="Ubah Data Pegawai">
@@ -34,7 +18,7 @@
         <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 text-muted" onclick="window.print()" title="Cetak Ringkasan Profil">
             <i class="fas fa-print me-1"></i> Cetak
         </button>
-        <button type="button" class="btn-close ms-1" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 </div>
 
@@ -456,15 +440,13 @@
 </div>
 
 <div class="modal-footer border-top px-4 py-3 bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <div class="d-flex align-items-center gap-2">
-        <button type="button" class="btn btn-outline-primary rounded-pill px-3 py-1.5 shadow-xs" id="btnFooterBackToList" onclick="backToAggregateList()" style="display: none;">
-            <i class="fas fa-arrow-left me-1.5"></i> <span id="btnFooterBackToListText">Kembali ke Daftar Pegawai</span>
-        </button>
-        <div class="small text-muted" id="footerDbLabel">
-            <i class="fas fa-database text-primary me-1"></i> Database SI-KEP KPKNL Palembang
-        </div>
+    <div class="small text-muted" id="footerDbLabel">
+        <i class="fas fa-database text-primary me-1"></i> Database SI-KEP KPKNL Palembang
     </div>
     <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-outline-primary rounded-pill px-3 py-1.5 shadow-xs" id="btnFooterBackToList" onclick="backToAggregateList()" style="display: none;" title="Kembali ke daftar pegawai sebelumnya">
+            <i class="fas fa-arrow-left me-1.5"></i> <span id="btnFooterBackToListText">Kembali</span>
+        </button>
         <div class="btn-group btn-group-sm rounded-pill border shadow-xs overflow-hidden" id="footerNavGroup" style="display: none;">
             <button type="button" class="btn btn-light px-3 py-1.5 text-secondary" onclick="navigatePegawaiDetail(-1)" id="btnFooterPrev" title="Lihat Pegawai Sebelumnya">
                 <i class="fas fa-chevron-left me-1"></i> Sebelumnya

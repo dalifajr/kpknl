@@ -514,14 +514,15 @@ class KepegawaianViewsTest extends TestCase
             'lama_bertugas_ue_iv' => '4 thn 2 bln',
         ]);
 
-        // 1. Cek detail modal memiliki tombol navigasi dan fungsi kembali
+        // 1. Cek detail modal hanya memiliki tombol navigasi di bagian bawah (footer) dan teks 'Kembali'
         $detailResponse = $this->actingAs($user)->get("/pegawai/{$pegawai->id}/detail");
         $detailResponse->assertStatus(200);
-        $detailResponse->assertSee('btnHeaderBackToList', false);
+        $detailResponse->assertDontSee('btnHeaderBackToList', false);
+        $detailResponse->assertDontSee('headerNavGroup', false);
         $detailResponse->assertSee('btnFooterBackToList', false);
+        $detailResponse->assertSee('Kembali', false);
         $detailResponse->assertSee('backToAggregateList()', false);
         $detailResponse->assertSee('navigatePegawaiDetail', false);
-        $detailResponse->assertSee('headerNavGroup', false);
         $detailResponse->assertSee('footerNavGroup', false);
 
         // 2. Cek filter modal memiliki data-pegawai-id untuk navigasi dinamis

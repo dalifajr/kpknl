@@ -636,10 +636,10 @@
             });
         }
 
-        // Update navigation buttons (Kembali ke Daftar & Prev / Next) inside Detail Modal
+        // Update navigation buttons (Kembali & Prev / Next) inside Detail Modal
         function updateDetailModalNavigation() {
             if (!window.hasPreviousListModal) {
-                $('#btnHeaderBackToList, #btnFooterBackToList, #headerNavGroup, #footerNavGroup').hide();
+                $('#btnFooterBackToList, #footerNavGroup').hide();
                 return;
             }
 
@@ -647,32 +647,28 @@
             const currId = window.currentPegawaiId;
             const currIndex = ids.indexOf(currId);
             const total = ids.length;
-            const listTitle = window.previousListTitle || 'Daftar Pegawai';
 
-            // Show and update Back to List buttons
-            $('#btnHeaderBackToList, #btnFooterBackToList').show();
-            const shortTitle = listTitle.length > 25 ? listTitle.substring(0, 22) + '...' : listTitle;
-            $('#btnHeaderBackToListText').text('Kembali ke ' + shortTitle);
-            $('#btnFooterBackToListText').text('Kembali ke ' + listTitle);
+            // Show Back button with text "Kembali"
+            $('#btnFooterBackToList').show();
+            $('#btnFooterBackToListText').text('Kembali');
 
             // Configure Prev / Next navigation
             if (total > 1 && currIndex !== -1) {
-                $('#headerNavGroup, #footerNavGroup').show();
-                $('#pegawaiNavCounter').text((currIndex + 1) + ' / ' + total);
+                $('#footerNavGroup').show();
 
                 if (currIndex > 0) {
-                    $('#btnPrevPegawai, #btnFooterPrev').prop('disabled', false).removeClass('disabled opacity-50');
+                    $('#btnFooterPrev').prop('disabled', false).removeClass('disabled opacity-50');
                 } else {
-                    $('#btnPrevPegawai, #btnFooterPrev').prop('disabled', true).addClass('disabled opacity-50');
+                    $('#btnFooterPrev').prop('disabled', true).addClass('disabled opacity-50');
                 }
 
                 if (currIndex < total - 1) {
-                    $('#btnNextPegawai, #btnFooterNext').prop('disabled', false).removeClass('disabled opacity-50');
+                    $('#btnFooterNext').prop('disabled', false).removeClass('disabled opacity-50');
                 } else {
-                    $('#btnNextPegawai, #btnFooterNext').prop('disabled', true).addClass('disabled opacity-50');
+                    $('#btnFooterNext').prop('disabled', true).addClass('disabled opacity-50');
                 }
             } else {
-                $('#headerNavGroup, #footerNavGroup').hide();
+                $('#footerNavGroup').hide();
             }
         }
 
