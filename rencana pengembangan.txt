@@ -3,4 +3,6 @@ RENCANA PENGEMBANGAN APLIKASI SSO KPKNL DAN APLIKASI DIDALAMNYA.
 
 saya ingin user maintenance dapat mengassign role user per-aplikasi. karena untuk saat ini settings role berlaku untuk seluruh aplikasi. untuk kedepannya user maintenance dapat mengatur role user per aplikasi. beritahu juga dimana menu untuk mengaturnya dan pastikan kamu mengetesnya. seperti popup, alur, logika dll. (SELESAI ✓)
 
+pembuatan laman dokumentasi pada aplikasi sso kpknl palembang dengan isi yang menyesuaikan setiap role user, fitur download pdf resmi, dan penjelasan detail seluruh fitur sso. (SELESAI ✓)
+
 
