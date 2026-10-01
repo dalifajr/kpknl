@@ -877,6 +877,10 @@
                 data: formData,
                 processData: false,
                 contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'Accept': 'application/json'
+                },
                 success: function(res) {
                     submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Data Pegawai');
                     if (res.success) {
@@ -945,11 +949,18 @@
                         }
                     });
 
+                    const deleteUrl = "{{ route('pegawai.destroy', ['id' => ':id']) }}".replace(':id', id);
+
                     $.ajax({
-                        url: `/pegawai/${id}`,
-                        type: 'DELETE',
+                        url: deleteUrl,
+                        type: 'POST',
+                        data: {
+                            _method: 'DELETE',
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
                         headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                            'Accept': 'application/json'
                         },
                         success: function(res) {
                             if (res.success) {
@@ -957,7 +968,7 @@
                                     title: 'Berhasil Dihapus!',
                                     text: res.message,
                                     icon: 'success',
-                                    timer: 2500,
+                                    timer: 2000,
                                     showConfirmButton: false
                                 }).then(() => {
                                     window.location.reload();
@@ -970,6 +981,14 @@
                             let msg = 'Terjadi kesalahan saat menghapus data pegawai.';
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 msg = xhr.responseJSON.message;
+                            } else if (xhr.status === 404) {
+                                msg = 'Data pegawai atau rute tidak ditemukan di server (404).';
+                            } else if (xhr.status === 403) {
+                                msg = 'Akses ditolak: Hanya role Admin dan Superadmin yang berwenang menghapus data pegawai.';
+                            } else if (xhr.status === 419) {
+                                msg = 'Sesi telah berakhir atau CSRF token kedaluwarsa. Silakan refresh halaman dan coba kembali.';
+                            } else if (xhr.statusText) {
+                                msg += ' (' + xhr.status + ' ' + xhr.statusText + ')';
                             }
                             Swal.fire('Gagal Menghapus', msg, 'error');
                         }
