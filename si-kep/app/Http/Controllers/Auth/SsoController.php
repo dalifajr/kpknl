@@ -109,7 +109,12 @@ class SsoController extends Controller
             }
 
             // 3. Find or Create Local User
+            $ssoUserId = $ssoUser['id'] ?? null;
             $email = $ssoUser['email'] ?? ($ssoUser['username'] . '@kpknl.go.id');
+            $username = $ssoUser['username'] ?? explode('@', $email)[0];
+            $name = $ssoUser['name'] ?? $username;
+            $avatarUrl = $ssoUser['avatar_url'] ?? null;
+
             $role = \App\Support\SsoRole::resolve($ssoUser);
             $role = match ($role) {
                 'maintenance', 'superadmin', 'administrator' => $role,
@@ -117,16 +122,47 @@ class SsoController extends Controller
                 default => 'user',
             };
 
-            $localUser = User::updateOrCreate(
-                ['sso_user_id' => $ssoUser['id']],
-                [
-                    'name' => $ssoUser['name'],
-                    'username' => $ssoUser['username'] ?? explode('@', $email)[0],
+            // Cari user lokal: prioritas email (identitas unik utama), lalu sso_user_id, lalu username
+            $localUser = null;
+            if (!empty($email)) {
+                $localUser = User::where('email', $email)->first();
+            }
+
+            if (!$localUser && !empty($ssoUserId)) {
+                $localUser = User::where('sso_user_id', $ssoUserId)->first();
+            }
+
+            if (!$localUser && !empty($username)) {
+                $localUser = User::where('username', $username)->first();
+            }
+
+            // Bersihkan sso_user_id pada record lain yang mungkin bentrok untuk menjaga unique constraint
+            if (!empty($ssoUserId)) {
+                User::where('sso_user_id', $ssoUserId)
+                    ->when($localUser, fn ($q) => $q->where('id', '!=', $localUser->id))
+                    ->update(['sso_user_id' => null]);
+            }
+
+            if ($localUser) {
+                $localUser->update([
+                    'sso_user_id' => $ssoUserId,
+                    'name' => $name,
+                    'username' => $username,
+                    'email' => $email,
+                    'role' => $role,
+                    'avatar_url' => $avatarUrl ?? $localUser->avatar_url,
+                ]);
+            } else {
+                $localUser = User::create([
+                    'sso_user_id' => $ssoUserId,
+                    'name' => $name,
+                    'username' => $username,
                     'email' => $email,
                     'role' => $role,
                     'password' => bcrypt(Str::random(32)),
-                ]
-            );
+                    'avatar_url' => $avatarUrl,
+                ]);
+            }
 
             // 4. Authenticate in SI-KEP Application and persist SSO token in session
             session([
