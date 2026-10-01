@@ -914,6 +914,70 @@
             });
         });
 
+        // Global Delete Pegawai Confirmation & Execution (Admin & Superadmin)
+        function confirmDeletePegawai(id, nama, nip) {
+            // Close detail modal if open
+            const detailModalEl = bootstrap.Modal.getInstance(document.getElementById('pegawaiDetailModal'));
+            if (detailModalEl) {
+                detailModalEl.hide();
+            }
+
+            Swal.fire({
+                title: 'Hapus Data Pegawai?',
+                html: `Apakah Anda yakin ingin menghapus data pegawai <strong>${nama}</strong> (NIP: ${nip || '-'})?<br><br><div class="alert alert-danger text-start small mb-0"><i class="fas fa-triangle-exclamation me-1"></i> <strong>Perhatian:</strong> Data pegawai akan dihapus secara permanen dari aplikasi SI-KEP dan baris yang bersangkutan akan dihapus dari Google Spreadsheet.</div>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Ya, Hapus Pegawai',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                focusCancel: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Memproses Penghapusan...',
+                        html: 'Sedang menghapus data lokal dan baris Google Spreadsheet...',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        url: `/pegawai/${id}`,
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    title: 'Berhasil Dihapus!',
+                                    text: res.message,
+                                    icon: 'success',
+                                    timer: 2500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Gagal Menghapus', res.message || 'Terjadi kesalahan.', 'error');
+                            }
+                        },
+                        error: function(xhr) {
+                            let msg = 'Terjadi kesalahan saat menghapus data pegawai.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+                            Swal.fire('Gagal Menghapus', msg, 'error');
+                        }
+                    });
+                }
+            });
+        }
+
         // Wipe Data Trigger with Double Confirmation SweetAlert
         $('#btnWipeDataTrigger').on('click', function() {
             // Hide settings modal first to release Bootstrap 5 focus trap so SweetAlert input can be clicked & typed into

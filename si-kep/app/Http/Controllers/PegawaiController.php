@@ -294,7 +294,7 @@ class PegawaiController extends Controller
     public function getFormData($id = null)
     {
         $user = Auth::user();
-        if (!$user || !in_array($user->role, ['superadmin', 'maintenance', 'administrator'])) {
+        if (!$user || !in_array($user->role, ['superadmin', 'admin', 'administrator', 'maintenance'])) {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
 
@@ -310,13 +310,13 @@ class PegawaiController extends Controller
     }
 
     /**
-     * Store New Pegawai (Superadmin & Maintenance only) with Dual-Write
+     * Store New Pegawai (Admin, Superadmin & Maintenance) with Dual-Write
      */
     public function store(Request $request, GoogleSheetSyncService $syncService)
     {
         $user = Auth::user();
-        if (!$user || !in_array($user->role, ['superadmin', 'maintenance', 'administrator'])) {
-            return response()->json(['success' => false, 'message' => 'Hanya Superadmin dan Maintenance yang berwenang menambah pegawai.'], 403);
+        if (!$user || !in_array($user->role, ['superadmin', 'admin', 'administrator', 'maintenance'])) {
+            return response()->json(['success' => false, 'message' => 'Hanya Admin dan Superadmin yang berwenang menambah pegawai.'], 403);
         }
 
         $request->validate([
@@ -441,13 +441,13 @@ class PegawaiController extends Controller
     }
 
     /**
-     * Update Existing Pegawai (Superadmin & Maintenance only) with Dual-Write
+     * Update Existing Pegawai (Admin, Superadmin & Maintenance) with Dual-Write
      */
     public function update(Request $request, $id, GoogleSheetSyncService $syncService)
     {
         $user = Auth::user();
-        if (!$user || !in_array($user->role, ['superadmin', 'maintenance', 'administrator'])) {
-            return response()->json(['success' => false, 'message' => 'Hanya Superadmin dan Maintenance yang berwenang mengubah data pegawai.'], 403);
+        if (!$user || !in_array($user->role, ['superadmin', 'admin', 'administrator', 'maintenance'])) {
+            return response()->json(['success' => false, 'message' => 'Hanya Admin dan Superadmin yang berwenang mengubah data pegawai.'], 403);
         }
 
         $pegawai = Pegawai::findOrFail($id);
@@ -619,5 +619,82 @@ class PegawaiController extends Controller
         }
         $file->move($targetDir, $filename);
         return 'avatars/' . $filename;
+    }
+
+    /**
+     * Delete Pegawai (Admin & Superadmin) with Dual-Write Delete to Google Spreadsheet
+     */
+    public function destroy(Request $request, $id, GoogleSheetSyncService $syncService)
+    {
+        $user = Auth::user();
+        if (!$user || !in_array($user->role, ['superadmin', 'admin', 'administrator', 'maintenance'])) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak: Hanya role Admin dan Superadmin yang berwenang menghapus data pegawai.'
+                ], 403);
+            }
+            abort(403, 'Akses ditolak: Hanya role Admin dan Superadmin yang berwenang menghapus data pegawai.');
+        }
+
+        $pegawai = Pegawai::findOrFail($id);
+        $pegawaiNama = $pegawai->nama;
+        $pegawaiNip = $pegawai->nip;
+        $payloadBefore = $pegawai->toArray();
+
+        DB::beginTransaction();
+        try {
+            // Nullify reference if pegawai is kepala unit
+            UnitKerja::where('kepala_pegawai_id', $pegawai->id)->update(['kepala_pegawai_id' => null]);
+
+            // Record ChangeLog before deletion
+            $log = ChangeLog::create([
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'pegawai_id' => null,
+                'nama_pegawai' => $pegawaiNama,
+                'nip' => $pegawaiNip,
+                'action' => 'delete',
+                'description' => "Penghapusan data personil pegawai: {$pegawaiNama} (NIP: " . ($pegawaiNip ?: '-') . ")",
+                'payload_before' => $payloadBefore,
+                'payload_after' => null,
+                'sync_status' => 'pending',
+            ]);
+
+            // Delete avatar if exists
+            if (!empty($pegawai->avatar_url) && Storage::disk('public')->exists($pegawai->avatar_url)) {
+                Storage::disk('public')->delete($pegawai->avatar_url);
+            }
+
+            // Delete record from database
+            $pegawai->delete();
+
+            DB::commit();
+
+            // Dual-Write Delete to Google Spreadsheet via Webhook
+            $syncResult = $syncService->pushRowDelete($log);
+
+            $message = "Data pegawai {$pegawaiNama} berhasil dihapus dari aplikasi SI-KEP! " .
+                ($syncResult['success'] ? 'Baris di Google Spreadsheet berhasil dihapus.' : 'Pemberitahuan: ' . ($syncResult['message'] ?? 'Perubahan belum tersinkron ke spreadsheet.'));
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'sync' => $syncResult,
+                ]);
+            }
+
+            return redirect()->route('pegawai.index')->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghapus data pegawai: ' . $e->getMessage(),
+                ], 500);
+            }
+            return redirect()->route('pegawai.index')->with('error', 'Gagal menghapus data pegawai: ' . $e->getMessage());
+        }
     }
 }

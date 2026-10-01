@@ -6,7 +6,7 @@
 
 @section('header-actions')
     @auth
-        @if(in_array(auth()->user()->role, ['superadmin', 'maintenance', 'administrator']))
+        @if(in_array(auth()->user()->role, ['superadmin', 'admin', 'administrator', 'maintenance']))
             <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 shadow-sm fw-semibold text-primary" onclick="openPegawaiFormModal()">
                 <i class="fas fa-user-plus me-1"></i> Tambah Pegawai
             </button>
@@ -109,7 +109,7 @@
                             <th style="min-width: 170px;">Seksi / Unit Kerja</th>
                             <th style="min-width: 120px;">Gol. / Grade</th>
                             <th style="min-width: 130px;">Usia &amp; MK</th>
-                            <th class="text-end pe-4" style="width: 90px;">Aksi</th>
+                            <th class="text-end pe-4" style="width: 100px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -157,10 +157,19 @@
                                     <div class="fw-semibold text-dark">{{ $p->usia_tahun }} Thn {{ $p->usia_bulan }} Bln</div>
                                     <div class="small text-muted" style="font-size: 0.74rem;">MK: {{ $p->masa_kerja_tahun }} Thn</div>
                                 </td>
-                                <td class="text-end pe-4" onclick="event.stopPropagation(); showPegawaiDetail({{ $p->id }});">
-                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 34px; height: 34px; padding: 0;" title="Lihat Profil Lengkap">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                <td class="text-end pe-4" onclick="event.stopPropagation();">
+                                    <div class="d-inline-flex gap-1 justify-content-end">
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 34px; height: 34px; padding: 0;" title="Lihat Profil Lengkap" onclick="showPegawaiDetail({{ $p->id }});">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        @auth
+                                            @if(in_array(auth()->user()->role, ['superadmin', 'admin', 'administrator', 'maintenance']))
+                                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle" style="width: 34px; height: 34px; padding: 0;" title="Hapus Data Pegawai" onclick="confirmDeletePegawai({{ $p->id }}, '{{ addslashes($p->nama) }}', '{{ $p->nip }}')">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            @endif
+                                        @endauth
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

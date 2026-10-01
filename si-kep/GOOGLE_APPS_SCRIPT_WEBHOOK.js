@@ -95,7 +95,8 @@ function doPost(e) {
     var data = payload.row_data || payload.data || {};
     var targetNip = cleanNip(payload.nip || data.NIP || data.nip);
     var lookupNip = cleanNip(payload.original_nip || targetNip);
-    if (!targetNip) throw new Error('NIP wajib diisi untuk menentukan baris pegawai.');
+    var targetNama = normalizeSheetText(payload.nama || data.NAMA || data.nama).toUpperCase();
+    if (!targetNip && !targetNama) throw new Error('NIP atau Nama wajib diisi untuk menentukan baris pegawai.');
     var nipCol = colMap['NIP'] || 3;
     var dataStartRow = headerRowIndex + 1;
 
@@ -124,7 +125,41 @@ function doPost(e) {
     // A retry after a successful NIP change must find the updated row.
     if (targetRow === -1 && currentNipRow !== -1) targetRow = currentNipRow;
 
-    // 5. Tangani Penambahan Data Baru (CREATE)
+    // Fallback: Jika targetRow belum ditemukan berdasarkan NIP, coba cari berdasarkan NAMA
+    if (targetRow === -1 && targetNama && colMap['NAMA'] && lastRow >= dataStartRow) {
+      var namaCol = colMap['NAMA'];
+      var namaRange = sheet.getRange(dataStartRow, namaCol, (lastRow - dataStartRow + 1), 1).getValues();
+      for (var j = 0; j < namaRange.length; j++) {
+        var cellNama = normalizeSheetText(namaRange[j][0]).toUpperCase();
+        if (cellNama === targetNama) {
+          targetRow = dataStartRow + j;
+          break;
+        }
+      }
+    }
+
+    // 5. Tangani Penghapusan Data Pegawai (DELETE / DESTROY)
+    if (action === 'delete' || action === 'destroy') {
+      if (targetRow === -1) {
+        return respondJson({
+          status: "error",
+          message: "Pegawai dengan identitas '" + (targetNip || targetNama) + "' tidak ditemukan di Google Spreadsheet."
+        });
+      }
+
+      sheet.deleteRow(targetRow);
+      SpreadsheetApp.flush();
+
+      return respondJson({
+        status: "success",
+        message: "Data pegawai " + (payload.nama || data.nama || targetNip) + " berhasil dihapus dari baris " + targetRow + " Google Spreadsheet.",
+        row: targetRow,
+        nip: targetNip,
+        action: "delete"
+      });
+    }
+
+    // 6. Tangani Penambahan Data Baru (CREATE)
     if (action === 'create' || (action === 'update' && targetRow === -1 && targetNip)) {
       if (targetRow === -1) {
         // Cari baris akhir data PNS (sebelum banner motto / baris kosong sebelum PPNPN)

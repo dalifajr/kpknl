@@ -91,10 +91,10 @@ class ChangeLogController extends Controller
 
         $log = ChangeLog::findOrFail($id);
 
-        if ($log->action === 'rollback') {
+        if ($log->action === 'rollback' || $log->action === 'delete') {
             return response()->json([
                 'success' => false,
-                'message' => 'Log ini adalah entri rollback dan tidak dapat di-rollback kembali secara langsung.',
+                'message' => 'Log ini tidak dapat di-rollback secara otomatis.',
             ], 422);
         }
 

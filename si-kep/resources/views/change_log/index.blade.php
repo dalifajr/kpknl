@@ -192,6 +192,10 @@
                                         <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5 fw-bold" style="font-size: 0.68rem;">
                                             <i class="fas fa-plus me-1"></i>TAMBAH BARU
                                         </span>
+                                    @elseif(strtoupper($log->action) === 'DELETE')
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5 fw-bold" style="font-size: 0.68rem;">
+                                            <i class="fas fa-trash-alt me-1"></i>HAPUS DATA
+                                        </span>
                                     @elseif(strtoupper($log->action) === 'ROLLBACK')
                                         <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-0.5 fw-bold" style="font-size: 0.68rem;">
                                             <i class="fas fa-rotate-left me-1"></i>ROLLBACK
@@ -251,7 +255,7 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
 
-                                    @if($log->action !== 'rollback' && in_array(auth()->user()?->role, ['superadmin', 'maintenance', 'administrator']))
+                                    @if(!in_array($log->action, ['rollback', 'delete']) && in_array(auth()->user()?->role, ['superadmin', 'maintenance', 'administrator', 'admin']))
                                         <button type="button" class="btn btn-sm btn-outline-warning text-warning-emphasis rounded-circle" 
                                                 style="width: 32px; height: 32px; padding: 0;" 
                                                 onclick="event.stopPropagation(); confirmRollback({{ $log->id }}, '{{ addslashes($log->nama_pegawai) }}', '{{ $log->action }}')"

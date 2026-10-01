@@ -752,7 +752,7 @@ class GoogleSheetSyncService
         }
 
         try {
-            $payload = $log->payload_after ?? [];
+            $payload = !empty($log->payload_after) ? $log->payload_after : ($log->payload_before ?? []);
 
             // Fallback derivation for derived columns from foreign keys
             $pangkatRaw = $payload['pangkat_golongan_raw'] ?? null;
@@ -842,7 +842,7 @@ class GoogleSheetSyncService
                 ]);
                 return [
                     'success' => true,
-                    'message' => 'Berhasil disinkronkan ke Google Spreadsheet.',
+                    'message' => $log->action === 'delete' ? 'Berhasil dihapus dari Google Spreadsheet.' : 'Berhasil disinkronkan ke Google Spreadsheet.',
                 ];
             } else {
                 $errMsg = "HTTP " . $response->status() . ": " . substr($response->body(), 0, 200);
@@ -867,6 +867,14 @@ class GoogleSheetSyncService
                 'pending' => true,
             ];
         }
+    }
+
+    /**
+     * Push a delete action to Google Spreadsheet via Apps Script Webhook
+     */
+    public function pushRowDelete(\App\Models\ChangeLog $log): array
+    {
+        return $this->pushRowUpdate($log);
     }
 
     /**

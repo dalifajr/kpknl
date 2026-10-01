@@ -9,9 +9,12 @@
     </div>
     <div class="d-flex align-items-center gap-2">
         @auth
-            @if(in_array(auth()->user()->role, ['superadmin', 'maintenance', 'administrator']))
+            @if(in_array(auth()->user()->role, ['superadmin', 'admin', 'administrator', 'maintenance']))
                 <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs" onclick="openPegawaiFormModal({{ $pegawai->id }})" title="Ubah Data Pegawai">
                     <i class="fas fa-user-pen me-1"></i> Edit
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-xs" onclick="confirmDeletePegawai({{ $pegawai->id }}, '{{ addslashes($pegawai->nama) }}', '{{ $pegawai->nip }}')" title="Hapus Data Pegawai">
+                    <i class="fas fa-trash-alt me-1"></i> Hapus
                 </button>
             @endif
         @endauth

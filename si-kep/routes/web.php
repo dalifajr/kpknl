@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/pegawai/form-data/{id?}', [PegawaiController::class, 'getFormData'])->name('pegawai.form_data');
     Route::post('/pegawai/store', [PegawaiController::class, 'store'])->name('pegawai.store');
     Route::post('/pegawai/{id}/update', [PegawaiController::class, 'update'])->name('pegawai.update');
+    Route::delete('/pegawai/{id}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy');
+    Route::post('/pegawai/{id}/delete', [PegawaiController::class, 'destroy']);
     Route::get('/pegawai/{id}/detail', [PegawaiController::class, 'detail'])->name('pegawai.detail');
 
     // 3. Struktur & Jabatan
