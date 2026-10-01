@@ -71,6 +71,9 @@ class DiagramController extends Controller
             ->whereNotNull('tmt_ue_iv')
             ->where('tmt_ue_iv', '!=', '')
             ->where('tmt_ue_iv', '!=', '-')
+            ->whereNotNull('lama_bertugas_ue_iv')
+            ->where('lama_bertugas_ue_iv', '!=', '')
+            ->where('lama_bertugas_ue_iv', '!=', '-')
             ->with(['unitKerja', 'pangkatGolongan'])
             ->get()
             ->filter(function ($p) {

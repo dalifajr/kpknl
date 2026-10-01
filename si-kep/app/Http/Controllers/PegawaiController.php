@@ -262,15 +262,17 @@ class PegawaiController extends Controller
             case 'ue_iv':
                 $context = 'ue_iv';
                 if (!$request->filled('title')) {
-                    $title = 'Daftar Pegawai Unit Eselon IV (Urutan Masa Tugas Terlama ke Terbaru)';
+                    $title = 'Penugasan Eselon 4';
                 }
+                $query->whereNotNull('tmt_ue_iv')
+                      ->where('tmt_ue_iv', '!=', '')
+                      ->where('tmt_ue_iv', '!=', '-')
+                      ->whereNotNull('lama_bertugas_ue_iv')
+                      ->where('lama_bertugas_ue_iv', '!=', '')
+                      ->where('lama_bertugas_ue_iv', '!=', '-');
+
                 if ($value) {
                     $query->where('unit_kerja_id', $value);
-                } else {
-                    $query->where(function ($q) {
-                        $q->where('unit_kerja_id', '!=', 8)
-                          ->orWhereNull('unit_kerja_id');
-                    });
                 }
                 $pegawais = $query->get()
                     ->sortByDesc(function ($p) {

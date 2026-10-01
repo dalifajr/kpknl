@@ -95,14 +95,14 @@
         </div>
     </div>
 
-    <!-- Pegawai Unit Eselon IV (Masa Tugas Terlama ke Terbaru) -->
+    <!-- Penugasan Eselon 4 (Masa Tugas Terlama ke Terbaru) -->
     <div class="col-sm-6 col-xl-2">
         <div class="card shadow-sm border-0 h-100 border-start border-4 border-success card-clickable transition-all" style="border-left-color: #059669 !important;"
-             onclick="showAggregateModal('ue_iv', '', 'Daftar Pegawai Unit Eselon IV (Urutan Masa Tugas Terlama ke Terbaru)')"
-             title="Klik untuk melihat daftar pegawai unit Eselon IV urut masa tugas">
+             onclick="showAggregateModal('ue_iv', '', 'Penugasan Eselon 4')"
+             title="Klik untuk melihat daftar Penugasan Eselon 4 urut masa tugas">
             <div class="card-body p-3">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Pegawai Eselon IV</small>
+                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Penugasan Eselon 4</small>
                     <i class="fas fa-business-time opacity-50" style="color: #059669;"></i>
                 </div>
                 <h3 class="fw-bold mb-0" style="color: #059669;">{{ $totalUeIv }}</h3>
@@ -306,20 +306,20 @@
     </div>
 </div>
 
-<!-- Card Tabel: Daftar Pegawai Unit Eselon IV (Urutan Masa Tugas Terlama ke Terbaru) -->
+<!-- Card Tabel: Penugasan Eselon 4 -->
 <div class="row g-4 mb-4">
     <div class="col-12">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
                     <h6 class="mb-0 fw-bold text-dark">
-                        <i class="fas fa-business-time text-success me-2"></i>Masa Penugasan Pegawai di Unit Eselon IV (Seksi &amp; Subbagian)
+                        <i class="fas fa-business-time text-success me-2"></i>Penugasan Eselon 4
                     </h6>
-                    <small class="text-muted" style="font-size: 0.75rem;">Diurutkan secara berjenjang dari aparatur dengan masa tugas terlama ke paling baru untuk evaluasi rotasi &amp; penyegaran kerja</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Masa Penugasan Pegawai di Unit Eselon IV (Seksi &amp; Subbagian) &bull; Diurutkan secara berjenjang dari aparatur dengan masa tugas terlama ke paling baru untuk evaluasi rotasi &amp; penyegaran kerja</small>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-success-subtle text-success border border-success-subtle">{{ $totalUeIv }} Aparatur Eselon IV</span>
-                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="showAggregateModal('ue_iv', '', 'Daftar Pegawai Unit Eselon IV (Urutan Masa Tugas Terlama ke Terbaru)')">
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">{{ $totalUeIv }} Aparatur Eselon 4</span>
+                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="showAggregateModal('ue_iv', '', 'Penugasan Eselon 4')">
                         Buka Modal <i class="fas fa-up-right-from-square ms-1"></i>
                     </button>
                 </div>
@@ -328,7 +328,7 @@
                 @if($ueIvPegawaiList->isEmpty())
                     <div class="text-center py-5 text-muted">
                         <i class="fas fa-circle-check fs-2 text-success mb-2"></i>
-                        <p class="mb-0">Tidak ada data personil pada unit Eselon IV.</p>
+                        <p class="mb-0">Tidak ada data personil pada Penugasan Eselon 4.</p>
                     </div>
                 @else
                     <div class="table-responsive p-3 w-100">
@@ -383,7 +383,7 @@
                 @endif
             </div>
             <div class="card-footer bg-white border-top py-2 px-3 d-flex justify-content-between align-items-center">
-                <small class="text-muted"><i class="fas fa-info-circle me-1"></i> Data diperbarui otomatis dari rekam jejak TMT penugasan unit Eselon IV</small>
+                <small class="text-muted"><i class="fas fa-info-circle me-1"></i> Data diperbarui otomatis dari rekam jejak TMT Penugasan Eselon 4</small>
                 <a href="{{ route('pegawai.index') }}" class="btn btn-sm btn-link text-success p-0 text-decoration-none small fw-semibold">
                     Direktori Pegawai Lengkap <i class="fas fa-arrow-right ms-1"></i>
                 </a>

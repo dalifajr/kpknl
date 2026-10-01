@@ -32,7 +32,7 @@ class KepegawaianViewsTest extends TestCase
         $response->assertDontSee('Distribusi Formasi Personil per Seksi & Subbagian');
         $response->assertDontSee('onclick="openPegawaiFormModal()"', false);
         $response->assertSee('Total Personil');
-        $response->assertSee('Pegawai Eselon IV');
+        $response->assertSee('Penugasan Eselon 4');
         $response->assertDontSee('Seksi / Subbag');
         $response->assertSee('Masa Penugasan Pegawai di Unit Eselon IV');
         $response->assertSee('tableUeIvDashboard');
@@ -159,7 +159,57 @@ class KepegawaianViewsTest extends TestCase
         // 4. Eselon IV tenure ranking filter
         $response = $this->actingAs($user)->get('/pegawai/filter-modal?type=ue_iv');
         $response->assertStatus(200);
-        $response->assertSee('Daftar Pegawai Unit Eselon IV');
+        $response->assertSee('Penugasan Eselon 4');
+    }
+
+    public function test_penugasan_eselon_4_filters_out_pegawai_without_valid_tmt_and_lama_bertugas(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+
+        Pegawai::create([
+            'no_urut' => 1,
+            'nip' => '198501012010121001',
+            'nama' => 'Pegawai Eselon 4 Valid',
+            'nama_jabatan_raw' => 'Pelaksana Seksi PKN',
+            'tmt_ue_iv' => '15/7/2022',
+            'lama_bertugas_ue_iv' => '4 thn 2 bln',
+            'is_active' => true,
+        ]);
+
+        Pegawai::create([
+            'no_urut' => 2,
+            'nip' => '198601012010121002',
+            'nama' => 'Pegawai Tanpa Eselon 4',
+            'nama_jabatan_raw' => 'Kepala Kantor',
+            'tmt_ue_iv' => null,
+            'lama_bertugas_ue_iv' => null,
+            'is_active' => true,
+        ]);
+
+        Pegawai::create([
+            'no_urut' => 3,
+            'nip' => '198701012010121003',
+            'nama' => 'Pegawai Strip Eselon 4',
+            'nama_jabatan_raw' => 'Pelaksana Umum',
+            'tmt_ue_iv' => '-',
+            'lama_bertugas_ue_iv' => '-',
+            'is_active' => true,
+        ]);
+
+        // Filter modal test
+        $modalResponse = $this->actingAs($user)->get('/pegawai/filter-modal?type=ue_iv');
+        $modalResponse->assertStatus(200);
+        $modalResponse->assertSee('Penugasan Eselon 4');
+        $modalResponse->assertSee('Pegawai Eselon 4 Valid');
+        $modalResponse->assertDontSee('Pegawai Tanpa Eselon 4');
+        $modalResponse->assertDontSee('Pegawai Strip Eselon 4');
+
+        // Dashboard test
+        $dashResponse = $this->actingAs($user)->get('/');
+        $dashResponse->assertStatus(200);
+        $dashResponse->assertSee('Pegawai Eselon 4 Valid');
+        $dashResponse->assertDontSee('Pegawai Tanpa Eselon 4');
+        $dashResponse->assertDontSee('Pegawai Strip Eselon 4');
     }
 
     public function test_pegawai_pp17_2020_pensiun_calculation(): void

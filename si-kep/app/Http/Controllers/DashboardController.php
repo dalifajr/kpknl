@@ -87,12 +87,14 @@ class DashboardController extends Controller
             $q->where('tipe_pegawai', 'ppnpn')->where('is_active', true);
         }])->orderBy('urutan')->get();
 
-        // Pegawai Unit Eselon IV (Seksi & Subbagian) diurutkan dari masa tugas terlama ke terbaru
+        // Pegawai Penugasan Eselon 4 diurutkan dari masa tugas terlama ke terbaru
         $ueIvPegawaiList = Pegawai::where('is_active', true)
-            ->where(function ($q) {
-                $q->where('unit_kerja_id', '!=', 8)
-                  ->orWhereNull('unit_kerja_id');
-            })
+            ->whereNotNull('tmt_ue_iv')
+            ->where('tmt_ue_iv', '!=', '')
+            ->where('tmt_ue_iv', '!=', '-')
+            ->whereNotNull('lama_bertugas_ue_iv')
+            ->where('lama_bertugas_ue_iv', '!=', '')
+            ->where('lama_bertugas_ue_iv', '!=', '-')
             ->with(['unitKerja', 'pangkatGolongan'])
             ->get()
             ->sortByDesc(function ($p) {
