@@ -8,11 +8,12 @@ use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\UnitKerjaController;
 use Illuminate\Support\Facades\Route;
 
-// Authentication via SSO KPKNL Palembang
+// Authentication via SSO KPKNL Palembang (Direct SSO Redirection)
 Route::get('/login', [SsoController::class, 'showLogin'])->name('login');
+Route::get('/auth/sso', [SsoController::class, 'redirect']);
 Route::get('/auth/sso/redirect', [SsoController::class, 'redirect'])->name('sso.redirect');
 Route::get('/auth/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
-Route::post('/logout', [SsoController::class, 'logout'])->name('logout');
+Route::match(['get', 'post'], '/logout', [SsoController::class, 'logout'])->name('logout');
 
 // Protected Routes (Accessible by Authenticated Users)
 Route::middleware('auth')->group(function () {

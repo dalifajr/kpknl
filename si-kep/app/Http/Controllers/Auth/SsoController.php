@@ -14,15 +14,68 @@ use Exception;
 class SsoController extends Controller
 {
     /**
-     * Show dedicated Login Page without text/password form
+     * Resolve SSO base URL adapting dynamically to current request host (e.g. LAN IP 10.24.7.207 vs localhost).
      */
-    public function showLogin()
+    protected function getSsoBaseUrl(Request $request): string
+    {
+        $baseUrl = env('SSO_BASE_URL', 'http://localhost/sso/public');
+        $currentHost = $request->getHost();
+
+        if ($currentHost && !in_array(strtolower($currentHost), ['localhost', '127.0.0.1'])) {
+            $parsed = parse_url($baseUrl);
+            $targetHost = $parsed['host'] ?? 'localhost';
+            if (in_array(strtolower($targetHost), ['localhost', '127.0.0.1'])) {
+                $scheme = $request->getScheme();
+                $port = $request->getPort() && !in_array($request->getPort(), [80, 443]) ? ':' . $request->getPort() : '';
+                $path = $parsed['path'] ?? '/sso/public';
+                return "{$scheme}://{$currentHost}{$port}{$path}";
+            }
+        }
+
+        return rtrim($baseUrl, '/');
+    }
+
+    /**
+     * Resolve SSO Redirect URI matching current request host dynamically.
+     */
+    protected function getRedirectUri(Request $request): string
+    {
+        $configuredUri = env('SSO_REDIRECT_URI');
+        if ($configuredUri) {
+            $currentHost = $request->getHost();
+            if ($currentHost && !in_array(strtolower($currentHost), ['localhost', '127.0.0.1'])) {
+                $parsed = parse_url($configuredUri);
+                $targetHost = $parsed['host'] ?? 'localhost';
+                if (in_array(strtolower($targetHost), ['localhost', '127.0.0.1'])) {
+                    $scheme = $request->getScheme();
+                    $port = $request->getPort() && !in_array($request->getPort(), [80, 443]) ? ':' . $request->getPort() : '';
+                    $path = $parsed['path'] ?? '/si-kep/public/auth/sso/callback';
+                    return "{$scheme}://{$currentHost}{$port}{$path}";
+                }
+            }
+            return $configuredUri;
+        }
+
+        return url('/auth/sso/callback');
+    }
+
+    /**
+     * Direct redirect to SSO KPKNL Palembang login / authorization page.
+     * Eliminates intermediate landing screen as requested.
+     */
+    public function showLogin(Request $request)
     {
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
 
-        return view('auth.login');
+        // If an explicit error occurred (e.g. CSRF state mismatch or auth canceled),
+        // render the login error card so the user can inspect the issue and retry.
+        if (session('error')) {
+            return view('auth.login');
+        }
+
+        return $this->redirect($request);
     }
 
     /**
@@ -30,9 +83,19 @@ class SsoController extends Controller
      */
     public function redirect(Request $request)
     {
-        $ssoBaseUrl = rtrim(env('SSO_BASE_URL', 'http://sso.test'), '/');
+        if (Auth::check() && !$request->has('force') && !$request->has('reauth')) {
+            return redirect()->route('dashboard');
+        }
+
+        if ($request->has('force') || $request->has('reauth')) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        $ssoBaseUrl = $this->getSsoBaseUrl($request);
         $clientId = env('SSO_CLIENT_ID', 'client_simpatik_kepegawaian');
-        $redirectUri = env('SSO_REDIRECT_URI', url('/auth/sso/callback'));
+        $redirectUri = $this->getRedirectUri($request);
         $state = Str::random(40);
 
         session(['sso_state' => $state]);
@@ -69,10 +132,10 @@ class SsoController extends Controller
         session()->forget('sso_state');
 
         try {
-            $ssoBaseUrl = rtrim(env('SSO_BASE_URL', 'http://sso.test'), '/');
+            $ssoBaseUrl = $this->getSsoBaseUrl($request);
             $clientId = env('SSO_CLIENT_ID', 'client_simpatik_kepegawaian');
             $clientSecret = env('SSO_CLIENT_SECRET', 'secret_simpatik_kpknl_2026');
-            $redirectUri = env('SSO_REDIRECT_URI', url('/auth/sso/callback'));
+            $redirectUri = $this->getRedirectUri($request);
 
             // 1. Exchange Authorization Code for Access Token
             $response = Http::asForm()->timeout(15)->post($ssoBaseUrl . '/oauth/token', [
@@ -182,7 +245,7 @@ class SsoController extends Controller
     }
 
     /**
-     * Logout and destroy session
+     * Logout and destroy session, returning to SSO Portal Dashboard
      */
     public function logout(Request $request)
     {
@@ -191,6 +254,7 @@ class SsoController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('success', 'Anda telah berhasil keluar dari sistem SI-KEP.');
+        $ssoDashboardUrl = $this->getSsoBaseUrl($request) . '/dashboard';
+        return redirect($ssoDashboardUrl);
     }
 }
