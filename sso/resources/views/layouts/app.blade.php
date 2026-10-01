@@ -835,6 +835,7 @@
                     </li>
                     <li><a class="dropdown-item py-1.5 rounded my-0.5 fs-7" href="{{ route('profile.show') }}"><i class="fa-regular fa-user me-2 text-primary"></i> Profil Saya</a></li>
                     <li><a class="dropdown-item py-1.5 rounded my-0.5 fs-7" href="{{ route('login-sessions.index') }}"><i class="fa-solid fa-laptop-code me-2 text-primary"></i> Aktivitas Sesi Login</a></li>
+                    <li><a class="dropdown-item py-1.5 rounded my-0.5 fs-7" href="{{ route('documentation.index') }}"><i class="fa-solid fa-book-bookmark me-2 text-primary"></i> Buku Panduan & Fitur</a></li>
                     <li><hr class="dropdown-divider my-1"></li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
@@ -922,6 +923,16 @@
                     <a href="{{ route('profile.show') }}" class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
                         <i class="fa-regular fa-id-card"></i>
                         <span>Pengaturan Profil</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-heading">Bantuan & Informasi</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="{{ route('documentation.index') }}" class="sidebar-link {{ request()->routeIs('documentation.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                        <span>Buku Panduan & Fitur</span>
                     </a>
                 </li>
             </ul>

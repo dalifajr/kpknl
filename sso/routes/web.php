@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\MaintenanceOrchestratorController;
 use App\Http\Controllers\User\LoginSessionController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DocumentationController;
 use App\Http\Controllers\OAuth\AuthorizationController;
 use App\Http\Controllers\OAuth\TokenController;
 
@@ -90,6 +91,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Activity Logs
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+
+    // Buku Panduan & Dokumentasi Fitur SSO
+    Route::get('/documentation', [DocumentationController::class, 'index'])->name('documentation.index');
+    Route::get('/documentation/download-pdf', [DocumentationController::class, 'downloadPdf'])->name('documentation.pdf');
 
 
     // OAuth Authorization Endpoint (user consent / launch app)

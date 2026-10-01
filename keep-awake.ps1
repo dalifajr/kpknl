@@ -3,7 +3,7 @@
     KPKNL Palembang - Windows Keep Awake & Anti-Lock System
 .DESCRIPTION
     Mencegah layar laptop meredup, mati, atau terkunci otomatis (sleep / auto-lock)
-    dengan menggerakkan kursor 1 piksel secara periodik dan menyegarkan
+    dengan menggerakkan kursor 50 piksel secara periodik dan menyegarkan
     Windows Thread Execution State via Win32 API.
     100% User-Space | Tanpa Hak Administrator (Non-UAC) | Aman & Ringan.
 #>
@@ -37,11 +37,11 @@ public class NativeAwake {
         // Beritahu Windows Kernel untuk menjaga monitor dan CPU tetap aktif
         SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
         
-        // Gerakkan kursor 1px ke kanan lalu kembalikan ke posisi awal
+        // Gerakkan kursor 50px ke kanan lalu kembalikan ke posisi awal
         // Memicu hardware input event nyata sehingga timer idle OS di-reset
-        mouse_event(MOUSEEVENTF_MOVE, 1, 0, 0, UIntPtr.Zero);
+        mouse_event(MOUSEEVENTF_MOVE, 50, 0, 0, UIntPtr.Zero);
         System.Threading.Thread.Sleep(50);
-        mouse_event(MOUSEEVENTF_MOVE, -1, 0, 0, UIntPtr.Zero);
+        mouse_event(MOUSEEVENTF_MOVE, -50, 0, 0, UIntPtr.Zero);
     }
 
     public static void RestoreSleep() {
@@ -96,7 +96,7 @@ Write-Host " WAKTU MULAI            : " -NoNewline; Write-Host (Get-Date -Format
 Write-Host "-------------------------------------------------------------------------------" -ForegroundColor DarkCyan
 Write-Host " PETUNJUK:" -ForegroundColor Yellow
 Write-Host "  * Anda tetap dapat mengetik dan menggunakan laptop/mouse seperti biasa." -ForegroundColor Gray
-Write-Host "  * Pergerakan kursor sangat halus (1 piksel) sehingga tidak akan mengganggu." -ForegroundColor Gray
+Write-Host "  * Pergerakan kursor sangat halus (50 piksel) sehingga tidak akan mengganggu." -ForegroundColor Gray
 Write-Host "  * Tekan [CTRL + C] pada jendela ini untuk menghentikan proteksi kapan saja." -ForegroundColor Gray
 Write-Host "===============================================================================" -ForegroundColor Cyan
 Write-Host ""
@@ -118,7 +118,7 @@ try {
         $cycleText = "[SIKLUS #{0:D3}] " -f $cycle
         Write-Host "[$currentTime] " -NoNewline -ForegroundColor DarkGray
         Write-Host $cycleText -NoNewline -ForegroundColor Green
-        Write-Host "Kursor digerakkan (1px) " -NoNewline -ForegroundColor White
+        Write-Host "Kursor digerakkan (50px) " -NoNewline -ForegroundColor White
         Write-Host "| Display: AWAKE " -NoNewline -ForegroundColor Cyan
         Write-Host "| Berjalan: $elapsedStr" -ForegroundColor DarkGray
         
