@@ -425,9 +425,13 @@ class PegawaiController extends Controller
             // Try Dual-Write to Google Sheet
             $syncResult = $syncService->pushRowUpdate($log);
 
+            $syncStatusMsg = $syncResult['success']
+                ? 'Tersinkron ke Google Sheet.'
+                : 'Data tersimpan di database lokal (sinkronisasi spreadsheet tertunda: ' . ($syncResult['message'] ?? 'periksa webhook') . ').';
+
             return response()->json([
                 'success' => true,
-                'message' => "Pegawai {$pegawai->nama} berhasil ditambahkan! " . ($syncResult['success'] ? 'Tersinkron ke Google Sheet.' : 'Data tersimpan lokal.'),
+                'message' => "Pegawai {$pegawai->nama} berhasil ditambahkan! {$syncStatusMsg}",
                 'pegawai' => $pegawai,
                 'sync' => $syncResult,
             ]);
@@ -572,9 +576,13 @@ class PegawaiController extends Controller
             // Try Dual-Write to Google Sheet
             $syncResult = $syncService->pushRowUpdate($log);
 
+            $syncStatusMsg = $syncResult['success']
+                ? 'Tersinkron ke Google Sheet.'
+                : 'Data tersimpan di database lokal (sinkronisasi spreadsheet tertunda: ' . ($syncResult['message'] ?? 'periksa webhook') . ').';
+
             return response()->json([
                 'success' => true,
-                'message' => "Data pegawai {$pegawai->nama} berhasil diperbarui! " . ($syncResult['success'] ? 'Tersinkron ke Google Sheet.' : 'Data tersimpan lokal.'),
+                'message' => "Data pegawai {$pegawai->nama} berhasil diperbarui! {$syncStatusMsg}",
                 'pegawai' => $pegawai,
                 'sync' => $syncResult,
             ]);

@@ -125,8 +125,8 @@ function doPost(e) {
     // A retry after a successful NIP change must find the updated row.
     if (targetRow === -1 && currentNipRow !== -1) targetRow = currentNipRow;
 
-    // Fallback: Jika targetRow belum ditemukan berdasarkan NIP, coba cari berdasarkan NAMA
-    if (targetRow === -1 && targetNama && colMap['NAMA'] && lastRow >= dataStartRow) {
+    // Fallback: Jika targetRow belum ditemukan berdasarkan NIP, coba cari berdasarkan NAMA (khusus update/delete)
+    if (action !== 'create' && targetRow === -1 && targetNama && colMap['NAMA'] && lastRow >= dataStartRow) {
       var namaCol = colMap['NAMA'];
       var namaRange = sheet.getRange(dataStartRow, namaCol, (lastRow - dataStartRow + 1), 1).getValues();
       for (var j = 0; j < namaRange.length; j++) {
@@ -181,9 +181,22 @@ function doPost(e) {
     function setCell(colName, val) {
       if (val === undefined || val === null || val === '') return;
       var colKey = normalizeSheetText(colName).toUpperCase();
-      if (!colMap[colKey]) throw new Error('Kolom tidak ditemukan: ' + colName);
+      if (!colMap[colKey]) return;
       var cell = sheet.getRange(targetRow, colMap[colKey]);
       writes.push({ cell: cell, value: resolveDropdownValue(cell, val, colName) });
+    }
+
+    // Tulis nomor urut untuk data baru
+    if (action === 'create' || (colMap['NO'] && !sheet.getRange(targetRow, colMap['NO']).getValue())) {
+      var prevNo = 0;
+      if (targetRow > dataStartRow && colMap['NO']) {
+        var prevNoVal = sheet.getRange(targetRow - 1, colMap['NO']).getValue();
+        var parsedPrev = parseInt(prevNoVal, 10);
+        if (!isNaN(parsedPrev)) {
+          prevNo = parsedPrev;
+        }
+      }
+      setCell('NO', data.no_urut || (prevNo + 1));
     }
 
     // Tulis data pokok
@@ -256,8 +269,8 @@ function resolveDropdownValue(cell, value, columnName) {
   for (var i = 0; i < choices.length; i++) {
     if (normalizeSheetText(choices[i]).toLowerCase() === normalized) return choices[i];
   }
-  throw new Error('Nilai "' + value + '" tidak tersedia pada dropdown ' + columnName +
-    '. Samakan pilihan pada aplikasi dan spreadsheet, lalu sinkronkan ulang.');
+  // Tetap gunakan nilai asli jika tidak ada di pilihan dropdown agar data baru tidak gagal simpan
+  return value;
 }
 
 function doGet(e) {
@@ -305,19 +318,35 @@ function isRowNumericNumbers(vals) {
 }
 
 function findPnsInsertRow(sheet, dataStartRow, lastRow, colMap) {
-  // Cari baris kosong atau baris bertuliskan 'KPKNL Palembang berkomitmen'
-  var range = sheet.getRange(dataStartRow, 1, (lastRow - dataStartRow + 1), 3).getValues();
-  for (var r = 0; r < range.length; r++) {
-    var colA = String(range[r][0]).trim();
-    var colB = String(range[r][1]).trim();
-    if (colA === '' && colB.indexOf('berkomitmen') !== -1) {
-      return dataStartRow + r;
+  var noCol = colMap['NO'] || 1;
+  var namaCol = colMap['NAMA'] || 2;
+  var lastPnsRow = dataStartRow;
+
+  var numRows = Math.max(1, lastRow - dataStartRow + 1);
+  var values = sheet.getRange(dataStartRow, 1, numRows, Math.max(noCol, namaCol, 3)).getValues();
+
+  for (var r = 0; r < values.length; r++) {
+    var rowIdx = dataStartRow + r;
+    var rowText = values[r].join(' ').toLowerCase();
+
+    // Berhenti jika sudah mencapai banner komitmen integritas atau data Gorontalo
+    if (rowText.indexOf('komitmen menjaga integritas') !== -1 || rowText.indexOf('gorontalo') !== -1) {
+      break;
     }
-    if (colA === '' && colB === '') {
-      return dataStartRow + r;
+
+    var noVal = values[r][noCol - 1];
+    var namaVal = values[r][namaCol - 1];
+
+    if (String(namaVal).trim() !== '' && (typeof noVal === 'number' || (String(noVal).trim() !== '' && !isNaN(noVal)))) {
+      lastPnsRow = rowIdx;
+    } else if (String(namaVal).trim() === '' && String(noVal).trim() === '' && lastPnsRow > dataStartRow) {
+      // Baris kosong setelah data PNS ditemukan
+      break;
     }
   }
-  return lastRow + 1;
+
+  // Sisipkan tepat di baris berikutnya setelah PNS terakhir
+  return lastPnsRow + 1;
 }
 
 function respondJson(obj) {

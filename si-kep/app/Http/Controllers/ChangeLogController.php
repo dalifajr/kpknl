@@ -176,7 +176,10 @@ class ChangeLogController extends Controller
                 $syncResult = $syncService->pushRowUpdate($rollbackLog);
             }
 
-            $msg = "Perubahan pada log #{$log->id} berhasil dibatalkan (Rollback)! " . ($syncResult['success'] ? 'Tersinkron ke Google Sheet.' : 'Tersimpan di database lokal.');
+            $syncStatusMsg = $syncResult['success']
+                ? 'Tersinkron ke Google Sheet.'
+                : 'Tersimpan di database lokal (sinkronisasi spreadsheet tertunda: ' . ($syncResult['message'] ?? 'periksa webhook') . ').';
+            $msg = "Perubahan pada log #{$log->id} berhasil dibatalkan (Rollback)! {$syncStatusMsg}";
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([

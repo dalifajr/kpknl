@@ -135,9 +135,17 @@ class GoogleSheetSyncService
                 ]);
 
                 if ($probe->successful()) {
-                    $canWrite = true;
-                    $writeStatus = 'authorized';
-                    $writeMessage = 'Webhook Google Apps Script terhubung aktif dan siap menerima data pembaruan.';
+                    $probeJson = $probe->json();
+                    if (is_array($probeJson) && ($probeJson['message'] ?? '') === 'Data berhasil disimpan melalui POST API') {
+                        $canWrite = false;
+                        $writeStatus = 'mock_script_detected';
+                        $writeMessage = 'Webhook terhubung tetapi Google Apps Script belum diperbarui (masih skrip mock template "Data berhasil disimpan melalui POST API"). Data tidak akan tersimpan ke spreadsheet.';
+                        $advice = ($advice ? $advice . ' ' : '') . 'Buka Google Spreadsheet > Extensions > Apps Script > Tempelkan seluruh isi file GOOGLE_APPS_SCRIPT_WEBHOOK.js > Simpan > Deploy > Manage deployments > Edit > New version > Deploy.';
+                    } else {
+                        $canWrite = true;
+                        $writeStatus = 'authorized';
+                        $writeMessage = 'Webhook Google Apps Script terhubung aktif dan siap menerima data pembaruan.';
+                    }
                 } else {
                     $writeStatus = 'unauthorized';
                     $writeMessage = "Webhook Apps Script mengembalikan HTTP {$probe->status()} (Akses tulis gagal/dibatasi).";
@@ -268,11 +276,6 @@ class GoogleSheetSyncService
             $importedNiks = [];
 
             for ($i = $dataStartIndex; $i < count($rows); $i++) {
-                // Rule: Row 41 and below or Gorontalo data must NOT be included
-                if ($i >= 40) { // 0-indexed row 40 is line 41 in spreadsheet
-                    break;
-                }
-
                 $row = $rows[$i];
                 if (count($row) < 3) {
                     continue;
@@ -284,8 +287,8 @@ class GoogleSheetSyncService
                 }
 
                 $noVal = trim($this->getVal($row, $colMap, ['NO', 'NO.']));
-                // Must be valid number between 1 and 33
-                if (!is_numeric($noVal) || intval($noVal) < 1 || intval($noVal) > 33) {
+                // Must be valid positive integer
+                if (!is_numeric($noVal) || intval($noVal) < 1) {
                     continue;
                 }
 
@@ -831,6 +834,24 @@ class GoogleSheetSyncService
                     return [
                         'success' => false,
                         'message' => "Gagal sinkron ke spreadsheet: {$errMsg}",
+                        'pending' => true,
+                    ];
+                }
+
+                // Check if Google Apps Script returned the default stub/mock response without executing
+                $isMockScript = is_array($json) && ($json['message'] ?? '') === 'Data berhasil disimpan melalui POST API';
+
+                if ($isMockScript) {
+                    $errMsg = 'Google Apps Script di spreadsheet masih menggunakan skrip template/mock ("Data berhasil disimpan melalui POST API"). Data tersimpan di database lokal namun belum tersinkron ke spreadsheet. Harap pasang skrip GOOGLE_APPS_SCRIPT_WEBHOOK.js di Extensions > Apps Script dan lakukan Deploy versi baru.';
+
+                    $log->update([
+                        'sync_status' => 'pending',
+                        'sync_error' => $errMsg,
+                    ]);
+
+                    return [
+                        'success' => false,
+                        'message' => $errMsg,
                         'pending' => true,
                     ];
                 }

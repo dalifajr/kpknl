@@ -57,6 +57,47 @@ class DropdownSyncTest extends TestCase
         }
     }
 
+    public function test_mock_script_response_keeps_sync_pending_and_warns_admin(): void
+    {
+        Http::fake(['*' => Http::response(['status' => 'success', 'message' => 'Data berhasil disimpan melalui POST API'])]);
+        $log = ChangeLog::create([
+            'nama_pegawai' => 'Pegawai Baru',
+            'nip' => '199505052020121001',
+            'action' => 'create',
+            'description' => 'Penambahan personil baru',
+            'payload_after' => ['nama' => 'Pegawai Baru', 'nip' => '199505052020121001'],
+            'sync_status' => 'pending',
+        ]);
+
+        $result = app(GoogleSheetSyncService::class)->pushRowUpdate($log);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('pending', $log->fresh()->sync_status);
+        $this->assertStringContainsString('GOOGLE_APPS_SCRIPT_WEBHOOK.js', $log->fresh()->sync_error);
+    }
+
+    public function test_create_pegawai_with_mock_webhook_returns_truthful_pending_message(): void
+    {
+        Http::fake(['*' => Http::response(['status' => 'success', 'message' => 'Data berhasil disimpan melalui POST API'])]);
+        $admin = User::factory()->create(['role' => 'admin']);
+        $unit = UnitKerja::create(['kode_unit' => 'KI', 'nama_unit' => 'Seksi Kepatuhan Internal']);
+
+        $res = $this->actingAs($admin)->postJson(route('pegawai.store'), [
+            'nama' => 'Zaki Tester',
+            'nip' => '199901012022031001',
+            'unit_kerja_id' => $unit->id,
+            'nama_jabatan_raw' => 'Pelaksana',
+            'tipe_pegawai' => 'pns',
+            'jenis_kelamin' => 'L',
+        ]);
+
+        $res->assertOk();
+        $res->assertJson(['success' => true]);
+        $this->assertStringContainsString('sinkronisasi spreadsheet tertunda', $res->json('message'));
+        $this->assertDatabaseHas('pegawai', ['nama' => 'Zaki Tester', 'nip' => '199901012022031001']);
+        $this->assertDatabaseHas('change_logs', ['nama_pegawai' => 'Zaki Tester', 'sync_status' => 'pending']);
+    }
+
     public function test_help_matches_employee_edit_permissions(): void
     {
         foreach (['pegawai', 'superadmin', 'maintenance', 'administrator'] as $role) {
