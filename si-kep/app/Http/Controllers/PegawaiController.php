@@ -421,20 +421,6 @@ class PegawaiController extends Controller
             ]);
 
             DB::commit();
-
-            // Try Dual-Write to Google Sheet
-            $syncResult = $syncService->pushRowUpdate($log);
-
-            $syncStatusMsg = $syncResult['success']
-                ? 'Tersinkron ke Google Sheet.'
-                : 'Data tersimpan di database lokal (sinkronisasi spreadsheet tertunda: ' . ($syncResult['message'] ?? 'periksa webhook') . ').';
-
-            return response()->json([
-                'success' => true,
-                'message' => "Pegawai {$pegawai->nama} berhasil ditambahkan! {$syncStatusMsg}",
-                'pegawai' => $pegawai,
-                'sync' => $syncResult,
-            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -442,6 +428,28 @@ class PegawaiController extends Controller
                 'message' => 'Gagal menyimpan pegawai: ' . $e->getMessage(),
             ], 500);
         }
+
+        // Try Dual-Write to Google Sheet (post-commit)
+        try {
+            $syncResult = $syncService->pushRowUpdate($log);
+        } catch (\Throwable $e) {
+            $syncResult = [
+                'success' => false,
+                'message' => 'Gagal terhubung ke Google Spreadsheet: ' . $e->getMessage(),
+                'pending' => true,
+            ];
+        }
+
+        $syncStatusMsg = ($syncResult['success'] ?? false)
+            ? 'Tersinkron ke Google Sheet.'
+            : 'Data tersimpan di database lokal (sinkronisasi spreadsheet tertunda: ' . ($syncResult['message'] ?? 'periksa webhook') . ').';
+
+        return response()->json([
+            'success' => true,
+            'message' => "Pegawai {$pegawai->nama} berhasil ditambahkan! {$syncStatusMsg}",
+            'pegawai' => $pegawai,
+            'sync' => $syncResult,
+        ]);
     }
 
     /**
@@ -572,20 +580,6 @@ class PegawaiController extends Controller
             ]);
 
             DB::commit();
-
-            // Try Dual-Write to Google Sheet
-            $syncResult = $syncService->pushRowUpdate($log);
-
-            $syncStatusMsg = $syncResult['success']
-                ? 'Tersinkron ke Google Sheet.'
-                : 'Data tersimpan di database lokal (sinkronisasi spreadsheet tertunda: ' . ($syncResult['message'] ?? 'periksa webhook') . ').';
-
-            return response()->json([
-                'success' => true,
-                'message' => "Data pegawai {$pegawai->nama} berhasil diperbarui! {$syncStatusMsg}",
-                'pegawai' => $pegawai,
-                'sync' => $syncResult,
-            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -593,6 +587,28 @@ class PegawaiController extends Controller
                 'message' => 'Gagal memperbarui pegawai: ' . $e->getMessage(),
             ], 500);
         }
+
+        // Try Dual-Write to Google Sheet (post-commit)
+        try {
+            $syncResult = $syncService->pushRowUpdate($log);
+        } catch (\Throwable $e) {
+            $syncResult = [
+                'success' => false,
+                'message' => 'Gagal terhubung ke Google Spreadsheet: ' . $e->getMessage(),
+                'pending' => true,
+            ];
+        }
+
+        $syncStatusMsg = ($syncResult['success'] ?? false)
+            ? 'Tersinkron ke Google Sheet.'
+            : 'Data tersimpan di database lokal (sinkronisasi spreadsheet tertunda: ' . ($syncResult['message'] ?? 'periksa webhook') . ').';
+
+        return response()->json([
+            'success' => true,
+            'message' => "Data pegawai {$pegawai->nama} berhasil diperbarui! {$syncStatusMsg}",
+            'pegawai' => $pegawai,
+            'sync' => $syncResult,
+        ]);
     }
 
     /**
@@ -678,22 +694,6 @@ class PegawaiController extends Controller
             $pegawai->delete();
 
             DB::commit();
-
-            // Dual-Write Delete to Google Spreadsheet via Webhook
-            $syncResult = $syncService->pushRowDelete($log);
-
-            $message = "Data pegawai {$pegawaiNama} berhasil dihapus dari aplikasi SI-KEP! " .
-                ($syncResult['success'] ? 'Baris di Google Spreadsheet berhasil dihapus.' : 'Pemberitahuan: ' . ($syncResult['message'] ?? 'Perubahan belum tersinkron ke spreadsheet.'));
-
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $message,
-                    'sync' => $syncResult,
-                ]);
-            }
-
-            return redirect()->route('pegawai.index')->with('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
             if ($request->ajax() || $request->wantsJson()) {
@@ -704,5 +704,29 @@ class PegawaiController extends Controller
             }
             return redirect()->route('pegawai.index')->with('error', 'Gagal menghapus data pegawai: ' . $e->getMessage());
         }
+
+        // Dual-Write Delete to Google Spreadsheet via Webhook (post-commit)
+        try {
+            $syncResult = $syncService->pushRowDelete($log);
+        } catch (\Throwable $e) {
+            $syncResult = [
+                'success' => false,
+                'message' => 'Gagal terhubung ke Google Spreadsheet: ' . $e->getMessage(),
+                'pending' => true,
+            ];
+        }
+
+        $message = "Data pegawai {$pegawaiNama} berhasil dihapus dari aplikasi SI-KEP! " .
+            (($syncResult['success'] ?? false) ? 'Baris di Google Spreadsheet berhasil dihapus.' : 'Pemberitahuan: ' . ($syncResult['message'] ?? 'Perubahan belum tersinkron ke spreadsheet.'));
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'sync' => $syncResult,
+            ]);
+        }
+
+        return redirect()->route('pegawai.index')->with('success', $message);
     }
 }

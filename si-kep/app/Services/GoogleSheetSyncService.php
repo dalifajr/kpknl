@@ -124,11 +124,17 @@ class GoogleSheetSyncService
             $writeMessage = 'Webhook Google Apps Script belum diatur (Kanal Tulis belum aktif).';
         } else {
             try {
-                $probe = Http::withOptions([
-                    'timeout' => 25,
-                    'connect_timeout' => 15,
+                $caPath = 'C:/laragon/etc/ssl/cacert.pem';
+                $probeOptions = [
+                    'timeout' => 45,
+                    'connect_timeout' => 20,
                     'http_errors' => false,
-                ])->post($webhook, [
+                ];
+                if (file_exists($caPath)) {
+                    $probeOptions['verify'] = $caPath;
+                }
+
+                $probe = Http::withOptions($probeOptions)->post($webhook, [
                     'action' => 'check_permission',
                     'ping' => true,
                     'timestamp' => now()->toIso8601String(),
@@ -144,7 +150,13 @@ class GoogleSheetSyncService
                     } else {
                         $canWrite = true;
                         $writeStatus = 'authorized';
-                        $writeMessage = 'Webhook Google Apps Script terhubung aktif dan siap menerima data pembaruan.';
+                        $deployedVer = is_array($probeJson) ? ($probeJson['version'] ?? null) : null;
+                        if (!$deployedVer) {
+                            $writeMessage = 'Webhook terhubung, namun masih menggunakan deployment lama (belum versi 2.1.0). Fitur tambah baris otomatis dan hapus baris spreadsheet memerlukan Deploy "Versi Baru".';
+                            $advice = ($advice ? $advice . ' ' : '') . 'Buka Spreadsheet > Extensions > Apps Script > Deploy > Manage deployments > Edit > Pilih "New version" > Deploy.';
+                        } else {
+                            $writeMessage = "Webhook Google Apps Script terhubung aktif (v{$deployedVer}) dan siap menerima pembaruan data.";
+                        }
                     }
                 } else {
                     $writeStatus = 'unauthorized';
@@ -807,11 +819,17 @@ class GoogleSheetSyncService
                 'STATUS PENDIDIKAN DAN PENCANTUMAN GELAR AKADEMIK' => $statusGelar,
             ];
 
-            $response = Http::withOptions([
-                'timeout' => 30,
-                'connect_timeout' => 15,
+            $caPath = 'C:/laragon/etc/ssl/cacert.pem';
+            $httpOptions = [
+                'timeout' => 60,
+                'connect_timeout' => 20,
                 'http_errors' => false,
-            ])->post($webhookUrl, [
+            ];
+            if (file_exists($caPath)) {
+                $httpOptions['verify'] = $caPath;
+            }
+
+            $response = Http::withOptions($httpOptions)->post($webhookUrl, [
                 'action' => $log->action,
                 'nip' => $log->nip,
                 'original_nip' => $log->payload_before['nip'] ?? $log->nip,

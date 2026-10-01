@@ -1,33 +1,45 @@
 /**
  * ==============================================================================
- * GOOGLE APPS SCRIPT (GAS) WEBHOOK - SI-KEP KPKNL PALEMBANG
+ * GOOGLE APPS SCRIPT (GAS) WEBHOOK - SI-KEP KPKNL PALEMBANG (v2.1.0)
  * ==============================================================================
  * Skrip ini dipasang pada Google Spreadsheet Kepegawaian KPKNL Palembang
  * untuk menerima pembaruan data secara real-time dari aplikasi web SI-KEP.
  *
- * CARA PEMASANGAN DI GOOGLE SPREADSHEET:
+ * CARA PEMASANGAN / PEMBARUAN DI GOOGLE SPREADSHEET:
  * 1. Buka spreadsheet: https://docs.google.com/spreadsheets/d/1-pfEY_56CvIBaaCyxrfjv5nitEMHhPQCXKzuwdxX6hA
  * 2. Klik menu: Extensions (Ekstensi) > Apps Script
- * 3. Hapus semua kode default, lalu salin (copy-paste) seluruh isi skrip ini.
+ * 3. Hapus semua kode lama di editor, lalu tempelkan (paste) seluruh isi skrip ini.
  * 4. Klik tombol "Save" (ikon disket / Ctrl + S).
- * 5. Klik tombol "Deploy" (di pojok kanan atas) > "New deployment" (Deployment baru).
- * 6. Pilih tipe: "Web app" (ikon roda gerigi di sebelah Select type).
- * 7. Konfigurasi Web app:
- *    - Description : Webhook SI-KEP KPKNL Palembang
+ *
+ * PENTING: AGAR PERUBAHAN AKTIF PADA WEBHOOK URL, IKUTI SALAH SATU CARA BERIKUT:
+ * 
+ * [CARA A - Memperbarui Deployment Yang Ada (URL Tetap Sama)]:
+ * 5. Klik menu "Deploy" (di pojok kanan atas) > "Manage deployments" (Kelola deployment).
+ * 6. Klik ikon Pensil (Edit) di sebelah deployment Web app yang sedang aktif.
+ * 7. Pada dropdown "Version" (Versi), pilih "New version" (Versi baru).
+ * 8. Klik tombol "Deploy".
+ *
+ * [CARA B - Jika Membuat Deployment Baru]:
+ * 5. Klik menu "Deploy" > "New deployment".
+ * 6. Pilih tipe: "Web app" (ikon roda gerigi).
+ * 7. Konfigurasi:
  *    - Execute as  : Me (email akun Anda)
- *    - Who has access: Anyone (Siapa saja)  <--- SANGAT PENTING!
- * 8. Klik "Deploy" > Berikan izin otorisasi (Authorize access) > Advanced > Go to (unsafe).
- * 9. Salin "Web app URL" (akhiran /exec) dan tempelkan di Pengaturan Spreadsheet SI-KEP.
+ *    - Who has access: Anyone (Siapa saja)  <--- WAJIB "Anyone"
+ * 8. Klik "Deploy" > Berikan otorisasi izin jika diminta.
+ * 9. Salin "Web app URL" (akhiran /exec) dan simpan di Pengaturan Spreadsheet SI-KEP.
  * ==============================================================================
  */
 
+var SCRIPT_VERSION = "2.1.0";
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  // Tunggu hingga 15 detik jika ada request bersamaan
-  var hasLock = lock.tryLock(15000);
+  // Tunggu hingga 20 detik jika ada request bersamaan
+  var hasLock = lock.tryLock(20000);
   if (!hasLock) {
     return respondJson({
       status: "error",
+      version: SCRIPT_VERSION,
       message: "Server Google Spreadsheet sedang sibuk memproses permintaan lain. Coba beberapa saat lagi."
     });
   }
@@ -36,6 +48,7 @@ function doPost(e) {
     if (!e || !e.postData || !e.postData.contents) {
       return respondJson({
         status: "error",
+        version: SCRIPT_VERSION,
         message: "Tidak ada data payload POST yang diterima."
       });
     }
@@ -47,6 +60,7 @@ function doPost(e) {
     if (action === 'check_permission' || payload.ping === true) {
       return respondJson({
         status: "success",
+        version: SCRIPT_VERSION,
         message: "Webhook Google Apps Script SI-KEP terhubung aktif dan siap menerima data."
       });
     }
@@ -61,11 +75,11 @@ function doPost(e) {
 
     var lastRow = sheet.getLastRow();
     var lastCol = sheet.getLastColumn();
-    if (lastRow < 5) {
+    if (lastRow < 4) {
       throw new Error("Struktur sheet kosong atau baris header tidak ditemukan.");
     }
 
-    // 3. Deteksi Baris Header Kolom (Baris ke-5 pada spreadsheet KPKNL Palembang)
+    // 3. Deteksi Baris Header Kolom (Baris ke-4 atau ke-5 pada spreadsheet KPKNL Palembang)
     // Mencari baris yang mengandung 'NIP' dan 'NAMA'
     var headerRowIndex = -1;
     var maxSearchRow = Math.min(lastRow, 10);
@@ -131,7 +145,7 @@ function doPost(e) {
       var namaRange = sheet.getRange(dataStartRow, namaCol, (lastRow - dataStartRow + 1), 1).getValues();
       for (var j = 0; j < namaRange.length; j++) {
         var cellNama = normalizeSheetText(namaRange[j][0]).toUpperCase();
-        if (cellNama === targetNama) {
+        if (cellNama === targetNama || cellNama.indexOf(targetNama) !== -1 || targetNama.indexOf(cellNama) !== -1) {
           targetRow = dataStartRow + j;
           break;
         }
@@ -143,6 +157,7 @@ function doPost(e) {
       if (targetRow === -1) {
         return respondJson({
           status: "error",
+          version: SCRIPT_VERSION,
           message: "Pegawai dengan identitas '" + (targetNip || targetNama) + "' tidak ditemukan di Google Spreadsheet."
         });
       }
@@ -152,6 +167,7 @@ function doPost(e) {
 
       return respondJson({
         status: "success",
+        version: SCRIPT_VERSION,
         message: "Data pegawai " + (payload.nama || data.nama || targetNip) + " berhasil dihapus dari baris " + targetRow + " Google Spreadsheet.",
         row: targetRow,
         nip: targetNip,
@@ -171,6 +187,7 @@ function doPost(e) {
     if (targetRow === -1) {
       return respondJson({
         status: "error",
+        version: SCRIPT_VERSION,
         message: "Pegawai dengan NIP '" + targetNip + "' tidak ditemukan di Google Spreadsheet."
       });
     }
@@ -232,6 +249,7 @@ function doPost(e) {
 
     return respondJson({
       status: "success",
+      version: SCRIPT_VERSION,
       message: "Data pegawai " + (data.nama || targetNip) + " berhasil disinkronkan ke baris " + targetRow + " Google Spreadsheet.",
       row: targetRow,
       nip: targetNip,
@@ -241,6 +259,7 @@ function doPost(e) {
   } catch (err) {
     return respondJson({
       status: "error",
+      version: SCRIPT_VERSION,
       message: "Gagal memproses di Google Apps Script: " + err.toString()
     });
   } finally {
@@ -276,6 +295,7 @@ function resolveDropdownValue(cell, value, columnName) {
 function doGet(e) {
   return respondJson({
     status: "success",
+    version: SCRIPT_VERSION,
     message: "Webhook Google Apps Script SI-KEP KPKNL Palembang aktif dan siap menerima request POST."
   });
 }
