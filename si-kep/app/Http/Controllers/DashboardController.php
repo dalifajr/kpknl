@@ -170,8 +170,8 @@ class DashboardController extends Controller
     public function saveSettings(Request $request)
     {
         $user = auth()->user();
-        if (!$user || $user->role !== 'maintenance') {
-            abort(403, 'Akses ditolak. Pengaturan hanya dapat diubah oleh akun Maintenance.');
+        if (!$user || !in_array($user->role, ['maintenance', 'superadmin'])) {
+            abort(403, 'Akses ditolak. Pengaturan hanya dapat diubah oleh akun Maintenance atau Superadmin.');
         }
 
         $request->validate([
