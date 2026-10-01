@@ -18,15 +18,8 @@ class DocumentationController extends Controller
         $user = auth()->user();
         $primaryRole = $this->resolvePrimaryRole($user);
 
-        // Allow user to filter by role or default to their own role
-        $requestedRole = $request->query('role', $primaryRole);
-        $validRoles = ['user', 'admin', 'maintenance', 'superadmin', 'all'];
-
-        if (!in_array($requestedRole, $validRoles, true)) {
-            $requestedRole = $primaryRole;
-        }
-
-        $activeRole = $requestedRole;
+        // Hanya tampilkan panduan khusus untuk role yang sedang login
+        $activeRole = $primaryRole;
         $applications = Application::where('status', 'active')->orderBy('name')->get();
         $docSections = $this->getDocumentationData();
 
@@ -47,14 +40,8 @@ class DocumentationController extends Controller
         $user = auth()->user();
         $primaryRole = $this->resolvePrimaryRole($user);
 
-        $requestedRole = $request->query('role', $primaryRole);
-        $validRoles = ['user', 'admin', 'maintenance', 'superadmin', 'all'];
-
-        if (!in_array($requestedRole, $validRoles, true)) {
-            $requestedRole = $primaryRole;
-        }
-
-        $activeRole = $requestedRole;
+        // Unduhan PDF khusus dan terikat pada role yang sedang login
+        $activeRole = $primaryRole;
         $applications = Application::where('status', 'active')->orderBy('name')->get();
         $docSections = $this->getDocumentationData();
 

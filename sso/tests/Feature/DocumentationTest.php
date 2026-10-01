@@ -55,7 +55,7 @@ class DocumentationTest extends TestCase
         $pdfResponse->assertRedirect(route('login'));
     }
 
-    public function test_authenticated_user_can_view_documentation_page(): void
+    public function test_authenticated_user_only_sees_their_own_role_documentation(): void
     {
         $response = $this->actingAs($this->user)->get('/documentation');
 
@@ -64,20 +64,44 @@ class DocumentationTest extends TestCase
         $response->assertSee('Buku Panduan &amp; Dokumentasi Fitur SSO', false);
         $response->assertSee('Panduan Pegawai');
         $response->assertSee('SI-KEP Kepegawaian');
+
+        // Must NOT see guides for other roles
+        $response->assertDontSee('section-admin', false);
+        $response->assertDontSee('section-maintenance', false);
+        $response->assertDontSee('section-superadmin', false);
+        $response->assertDontSee('Maintenance Orchestrator');
     }
 
-    public function test_user_can_filter_documentation_by_role(): void
+    public function test_user_cannot_view_other_roles_via_query_parameter(): void
     {
+        // Regular user attempts to access maintenance guide via URL parameter
         $response = $this->actingAs($this->user)->get('/documentation?role=maintenance');
 
         $response->assertOk();
-        $response->assertSee('Tim Pengembang &amp; Pemeliharaan Sistem', false);
-        $response->assertSee('Maintenance Orchestrator');
+        // Still locked to Pegawai/User only
+        $response->assertSee('Panduan Pegawai');
+        $response->assertDontSee('section-maintenance', false);
+        $response->assertDontSee('Maintenance Orchestrator');
     }
 
-    public function test_user_can_download_role_specific_pdf(): void
+    public function test_maintenance_user_only_sees_maintenance_documentation(): void
     {
-        $response = $this->actingAs($this->user)->get('/documentation/download-pdf?role=user');
+        $response = $this->actingAs($this->maintenanceUser)->get('/documentation');
+
+        $response->assertOk();
+        $response->assertSee('section-maintenance', false);
+        $response->assertSee('Maintenance Orchestrator');
+
+        // Must NOT see ordinary user guide section
+        $response->assertDontSee('section-user', false);
+        $response->assertDontSee('section-admin', false);
+        $response->assertDontSee('section-superadmin', false);
+    }
+
+    public function test_user_downloads_only_their_own_role_pdf(): void
+    {
+        // Even if user specifies role=maintenance, it must strictly generate user PDF
+        $response = $this->actingAs($this->user)->get('/documentation/download-pdf?role=maintenance');
 
         $response->assertOk();
         $response->assertHeader('Content-Type', 'application/pdf');
@@ -90,13 +114,13 @@ class DocumentationTest extends TestCase
         $this->assertGreaterThan(1000, strlen($content));
     }
 
-    public function test_maintenance_can_download_full_documentation_pdf(): void
+    public function test_maintenance_user_downloads_maintenance_pdf(): void
     {
-        $response = $this->actingAs($this->maintenanceUser)->get('/documentation/download-pdf?role=all');
+        $response = $this->actingAs($this->maintenanceUser)->get('/documentation/download-pdf');
 
         $response->assertOk();
         $response->assertHeader('Content-Type', 'application/pdf');
-        $this->assertStringContainsString('Panduan_SSO_KPKNL_Palembang_Lengkap_Semua_Role_', $response->headers->get('Content-Disposition') ?? '');
+        $this->assertStringContainsString('Panduan_SSO_KPKNL_Palembang_Tim_Maintenance_', $response->headers->get('Content-Disposition') ?? '');
 
         $content = $response->getContent();
         $this->assertStringStartsWith('%PDF-', $content);

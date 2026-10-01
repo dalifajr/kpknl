@@ -118,45 +118,9 @@
                     Panduan lengkap pengoperasian, arsitektur integrasi OAuth 2.0, manajemen sesi, serta tata kelola hak akses pengguna sesuai peran (role) pada sistem Single Sign-On KPKNL Palembang.
                 </p>
                 <div class="d-flex flex-wrap align-items-center gap-2">
-                    <div class="dropdown">
-                        <button class="btn btn-warning rounded-pill px-4 py-2.5 fw-bold text-dark shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-file-pdf me-1.5 text-danger"></i> Unduh PDF Dokumentasi
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-2 mt-1">
-                            <li><h6 class="dropdown-header text-uppercase fs-8 fw-bold text-muted">Pilih Versi PDF:</h6></li>
-                            <li>
-                                <a class="dropdown-item py-2 px-3 fw-semibold" href="{{ route('documentation.pdf', ['role' => $primaryRole]) }}">
-                                    <i class="fa-solid fa-user-check me-2 text-primary"></i> Sesuai Role Saya ({{ ucfirst($primaryRole) }})
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item py-2 px-3 fw-semibold" href="{{ route('documentation.pdf', ['role' => 'all']) }}">
-                                    <i class="fa-solid fa-book me-2 text-success"></i> Panduan Lengkap (Semua Role)
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item py-1.5 px-3 fs-7" href="{{ route('documentation.pdf', ['role' => 'user']) }}">
-                                    <i class="fa-solid fa-user me-2 text-info"></i> Khusus Pegawai / User
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item py-1.5 px-3 fs-7" href="{{ route('documentation.pdf', ['role' => 'admin']) }}">
-                                    <i class="fa-solid fa-users-gear me-2 text-indigo"></i> Khusus Administrator
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item py-1.5 px-3 fs-7" href="{{ route('documentation.pdf', ['role' => 'maintenance']) }}">
-                                    <i class="fa-solid fa-wrench me-2 text-warning"></i> Khusus Tim Maintenance
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item py-1.5 px-3 fs-7" href="{{ route('documentation.pdf', ['role' => 'superadmin']) }}">
-                                    <i class="fa-solid fa-shield-halved me-2 text-danger"></i> Khusus Superadmin
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    <a href="{{ route('documentation.pdf') }}" class="btn btn-warning rounded-pill px-4 py-2.5 fw-bold text-dark shadow-sm">
+                        <i class="fa-solid fa-file-pdf me-1.5 text-danger"></i> Unduh PDF Panduan Saya ({{ ucfirst($primaryRole) }})
+                    </a>
 
                     <button type="button" class="btn btn-outline-light rounded-pill px-4 py-2.5 fw-semibold" onclick="window.print()">
                         <i class="fa-solid fa-print me-1.5"></i> Cetak Halaman
@@ -176,33 +140,24 @@
         </div>
     </div>
 
-    <!-- Quick Search & Role Filter Navigation -->
+    <!-- Header Panduan Khusus Role & Live Search -->
     <div class="card-m3 p-3.5 mb-4 shadow-sm">
         <div class="row g-3 align-items-center justify-content-between">
-            <div class="col-lg-8">
+            <div class="col-lg-7">
                 <div class="d-flex flex-wrap gap-2 align-items-center">
-                    <span class="fs-7 fw-bold text-muted me-1"><i class="fa-solid fa-filter me-1"></i>Tampilkan:</span>
-                    <a href="{{ route('documentation.index', ['role' => 'all']) }}" class="role-nav-pill {{ $activeRole === 'all' ? 'active' : '' }}">
-                        <i class="fa-solid fa-layer-group"></i> Semua Role
-                    </a>
-                    <a href="{{ route('documentation.index', ['role' => 'user']) }}" class="role-nav-pill {{ $activeRole === 'user' ? 'active' : '' }}">
-                        <i class="fa-solid fa-user"></i> Pegawai (User)
-                    </a>
-                    <a href="{{ route('documentation.index', ['role' => 'admin']) }}" class="role-nav-pill {{ $activeRole === 'admin' ? 'active' : '' }}">
-                        <i class="fa-solid fa-users-gear"></i> Administrator
-                    </a>
-                    <a href="{{ route('documentation.index', ['role' => 'maintenance']) }}" class="role-nav-pill {{ $activeRole === 'maintenance' ? 'active' : '' }}">
-                        <i class="fa-solid fa-wrench"></i> Tim Maintenance
-                    </a>
-                    <a href="{{ route('documentation.index', ['role' => 'superadmin']) }}" class="role-nav-pill {{ $activeRole === 'superadmin' ? 'active' : '' }}">
-                        <i class="fa-solid fa-shield-halved"></i> Superadmin
-                    </a>
+                    <span class="fs-7 fw-bold text-muted me-1"><i class="fa-solid fa-shield-halved me-1 text-primary"></i>Panduan Khusus Role:</span>
+                    <span class="badge rounded-pill px-3 py-2 fs-7 fw-bold text-white shadow-xs" style="background-color: {{ $docSections[$primaryRole]['color'] ?? '#0b3b60' }};">
+                        <i class="fa-solid fa-user-check me-1.5"></i> {{ $docSections[$primaryRole]['role_name'] ?? ucfirst($primaryRole) }}
+                    </span>
+                    <span class="badge bg-light text-secondary border rounded-pill px-2.5 py-1.5 fs-8">
+                        <i class="fa-solid fa-lock me-1 text-muted"></i> Terkunci sesuai sesi akun aktif
+                    </span>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-5">
                 <div class="input-group">
                     <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
-                    <input type="text" id="docSearchInput" class="form-control border-start-0" placeholder="Cari fitur, panduan, atau istilah..." aria-label="Cari panduan">
+                    <input type="text" id="docSearchInput" class="form-control border-start-0" placeholder="Cari topik atau fitur dalam panduan ini..." aria-label="Cari panduan">
                 </div>
             </div>
         </div>
@@ -243,7 +198,7 @@
     </div>
 
     <!-- SECTION 2: Panduan Pegawai / User -->
-    @if($activeRole === 'all' || $activeRole === 'user')
+    @if($primaryRole === 'user')
         <div class="card-m3 p-4 mb-4 shadow-sm doc-section" id="section-user">
             <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3 flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-3">
@@ -290,7 +245,7 @@
     @endif
 
     <!-- SECTION 3: Panduan Administrator -->
-    @if($activeRole === 'all' || $activeRole === 'admin')
+    @if($primaryRole === 'admin')
         <div class="card-m3 p-4 mb-4 shadow-sm doc-section" id="section-admin">
             <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3 flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-3">
@@ -337,7 +292,7 @@
     @endif
 
     <!-- SECTION 4: Panduan Tim Maintenance (Fitur Unggulan) -->
-    @if($activeRole === 'all' || $activeRole === 'maintenance')
+    @if($primaryRole === 'maintenance')
         <div class="card-m3 p-4 mb-4 shadow-sm doc-section" id="section-maintenance">
             <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3 flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-3">
@@ -384,7 +339,7 @@
     @endif
 
     <!-- SECTION 5: Panduan Superadmin -->
-    @if($activeRole === 'all' || $activeRole === 'superadmin')
+    @if($primaryRole === 'superadmin')
         <div class="card-m3 p-4 mb-4 shadow-sm doc-section" id="section-superadmin">
             <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3 flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-3">

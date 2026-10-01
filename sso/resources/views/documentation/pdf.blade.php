@@ -271,11 +271,7 @@
         <tr>
             <td class="meta-label">Cakupan Panduan</td>
             <td class="meta-val">
-                @if($activeRole === 'all')
-                    Semua Role (Pegawai, Admin, Maintenance, Superadmin)
-                @else
-                    Khusus Role {{ strtoupper($activeRole) }}
-                @endif
+                Khusus {{ $docSections[$primaryRole]['role_name'] ?? strtoupper($primaryRole) }}
             </td>
             <td class="meta-label">Dicetak Oleh</td>
             <td class="meta-val">{{ $user->name }} ({{ $user->username }})</td>
@@ -297,7 +293,7 @@
     @endforeach
 
     <!-- PANDUAN ROLE PEGAWAI / USER -->
-    @if($activeRole === 'all' || $activeRole === 'user')
+    @if($primaryRole === 'user')
         <div class="page-break"></div>
         <div class="section-header user">
             2. Panduan Penggunaan: {{ $docSections['user']['role_name'] }}
@@ -329,10 +325,10 @@
     @endif
 
     <!-- PANDUAN ROLE ADMINISTRATOR -->
-    @if($activeRole === 'all' || $activeRole === 'admin')
-        @if($activeRole === 'all') <div class="page-break"></div> @endif
+    @if($primaryRole === 'admin')
+        <div class="page-break"></div>
         <div class="section-header admin">
-            3. Panduan Pengelolaan: {{ $docSections['admin']['role_name'] }}
+            2. Panduan Pengelolaan: {{ $docSections['admin']['role_name'] }}
         </div>
         <p style="font-size: 8.5pt; color: #475569; margin-bottom: 14px;">
             {{ $docSections['admin']['summary'] }}
@@ -361,10 +357,10 @@
     @endif
 
     <!-- PANDUAN ROLE TIM MAINTENANCE (FITUR UNGGULAN) -->
-    @if($activeRole === 'all' || $activeRole === 'maintenance')
-        @if($activeRole === 'all') <div class="page-break"></div> @endif
+    @if($primaryRole === 'maintenance')
+        <div class="page-break"></div>
         <div class="section-header maintenance">
-            4. Panduan Teknis: {{ $docSections['maintenance']['role_name'] }}
+            2. Panduan Teknis: {{ $docSections['maintenance']['role_name'] }}
         </div>
         <p style="font-size: 8.5pt; color: #475569; margin-bottom: 14px;">
             {{ $docSections['maintenance']['summary'] }}
@@ -393,10 +389,10 @@
     @endif
 
     <!-- PANDUAN ROLE SUPERADMIN -->
-    @if($activeRole === 'all' || $activeRole === 'superadmin')
-        @if($activeRole === 'all') <div class="page-break"></div> @endif
+    @if($primaryRole === 'superadmin')
+        <div class="page-break"></div>
         <div class="section-header superadmin">
-            5. Panduan Tata Kelola: {{ $docSections['superadmin']['role_name'] }}
+            2. Panduan Tata Kelola: {{ $docSections['superadmin']['role_name'] }}
         </div>
         <p style="font-size: 8.5pt; color: #475569; margin-bottom: 14px;">
             {{ $docSections['superadmin']['summary'] }}
