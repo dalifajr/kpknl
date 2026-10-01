@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserImportController;
+use App\Http\Controllers\Admin\UserExportController;
 use App\Http\Controllers\Admin\ApplicationController;
 
 use App\Http\Controllers\Admin\ActivityLogController;
@@ -110,6 +111,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('users/import-step/{jobId}', [UserImportController::class, 'step'])->name('users.import-step');
         Route::post('users/import-resolve/{jobId}', [UserImportController::class, 'resolveDuplicates'])->name('users.import-resolve');
         Route::post('users/import-cancel/{jobId}', [UserImportController::class, 'cancel'])->name('users.import-cancel');
+
+        // User Export Routes (Superadmin & Maintenance)
+        Route::get('users/export', [UserExportController::class, 'export'])->name('users.export');
 
         // User Management
         Route::resource('users', UserController::class);

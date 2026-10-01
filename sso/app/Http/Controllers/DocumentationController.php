@@ -314,6 +314,18 @@ class DocumentationController extends Controller
                         ],
                         'notes' => 'Lakukan backup berkala sebelum melakukan perubahan skema migrasi database besar.',
                     ],
+                    [
+                        'title' => '6. Fitur Ekspor Data Pengguna (Excel & CSV)',
+                        'icon' => 'fa-solid fa-file-export',
+                        'steps' => [
+                            'Buka menu "Kelola User" (/admin/users) pada sidebar.',
+                            'Klik tombol dropdown "Ekspor User" di bagian kanan atas halaman.',
+                            'Pilih format unduhan: Ekspor ke Excel (.xlsx) atau Ekspor ke CSV (.csv).',
+                            'Berkas yang diunduh menyajikan data mendetail: Username, Nama Lengkap, Email, Role Global SSO, Status Akun, Jumlah Aplikasi, Aplikasi & Role Penugasan (misal: "SI-KEP (Operator); Peminjaman Berkas Lelang (Peminjam)"), dan Tanggal Terdaftar.',
+                            'Fitur ekspor secara cerdas mengikuti filter aktif (pencarian, role, dan status) yang sedang diterapkan pada tabel.',
+                        ],
+                        'notes' => 'Gunakan data ekspor ini untuk audit berkala hak akses pegawai dan pelaporan berkas inventarisasi akun TI.',
+                    ],
                 ],
             ],
             'superadmin' => [
@@ -351,6 +363,17 @@ class DocumentationController extends Controller
                             'Pastikan pergantian kata sandi berkala dilakukan oleh seluruh jajaran pengguna.',
                         ],
                         'notes' => 'Prinsip least privilege dan separation of duties diterapkan secara ketat dalam arsitektur SSO KPKNL Palembang.',
+                    ],
+                    [
+                        'title' => '4. Ekspor Data Pengguna Resmi (Excel & CSV)',
+                        'icon' => 'fa-solid fa-file-export',
+                        'steps' => [
+                            'Buka menu "Kelola User" (/admin/users).',
+                            'Klik tombol "Ekspor User" di sudut kanan atas.',
+                            'Pilih format yang diinginkan (.xlsx atau .csv) untuk mengunduh rekapitulasi pegawai, hak akses, dan role per-aplikasi.',
+                            'Hasil ekspor secara otomatis mematuhi kebijakan privasi data dan proteksi keamanan.',
+                        ],
+                        'notes' => 'Data ekspor memuat detail lengkap pemetaan aplikasi dan role yang telah ditetapkan.',
                     ],
                 ],
             ],

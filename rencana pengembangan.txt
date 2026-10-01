@@ -5,4 +5,6 @@ saya ingin user maintenance dapat mengassign role user per-aplikasi. karena untu
 
 pembuatan laman dokumentasi pada aplikasi sso kpknl palembang dengan isi yang menyesuaikan setiap role user, fitur download pdf resmi, dan penjelasan detail seluruh fitur sso. (SELESAI ✓)
 
+fitur ekspor user pada role superadmin dan maintenance untuk mengekspor daftar user SSO dengan detail username, nama, role, status, dan aplikasi yang diassign beserta info role spesifik pada aplikasi tersebut dalam format Excel (.xlsx) dan CSV (.csv). (SELESAI ✓)
+
 

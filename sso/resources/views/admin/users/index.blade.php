@@ -44,7 +44,28 @@
         <h3 class="mb-1 fw-bold text-dark">Manajemen User SSO</h3>
         <p class="text-muted mb-0">Superadmin memiliki kendali penuh untuk menambah, mengedit role, meng-assign aplikasi, dan menonaktifkan user.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
+        @if(auth()->user()->isSuperadmin() || auth()->user()->isMaintenance())
+            <div class="dropdown">
+                <button type="button" class="btn btn-outline-primary rounded-pill px-3.5 py-2 fw-semibold dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="btnExportUsers">
+                    <i class="fa-solid fa-file-export me-1.5"></i> Ekspor User
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 py-2 mt-1">
+                    <li><h6 class="dropdown-header text-uppercase fs-9 fw-bold text-muted">Format Ekspor:</h6></li>
+                    <li>
+                        <a class="dropdown-item py-2 px-3 fs-7 fw-semibold" href="{{ route('admin.users.export', array_merge(request()->query(), ['format' => 'xlsx'])) }}">
+                            <i class="fa-solid fa-file-excel me-2 text-success"></i> Ekspor ke Excel (.xlsx)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2 px-3 fs-7 fw-semibold" href="{{ route('admin.users.export', array_merge(request()->query(), ['format' => 'csv'])) }}">
+                            <i class="fa-solid fa-file-csv me-2 text-primary"></i> Ekspor ke CSV (.csv)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        @endif
+
         <button type="button" class="btn btn-tonal rounded-pill px-4 py-2" id="btnOpenImportModal">
             <i class="fa-solid fa-file-excel me-1.5 text-success"></i> Import Excel
         </button>
