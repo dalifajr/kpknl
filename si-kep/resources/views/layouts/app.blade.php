@@ -557,26 +557,72 @@
             }
         });
 
+        // Navigation state between list modal and employee detail modal
+        window.hasPreviousListModal = false;
+        window.previousListTitle = '';
+        window.previousListPegawaiIds = [];
+        window.currentPegawaiId = null;
+        window.isNavigatingBackToList = false;
+
         // Universal Function to open employee detail modal
-        function showPegawaiDetail(id) {
-            // Close list modal if open
-            const listModalEl = bootstrap.Modal.getInstance(document.getElementById('aggregateListModal'));
-            if (listModalEl) {
-                listModalEl.hide();
+        function showPegawaiDetail(id, fromNav = false) {
+            id = parseInt(id);
+            window.currentPegawaiId = id;
+
+            const listModalEl = document.getElementById('aggregateListModal');
+            const listModalInst = listModalEl ? bootstrap.Modal.getInstance(listModalEl) : null;
+
+            // If aggregateListModal is currently open, capture its state and transition cleanly
+            if (listModalEl && listModalEl.classList.contains('show')) {
+                window.hasPreviousListModal = true;
+                window.previousListTitle = document.querySelector('#aggregateListModal .modal-title')?.innerText?.trim() || 'Daftar Pegawai';
+
+                // Grab all pegawai IDs from the active list modal (filtered or all)
+                const rows = Array.from(document.querySelectorAll('#tableFilteredPegawai tbody tr.modal-pegawai-row'));
+                const visibleRows = rows.filter(r => r.style.display !== 'none');
+                const targetRows = visibleRows.length > 0 ? visibleRows : rows;
+
+                window.previousListPegawaiIds = targetRows.map(r => {
+                    const dataId = r.getAttribute('data-pegawai-id');
+                    if (dataId) return parseInt(dataId);
+                    const match = (r.getAttribute('onclick') || '').match(/\d+/);
+                    return match ? parseInt(match[0]) : null;
+                }).filter(Boolean);
+
+                if (listModalInst) {
+                    $(listModalEl).one('hidden.bs.modal', function () {
+                        executeShowPegawaiDetail(id);
+                    });
+                    listModalInst.hide();
+                    return;
+                }
             }
 
-            const modalEl = new bootstrap.Modal(document.getElementById('pegawaiDetailModal'));
-            $('#pegawaiModalBody').html(`
-                <div class="modal-body text-center py-5">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <div class="mt-2 text-muted fw-semibold">Memuat profil pegawai...</div>
-                </div>
-            `);
-            modalEl.show();
+            executeShowPegawaiDetail(id, fromNav);
+        }
+
+        function executeShowPegawaiDetail(id, fromNav = false) {
+            const detailModalEl = document.getElementById('pegawaiDetailModal');
+            const modalEl = bootstrap.Modal.getOrCreateInstance(detailModalEl);
+
+            const isAlreadyOpen = detailModalEl.classList.contains('show');
+
+            if (!isAlreadyOpen) {
+                $('#pegawaiModalBody').html(`
+                    <div class="modal-body text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <div class="mt-2 text-muted fw-semibold">Memuat profil pegawai...</div>
+                    </div>
+                `);
+                modalEl.show();
+            } else {
+                $('#pegawaiModalBody .modal-body').css('opacity', '0.4');
+            }
 
             const detailUrl = "{{ route('pegawai.detail', ['id' => ':id']) }}".replace(':id', id);
             $.get(detailUrl, function(html) {
                 $('#pegawaiModalBody').html(html);
+                updateDetailModalNavigation();
             }).fail(function(xhr) {
                 console.error("Gagal memuat profil pegawai:", xhr);
                 $('#pegawaiModalBody').html(`
@@ -590,9 +636,112 @@
             });
         }
 
+        // Update navigation buttons (Kembali ke Daftar & Prev / Next) inside Detail Modal
+        function updateDetailModalNavigation() {
+            if (!window.hasPreviousListModal) {
+                $('#btnHeaderBackToList, #btnFooterBackToList, #headerNavGroup, #footerNavGroup').hide();
+                return;
+            }
+
+            const ids = window.previousListPegawaiIds || [];
+            const currId = window.currentPegawaiId;
+            const currIndex = ids.indexOf(currId);
+            const total = ids.length;
+            const listTitle = window.previousListTitle || 'Daftar Pegawai';
+
+            // Show and update Back to List buttons
+            $('#btnHeaderBackToList, #btnFooterBackToList').show();
+            const shortTitle = listTitle.length > 25 ? listTitle.substring(0, 22) + '...' : listTitle;
+            $('#btnHeaderBackToListText').text('Kembali ke ' + shortTitle);
+            $('#btnFooterBackToListText').text('Kembali ke ' + listTitle);
+
+            // Configure Prev / Next navigation
+            if (total > 1 && currIndex !== -1) {
+                $('#headerNavGroup, #footerNavGroup').show();
+                $('#pegawaiNavCounter').text((currIndex + 1) + ' / ' + total);
+
+                if (currIndex > 0) {
+                    $('#btnPrevPegawai, #btnFooterPrev').prop('disabled', false).removeClass('disabled opacity-50');
+                } else {
+                    $('#btnPrevPegawai, #btnFooterPrev').prop('disabled', true).addClass('disabled opacity-50');
+                }
+
+                if (currIndex < total - 1) {
+                    $('#btnNextPegawai, #btnFooterNext').prop('disabled', false).removeClass('disabled opacity-50');
+                } else {
+                    $('#btnNextPegawai, #btnFooterNext').prop('disabled', true).addClass('disabled opacity-50');
+                }
+            } else {
+                $('#headerNavGroup, #footerNavGroup').hide();
+            }
+        }
+
+        // Navigate back to the previous list modal without losing content or scroll
+        function backToAggregateList() {
+            window.isNavigatingBackToList = true;
+            const detailModalEl = document.getElementById('pegawaiDetailModal');
+            const detailModalInst = detailModalEl ? bootstrap.Modal.getInstance(detailModalEl) : null;
+
+            if (detailModalInst) {
+                $(detailModalEl).one('hidden.bs.modal', function () {
+                    const listModalEl = document.getElementById('aggregateListModal');
+                    const listModalInst = bootstrap.Modal.getOrCreateInstance(listModalEl);
+                    listModalInst.show();
+                    window.isNavigatingBackToList = false;
+                });
+                detailModalInst.hide();
+            } else {
+                const listModalEl = document.getElementById('aggregateListModal');
+                const listModalInst = bootstrap.Modal.getOrCreateInstance(listModalEl);
+                listModalInst.show();
+                window.isNavigatingBackToList = false;
+            }
+        }
+
+        // Flip between employees in the current list
+        function navigatePegawaiDetail(direction) {
+            const ids = window.previousListPegawaiIds || [];
+            const currId = window.currentPegawaiId;
+            const currIndex = ids.indexOf(currId);
+
+            if (currIndex === -1 || ids.length <= 1) return;
+
+            const nextIndex = currIndex + direction;
+            if (nextIndex >= 0 && nextIndex < ids.length) {
+                const nextId = ids[nextIndex];
+                window.currentPegawaiId = nextId;
+                executeShowPegawaiDetail(nextId, true);
+            }
+        }
+
+        // Reset navigation state when detail modal is completely dismissed (unless returning to list)
+        $(document).ready(function() {
+            $('#pegawaiDetailModal').on('hidden.bs.modal', function () {
+                if (!window.isNavigatingBackToList) {
+                    window.hasPreviousListModal = false;
+                    window.previousListPegawaiIds = [];
+                    window.previousListTitle = '';
+                }
+            });
+
+            // Keyboard shortcut navigation (Left/Right arrow)
+            $(document).on('keydown', function(e) {
+                if (!$('#pegawaiDetailModal').hasClass('show')) return;
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    navigatePegawaiDetail(-1);
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    navigatePegawaiDetail(1);
+                }
+            });
+        });
+
         // Universal Function for Clickable Cards & Charts Modal Drill-Down
         function showAggregateModal(type, value = '', title = '') {
-            const modalEl = new bootstrap.Modal(document.getElementById('aggregateListModal'));
+            const modalEl = bootstrap.Modal.getOrCreateInstance(document.getElementById('aggregateListModal'));
             $('#aggregateListModalContent').html(`
                 <div class="modal-body text-center py-5">
                     <div class="spinner-border text-primary" role="status"></div>

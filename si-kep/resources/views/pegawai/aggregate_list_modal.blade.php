@@ -45,7 +45,7 @@
                     @php 
                         $kgb = $p->kgb_status; 
                     @endphp
-                    <tr class="modal-pegawai-row" role="button" onclick="showPegawaiDetail({{ $p->id }})" title="Klik untuk melihat profil lengkap">
+                    <tr class="modal-pegawai-row" role="button" data-pegawai-id="{{ $p->id }}" onclick="showPegawaiDetail({{ $p->id }})" title="Klik untuk melihat profil lengkap">
                         <td class="text-center text-muted fw-semibold ps-3">{{ $loop->iteration }}</td>
                         <td>
                             <div class="d-flex align-items-center gap-2">

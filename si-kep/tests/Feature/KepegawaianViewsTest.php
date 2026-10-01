@@ -497,5 +497,37 @@ class KepegawaianViewsTest extends TestCase
         $modalResponse->assertSee('Sesuai HRIS');
         $modalResponse->assertSee('Beda HRIS');
     }
+
+    /**
+     * Test modal profil pegawai memiliki elemen navigasi kembali ke daftar dan antar pegawai
+     */
+    public function test_detail_modal_contains_navigation_elements_back_to_list(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $pegawai = Pegawai::create([
+            'no_urut' => 20,
+            'nip' => '199501012020011001',
+            'nama' => 'Navigasi Tester',
+            'tipe_pegawai' => 'pns',
+            'is_active' => true,
+            'tmt_ue_iv' => '15/7/2022',
+            'lama_bertugas_ue_iv' => '4 thn 2 bln',
+        ]);
+
+        // 1. Cek detail modal memiliki tombol navigasi dan fungsi kembali
+        $detailResponse = $this->actingAs($user)->get("/pegawai/{$pegawai->id}/detail");
+        $detailResponse->assertStatus(200);
+        $detailResponse->assertSee('btnHeaderBackToList', false);
+        $detailResponse->assertSee('btnFooterBackToList', false);
+        $detailResponse->assertSee('backToAggregateList()', false);
+        $detailResponse->assertSee('navigatePegawaiDetail', false);
+        $detailResponse->assertSee('headerNavGroup', false);
+        $detailResponse->assertSee('footerNavGroup', false);
+
+        // 2. Cek filter modal memiliki data-pegawai-id untuk navigasi dinamis
+        $listResponse = $this->actingAs($user)->get('/pegawai/filter-modal?type=ue_iv');
+        $listResponse->assertStatus(200);
+        $listResponse->assertSee("data-pegawai-id=\"{$pegawai->id}\"", false);
+    }
 }
 
